@@ -2,15 +2,19 @@ package agent;
 
 import uchicago.src.sim.space.Object2DGrid;
 
+import java.awt.image.BufferedImage;
+
 /**
  * Created by sergi on 16/10/2016.
  */
 public class Human extends Agent {
 
-    private int radio_range = 5;
+    private static final int DEFAULT_RADIO_RANGE = 10;
 
-    public Human(int pos_x, int pos_y, Object2DGrid c, int id, int vision_range, int radio_range) {
-        super(pos_x, pos_y, c, id, vision_range);
+    private int radio_range = DEFAULT_RADIO_RANGE;
+
+    public Human(int pos_x, int pos_y, Object2DGrid c, BufferedImage icon, int id, int vision_range, int radio_range) {
+        super(pos_x, pos_y, c, icon, id, vision_range);
         this.radio_range = radio_range;
     }
 
@@ -21,4 +25,5 @@ public class Human extends Agent {
     public void setRadio_range(int radio_range) {
         this.radio_range = radio_range;
     }
+
 }

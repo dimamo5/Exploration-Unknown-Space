@@ -1,5 +1,6 @@
 package model;
 
+import sajas.sim.repast3.Repast3Launcher;
 import uchicago.src.sim.engine.BasicAction;
 import uchicago.src.sim.engine.Schedule;
 import uchicago.src.sim.engine.SimInit;
@@ -9,6 +10,7 @@ import uchicago.src.sim.gui.Object2DDisplay;
 import uchicago.src.sim.space.Object2DGrid;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -17,7 +19,7 @@ import java.util.Arrays;
 /**
  * Created by sergi on 12/11/2016.
  */
-public class Model extends SimModelImpl {
+public class Model extends Repast3Launcher {
 
     public DisplaySurface dsurf;
     public DisplaySurface dsurf2;
@@ -32,6 +34,7 @@ public class Model extends SimModelImpl {
     public Model() {
     }
 
+
     @Override
     public String[] getInitParam() {
         return new String[0];
@@ -45,6 +48,8 @@ public class Model extends SimModelImpl {
         createModel();
         createDisplay();
     }
+
+
 
     private void createDisplay(){
 
@@ -61,9 +66,8 @@ public class Model extends SimModelImpl {
         dsurf2.print();*/
 
         dsurf.addDisplayableProbeable(display,"Agent Space");
-        //surf.setBackground(Color.WHITE);
-        /*dsurf.setSize(400,100);
-        dsurf.setLocation(10,10);*/
+        dsurf.setBackground(Color.LIGHT_GRAY);
+        dsurf.setLocation(10,10);
         dsurf.display();
 
         /*dsurf.addDisplayableProbeable(getPrettyMap, "Agents Space");
@@ -117,6 +121,9 @@ public class Model extends SimModelImpl {
 
     @Override
     public void setup() {
+
+        //change properties of gui
+
         schedule = new Schedule();
         if (dsurf != null) dsurf.dispose();
         dsurf = new DisplaySurface(this, "Forest Display");
@@ -134,8 +141,9 @@ public class Model extends SimModelImpl {
 
     @Override
     public String getName() {
-        return null;
+        return "Exploration of Unknown Space -- SAJaS Repast3 Test";
     }
+
 
     private void buildSchedule() {
         //schedule.scheduleActionBeginning(0, new MainAction());
@@ -185,6 +193,11 @@ public class Model extends SimModelImpl {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+    }
+
+    @Override
+    protected void launchJADE() {  //TODO
 
     }
 

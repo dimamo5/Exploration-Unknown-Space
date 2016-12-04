@@ -1,10 +1,13 @@
 package agent;
 
+import SAJaS_related.SAJaSAgent;
 import model.MapElement;
+
 import uchicago.src.sim.space.Object2DGrid;
 
 import java.awt.image.BufferedImage;
 import java.util.Vector;
+
 
 /**
  * Created by sergi on 16/10/2016.
@@ -21,13 +24,14 @@ public class Agent extends MapElement {
 
     private static final int DEFAULT_VISION_RANGE = 5;
 
-
     private int id, vision_range = DEFAULT_VISION_RANGE,    //cells count
             current_dir = -1, previous_dir = -1;            //no current/previous direction at the begining
 
     // TODO: 16/10/2016 add agent's own map
 
     private boolean at_map_exit = false, found_map_exit = false;
+
+    private SAJaSAgent sajas_agent;
 
     //==================================== METHODS ====================================================//
 

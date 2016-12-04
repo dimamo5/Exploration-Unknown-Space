@@ -32,7 +32,7 @@ public class Agent extends MapElement {
     //==================================== METHODS ====================================================//
 
     public Agent(int pos_x, int pos_y, Object2DGrid c, BufferedImage icon, int id, int vision_range) {
-        super(pos_x, pos_y, c, icon);
+        super(pos_x, pos_y, c);
         this.id = id;
         this.vision_range = vision_range;
     }

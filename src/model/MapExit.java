@@ -9,7 +9,8 @@ import java.awt.image.BufferedImage;
  */
 public class MapExit extends MapElement {
 
-    public MapExit(int pos_x, int pos_y, Object2DGrid c, BufferedImage icon) {
-        super(pos_x, pos_y, c, icon);
+    public MapExit(int pos_x, int pos_y, Object2DGrid c) {
+        super(pos_x, pos_y, c);
     }
+
 }

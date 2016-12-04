@@ -235,7 +235,7 @@ public class Repast3ServiceConsumerProviderLauncher extends Repast3Launcher {
 
 	private void buildAndScheduleDisplay() {
 
-		// display surface
+		// getPrettyMap surface
 		if (dsurf != null) dsurf.dispose();
 		dsurf = new DisplaySurface(this, "Service Consumer/Provider Display");
 		registerDisplaySurface("Service Consumer/Provider Display", dsurf);

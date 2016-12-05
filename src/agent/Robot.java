@@ -2,6 +2,7 @@ package agent;
 
 import model.map.MapElement;
 import model.map.Obstacle;
+import sajas.core.behaviours.Behaviour;
 
 import java.util.ArrayList;
 import java.util.Vector;
@@ -30,6 +31,21 @@ public class Robot extends ExplorerAgent {
 
     public void getInfo() {
 
+    }
+
+    @Override
+    protected void setup() {
+        super.setup();
+    }
+
+    @Override
+    protected void takeDown() {
+        super.takeDown();
+    }
+
+    @Override
+    public void addBehaviour(Behaviour b) {
+        super.addBehaviour(b);
     }
 
 

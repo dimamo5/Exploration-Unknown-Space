@@ -1,8 +1,9 @@
 package agent;
 
-import SAJaS_related.SAJaSAgent;
-import model.MapElement;
-
+import sajas.core.Agent;
+import jade.content.lang.Codec;
+import jade.content.onto.Ontology;
+import model.map.MapElement;
 import uchicago.src.sim.space.Object2DGrid;
 
 import java.awt.image.BufferedImage;
@@ -12,7 +13,7 @@ import java.util.Vector;
 /**
  * Created by sergi on 16/10/2016.
  */
-public class Agent extends MapElement {
+public class ExplorerAgent extends Agent {
 
     /*
     * Dir:
@@ -31,12 +32,11 @@ public class Agent extends MapElement {
 
     private boolean at_map_exit = false, found_map_exit = false;
 
-    private SAJaSAgent sajas_agent;
-
+    private Codec codec;
+    private Ontology serviceOntology;
     //==================================== METHODS ====================================================//
 
-    public Agent(int pos_x, int pos_y, Object2DGrid c, BufferedImage icon, int id, int vision_range) {
-        super(pos_x, pos_y, c);
+    public ExplorerAgent(int id, int vision_range) {
         this.id = id;
         this.vision_range = vision_range;
     }
@@ -93,11 +93,4 @@ public class Agent extends MapElement {
     }
 
 
-    protected Vector<MapElement> get_closest_neighbors() {
-
-        //call to object2dGrid method
-        //vonneuman neighbours -> https://pt.wikipedia.org/wiki/Vizinhan%C3%A7a_de_von_Neumann
-
-        return map.getVonNeumannNeighbors(this.getX(),this.getY(), true);
-    }
 }

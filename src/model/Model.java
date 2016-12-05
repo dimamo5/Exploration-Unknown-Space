@@ -1,10 +1,13 @@
 package model;
 
+import model.map.Map;
+import model.map.MapElement;
+import model.map.Obstacle;
 import sajas.sim.repast3.Repast3Launcher;
+import sajas.wrapper.ContainerController;
 import uchicago.src.sim.engine.BasicAction;
 import uchicago.src.sim.engine.Schedule;
 import uchicago.src.sim.engine.SimInit;
-import uchicago.src.sim.engine.SimModelImpl;
 import uchicago.src.sim.gui.DisplaySurface;
 import uchicago.src.sim.gui.Object2DDisplay;
 import uchicago.src.sim.space.Object2DGrid;
@@ -14,22 +17,26 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * Created by sergi on 12/11/2016.
  */
 public class Model extends Repast3Launcher {
 
+    private static final boolean BATCH_MODE = true;
+
     public DisplaySurface dsurf;
     public DisplaySurface dsurf2;
     private Object2DGrid forest_space;
     private Object2DGrid heat_map_space;
-    private Schedule schedule;
-    private ArrayList<MapElement> assets_list;
     private Object2DDisplay heat_map_display;
+
+    private Schedule schedule;
+
+    private ArrayList<MapElement> assets_list;
     public static long tick = 0;
 
+    private ContainerController agentContainer;
 
     public Model() {
     }
@@ -37,11 +44,12 @@ public class Model extends Repast3Launcher {
 
     @Override
     public String[] getInitParam() {
-        return new String[0];
+        return new String[]{};
     }
 
     @Override
     public void begin() {
+        super.begin();
         forest_space = new Object2DGrid(10 ,10);
         heat_map_space = new Object2DGrid(10, 10);
 
@@ -58,14 +66,14 @@ public class Model extends Repast3Launcher {
 
         //heat_map_display = new Object2DDisplay(heat_map_space);
 
-       /* dsurf2.addDisplayableProbeable(heat_map_display,"Agent View");
+       /* dsurf2.addDisplayableProbeable(heat_map_display,"ExplorerAgent View");
         addSimEventListener(dsurf2);
         //dsurf2.setBackground(Color.GREEN);
         dsurf2.setSize(400,50);
         dsurf2.setLocation(280,80);
         dsurf2.print();*/
 
-        dsurf.addDisplayableProbeable(display,"Agent Space");
+        dsurf.addDisplayableProbeable(display,"ExplorerAgent Space");
         dsurf.setBackground(Color.LIGHT_GRAY);
         dsurf.setLocation(10,10);
         dsurf.display();
@@ -204,7 +212,11 @@ public class Model extends Repast3Launcher {
 
     public static void main(String args[]){
 
+        boolean runMode = !BATCH_MODE;   // BATCH_MODE or !BATCH_MODE = GUI_MODE
+
         SimInit init = new SimInit();
-        init.loadModel(new Model(), null, false);  //setting last param to true only displays surfaces
+        init.setNumRuns(1);   // works only in batch mode
+
+        init.loadModel(new Model(), null, runMode);  //setting last param to true only displays surfaces
     }
 }

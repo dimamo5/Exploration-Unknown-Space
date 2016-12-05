@@ -1,4 +1,4 @@
-package model;
+package model.map;
 
 import uchicago.src.sim.engine.Stepable;
 import uchicago.src.sim.gui.Drawable;
@@ -20,17 +20,17 @@ import java.awt.image.BufferedImage;
 public class MapElement implements Drawable, Stepable {
 
     private int pos_x, pos_y;
-    protected static Object2DGrid map;
+    //protected static Object2DGrid map;
     private static Image image;
 
-    public static Object2DGrid getMap() {
+   /* public static Object2DGrid getMap() {
         return map;
     }
 
     public static void setMap(Object2DGrid map) {
         MapElement.map = map;
     }
-
+*/
     public static Image getImage() {
         return image;
     }
@@ -42,7 +42,7 @@ public class MapElement implements Drawable, Stepable {
     public MapElement(int pos_x, int pos_y, Object2DGrid c) {
         this.pos_x = pos_x;
         this.pos_y = pos_y;
-        map = c;
+        //map = c;
     }
 
     @Override

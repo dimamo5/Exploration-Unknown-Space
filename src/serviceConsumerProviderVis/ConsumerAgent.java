@@ -80,7 +80,7 @@ public class ConsumerAgent extends Agent {
 		serviceOntology = ServiceOntology.getInstance();
 		getContentManager().registerLanguage(codec);
 		getContentManager().registerOntology(serviceOntology);
-		
+
 		// subscribe DF
 		DFAgentDescription template = new DFAgentDescription();
 		ServiceDescription sd = new ServiceDescription();
@@ -100,7 +100,7 @@ public class ConsumerAgent extends Agent {
 		} catch (CodecException | OntologyException e) {
 			e.printStackTrace();
 		}
-		
+
 		// waker behaviour for starting CNets
 		addBehaviour(new StartCNets(this, 2000));
 	}

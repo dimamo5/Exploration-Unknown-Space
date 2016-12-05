@@ -241,8 +241,8 @@ public class Repast3ServiceConsumerProviderLauncher extends Repast3Launcher {
 		registerDisplaySurface("Service Consumer/Provider Display", dsurf);
 		Network2DDisplay display = new Network2DDisplay(nodes,WIDTH,HEIGHT);
 		dsurf.addDisplayableProbeable(display, "Network Display");
-        dsurf.addZoomable(display);
-        addSimEventListener(dsurf);
+		dsurf.addZoomable(display);
+		addSimEventListener(dsurf);
 		dsurf.display();
 
 		// graph

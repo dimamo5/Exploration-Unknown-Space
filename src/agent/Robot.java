@@ -1,26 +1,22 @@
 package agent;
 
-import model.EmptySpace;
-import model.MapElement;
-import model.Obstacle;
-import uchicago.src.sim.engine.gui.components.ArrayListListModel;
-import uchicago.src.sim.space.Object2DGrid;
+import model.map.MapElement;
+import model.map.Obstacle;
 
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Vector;
 
 /**
  * Created by sergi on 16/10/2016.
  */
-public class Robot extends Agent {
+public class Robot extends ExplorerAgent {
 
     private static final int DEFAULT_ENERGY = 15; //15 cells/turns by default
 
     private int energy = DEFAULT_ENERGY;
 
-    public Robot(int pos_x, int pos_y, Object2DGrid c, BufferedImage icon, int id, int vision_range, int energy) {
-        super(pos_x, pos_y, c, icon, id, vision_range);
+    public Robot(int id, int vision_range, int energy) {
+        super(id, vision_range);
         this.energy = energy;
     }
 
@@ -36,10 +32,6 @@ public class Robot extends Agent {
 
     }
 
-    public void step() {
-        if (energy-- > 0)
-            move();
-    }
 
     private void move() {
 
@@ -51,9 +43,9 @@ public class Robot extends Agent {
 
     private void move_random(){ //can the robot move after finding the exit????
 
-        Vector<MapElement> neighbors = get_closest_neighbors();
+       // Vector<MapElement> neighbors = get_closest_neighbors();
 
-        get_neighbors_empty_spaces(neighbors);
+       // get_neighbors_empty_spaces(neighbors);
 
         //TODO.....move
 

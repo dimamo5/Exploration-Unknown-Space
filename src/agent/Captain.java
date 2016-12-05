@@ -1,5 +1,6 @@
 package agent;
 
+import sajas.core.behaviours.Behaviour;
 import uchicago.src.sim.space.Object2DGrid;
 
 import java.awt.image.BufferedImage;
@@ -28,4 +29,21 @@ public class Captain extends Human {
     public void move(){
 
     }
+
+    @Override
+    protected void setup() {
+        super.setup();
+    }
+
+    @Override
+    protected void takeDown() {
+        super.takeDown();
+    }
+
+    @Override
+    public void addBehaviour(Behaviour b) {
+        super.addBehaviour(b);
+    }
+
+
 }

@@ -1,4 +1,4 @@
-package model;
+package model.map;
 
 import java.io.*;
 import java.nio.file.FileSystems;

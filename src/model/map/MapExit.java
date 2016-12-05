@@ -1,8 +1,6 @@
-package model;
+package model.map;
 
 import uchicago.src.sim.space.Object2DGrid;
-
-import java.awt.image.BufferedImage;
 
 /**
  * Created by sergi on 12/11/2016.

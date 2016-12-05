@@ -1,13 +1,14 @@
 package agent;
 
+import jade.domain.FIPAAgentManagement.DFAgentDescription;
+import jade.domain.FIPAException;
+import jade.lang.acl.ACLMessage;
+import model.map.AgentModel;
 import sajas.core.Agent;
 import jade.content.lang.Codec;
 import jade.content.onto.Ontology;
-import model.map.MapElement;
-import uchicago.src.sim.space.Object2DGrid;
-
-import java.awt.image.BufferedImage;
-import java.util.Vector;
+import sajas.domain.DFService;
+import sajas.proto.SubscriptionInitiator;
 
 
 /**
@@ -31,6 +32,16 @@ public class ExplorerAgent extends Agent {
     // TODO: 16/10/2016 add agent's own map
 
     private boolean at_map_exit = false, found_map_exit = false;
+    private AgentModel model_link;
+
+    public AgentModel getModel_link() {
+        return model_link;
+    }
+
+    public void setModel_link(AgentModel model_link) {
+        this.model_link = model_link;
+    }
+
 
     private Codec codec;
     private Ontology serviceOntology;
@@ -40,6 +51,29 @@ public class ExplorerAgent extends Agent {
         this.id = id;
         this.vision_range = vision_range;
     }
+
+    private class DFSubscInit extends SubscriptionInitiator {
+
+        private static final long serialVersionUID = 1L;
+
+        DFSubscInit(Agent agent, DFAgentDescription dfad) {
+            super(agent, DFService.createSubscriptionMessage(agent, getDefaultDF(), dfad, null));
+        }
+
+        protected void handleInform(ACLMessage inform) {
+            try {
+                DFAgentDescription[] dfads = DFService.decodeNotification(inform.getContent());
+               /* for(int i = 0; i < dfads.length; i++) {
+                    AID agent = dfads[i].getName();
+                    ((ConsumerAgent) myAgent).addProvider(agent);
+                }*/
+            } catch (FIPAException fe) {
+                fe.printStackTrace();
+            }
+        }
+
+    }
+
 
     public int getCurrent_dir() {
         return current_dir;
@@ -80,6 +114,7 @@ public class ExplorerAgent extends Agent {
     public void setAt_map_exit(boolean at_map_exit) {
         this.at_map_exit = at_map_exit;
     }
+
     public boolean isAt_map_exit() {
         return at_map_exit;
     }

@@ -1,5 +1,6 @@
 package model.map;
 
+import uchicago.src.sim.gui.SimGraphics;
 import uchicago.src.sim.space.Object2DGrid;
 
 

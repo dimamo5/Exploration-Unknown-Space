@@ -1,7 +1,9 @@
 package onto;
 
 import jade.content.onto.BeanOntology;
+import jade.content.onto.BeanOntologyException;
 import jade.content.onto.Ontology;
+import model.map.ViewMap;
 
 /**
  * Created by sergi on 05/12/2016.
@@ -22,11 +24,11 @@ public class ExplorationOntology extends BeanOntology{
     private ExplorationOntology() {
         super(ONTOLOGY_NAME);
 
-       /* try {
+       try {
             // add all Concept, Predicate and AgentAction
-            //add(classname.class);
+             add(ViewMap.class);
         } catch(BeanOntologyException boe) {
             boe.printStackTrace();
-        }*/
+        }
     }
 }

@@ -10,11 +10,10 @@ import java.awt.image.BufferedImage;
  */
 public class Captain extends Human {
 
-
     public int cellphone_range;
 
-    public Captain(int pos_x, int pos_y, Object2DGrid c, BufferedImage icon, int id, int vision_range, int radio_range, int cellphone_range) {
-        super(pos_x, pos_y, c, icon, id, vision_range, radio_range);
+    public Captain(int id, int vision_range, int radio_range, int cellphone_range) {
+        super(id, vision_range, radio_range);
         this.cellphone_range = cellphone_range;
     }
 

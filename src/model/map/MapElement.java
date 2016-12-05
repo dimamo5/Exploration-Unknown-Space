@@ -20,23 +20,14 @@ import java.awt.image.BufferedImage;
 public class MapElement implements Drawable, Stepable {
 
     private int pos_x, pos_y;
-    //protected static Object2DGrid map;
-    private static Image image;
+    private Image image;
 
-   /* public static Object2DGrid getMap() {
-        return map;
-    }
-
-    public static void setMap(Object2DGrid map) {
-        MapElement.map = map;
-    }
-*/
-    public static Image getImage() {
+    public Image getImage() {
         return image;
     }
 
-    public static void setImage(BufferedImage image) {
-        MapElement.image = image;
+    public void setImage(BufferedImage image) {
+        this.image = image;
     }
 
     public MapElement(int pos_x, int pos_y, Object2DGrid c) {

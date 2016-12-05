@@ -1,15 +1,18 @@
 package model;
 
+import agent.Captain;
+import jade.core.Profile;
+import jade.core.ProfileImpl;
+import model.map.AgentModel;
 import model.map.Map;
-import model.map.MapElement;
 import model.map.Obstacle;
+import sajas.core.Runtime;
 import sajas.sim.repast3.Repast3Launcher;
 import sajas.wrapper.ContainerController;
 import uchicago.src.sim.engine.BasicAction;
 import uchicago.src.sim.engine.Schedule;
 import uchicago.src.sim.engine.SimInit;
-import uchicago.src.sim.gui.DisplaySurface;
-import uchicago.src.sim.gui.Object2DDisplay;
+import uchicago.src.sim.gui.*;
 import uchicago.src.sim.space.Object2DGrid;
 
 import javax.imageio.ImageIO;
@@ -32,8 +35,9 @@ public class Model extends Repast3Launcher {
     private Object2DDisplay heat_map_display;
 
     private Schedule schedule;
+    private ContainerController mainContainer;
 
-    private ArrayList<MapElement> assets_list;
+    private ArrayList<Object> display_list;
     public static long tick = 0;
 
     private ContainerController agentContainer;
@@ -49,7 +53,7 @@ public class Model extends Repast3Launcher {
 
     @Override
     public void begin() {
-        forest_space = new Object2DGrid(10 ,10);
+        forest_space = new Object2DGrid(10, 10);
         heat_map_space = new Object2DGrid(10, 10);
 
         createModel();
@@ -57,11 +61,10 @@ public class Model extends Repast3Launcher {
     }
 
 
-
-    private void createDisplay(){
+    private void createDisplay() {
 
         Object2DDisplay display = new Object2DDisplay(forest_space);
-        display.setObjectList(assets_list);
+        display.setObjectList(display_list);
 
         //heat_map_display = new Object2DDisplay(heat_map_space);
 
@@ -72,9 +75,9 @@ public class Model extends Repast3Launcher {
         dsurf2.setLocation(280,80);
         //dsurf2.print();*/
 
-        dsurf.addDisplayableProbeable(display,"ExplorerAgent Space");
+        dsurf.addDisplayableProbeable(display, "ExplorerAgent Space");
         dsurf.setBackground(Color.LIGHT_GRAY);
-        dsurf.setLocation(10,10);
+        dsurf.setLocation(10, 10);
         dsurf.display();
 
         /*dsurf.addDisplayableProbeable(getPrettyMap, "Agents Space");
@@ -85,16 +88,16 @@ public class Model extends Repast3Launcher {
         dsurf.setVisible(true);*/
     }
 
-    private void createModel(){
-        assets_list = new ArrayList<>();
+    private void createModel() {
+        display_list = new ArrayList<>();
 
-        Map forest = new Map(10,10);
+        Map forest = new Map(10, 10);
 
         forest.print(); //prints map on console
 
         //Map model
-        forest_space = new Object2DGrid(forest.getWidth()-1,forest.getHeight()); //-1 ignores '\n'
-        heat_map_space = new Object2DGrid(forest.getWidth()-1,forest.getHeight());
+        forest_space = new Object2DGrid(forest.getWidth() - 1, forest.getHeight()); //-1 ignores '\n'
+        heat_map_space = new Object2DGrid(forest.getWidth() - 1, forest.getHeight());
 
 
         for (int y = 0; y < forest_space.getSizeY(); y++) {
@@ -103,12 +106,17 @@ public class Model extends Repast3Launcher {
                 char c = forest.getMap_in_array()[y][x];
 
                 if (c != ' ' && c != '\n') {
-                    Obstacle tree = new Obstacle(x,y,forest_space);
-                    assets_list.add(tree);
+                    Obstacle tree = new Obstacle(x, y, forest_space);
+                    try {
+                        tree.setImage(ImageIO.read(new File("res/icons/tree.png")));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    display_list.add(tree);
                     forest_space.putObjectAt(x, y, tree);
-                }
-                else if(c!= '\n')
-                {
+
+                } else if (c != '\n') {
+
                     //Node n = new Node(i,j);
                     //prevgraph.add(n);
                     //EmptySpace empty_space = new EmptySpace(i,j, forest_space);
@@ -119,7 +127,8 @@ public class Model extends Repast3Launcher {
             }
         }
 
-        setMapImages();
+        launchAgents();
+
     }
 
     @Override
@@ -150,7 +159,7 @@ public class Model extends Repast3Launcher {
 
     private void buildSchedule() {
         //schedule.scheduleActionBeginning(0, new MainAction());
-        schedule.scheduleActionBeginning (1, this, "step");
+        schedule.scheduleActionBeginning(1, this, "step");
         schedule.scheduleActionAtInterval(1, dsurf, "updateDisplay", Schedule.LAST);
         schedule.scheduleActionAtInterval(1, dsurf2, "updateDisplay", Schedule.LAST);
     }
@@ -169,43 +178,55 @@ public class Model extends Repast3Launcher {
         }
     }
 
-    public void step () {
+    public void step() {
         tick++;
     }
 
-    private void spread_agents( /*empty_spaces*/){
+    private void spread_agents( /*empty_spaces*/) {
         //distribui agentes pelos espaços vazios
     }
 
-    private void init_model(){
+    private void init_model() {
 
     }
 
-    private void make_display(){
+    private void make_display() {
         //panel graphics + listeners
     }
 
-    private void setMapImages(){
-        try {
-            Obstacle.setImage(ImageIO.read(new File("res/icons/tree.png")));
 
-           /* MapExit.setImage(ImageIO.read(new File()));
-            Captain.setImage(ImageIO.read(new File()));
-            Soldier.setImage(ImageIO.read(new File()));
-            Robot.setImage(ImageIO.read(new File()));*/
-        } catch (IOException e) {
-            e.printStackTrace();
+    @Override
+    protected void launchJADE() {
+        Runtime rt = Runtime.instance();
+        Profile p1 = new ProfileImpl();
+
+        mainContainer = rt.createMainContainer(p1);
+
+        //launchAgents();
+    }
+
+    private void launchAgents() {
+
+        //todo
+        //use input params: N_CAPTAIN, N_SOLDIER, N_ROBOT
+        //use random to generate agent's position
+
+        int n = 2;
+
+        ArrayList<Captain> agents = new ArrayList<>();
+
+        for (int i = 0; i < n; i++) {
+            Captain cap = new Captain(5,5,5,5 );
+            cap.setModel_link(new AgentModel(5+i,5+i,forest_space, AgentModel.agent_type.CAPTAIN));
+            display_list.add(cap.getModel_link());
+            forest_space.putObjectAt(5+i,5+i, cap.getModel_link());
+            agents.add(cap);
         }
 
     }
 
-    @Override
-    protected void launchJADE() {  //TODO
 
-    }
-
-
-    public static void main(String args[]){
+    public static void main(String args[]) {
 
         boolean runMode = !BATCH_MODE;   // BATCH_MODE or !BATCH_MODE = GUI_MODE
 

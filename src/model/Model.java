@@ -49,7 +49,6 @@ public class Model extends Repast3Launcher {
 
     @Override
     public void begin() {
-        super.begin();
         forest_space = new Object2DGrid(10 ,10);
         heat_map_space = new Object2DGrid(10, 10);
 
@@ -66,12 +65,12 @@ public class Model extends Repast3Launcher {
 
         //heat_map_display = new Object2DDisplay(heat_map_space);
 
-       /* dsurf2.addDisplayableProbeable(heat_map_display,"ExplorerAgent View");
+        /*dsurf2.addDisplayableProbeable(heat_map_display,"ExplorerAgent View");
         addSimEventListener(dsurf2);
         //dsurf2.setBackground(Color.GREEN);
         dsurf2.setSize(400,50);
         dsurf2.setLocation(280,80);
-        dsurf2.print();*/
+        //dsurf2.print();*/
 
         dsurf.addDisplayableProbeable(display,"ExplorerAgent Space");
         dsurf.setBackground(Color.LIGHT_GRAY);
@@ -91,15 +90,11 @@ public class Model extends Repast3Launcher {
 
         Map forest = new Map(10,10);
 
-        //forest.print(); //prints map on console
+        forest.print(); //prints map on console
 
         //Map model
         forest_space = new Object2DGrid(forest.getWidth()-1,forest.getHeight()); //-1 ignores '\n'
         heat_map_space = new Object2DGrid(forest.getWidth()-1,forest.getHeight());
-
-
-        //alter this to show paredes e assim ter em atenção os sizes
-        //correr o Model.main para perceber
 
 
         for (int y = 0; y < forest_space.getSizeY(); y++) {

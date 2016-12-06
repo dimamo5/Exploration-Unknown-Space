@@ -221,8 +221,10 @@ public class Map {
     public static void main(String[] args) {
 
         Map map = new Map(10, 10);
-        for(int i = 0; i< map.getHeight(); i++)
-            System.out.println(Arrays.toString(map.getMap_in_array()[i]));
+        for(int i = 0; i< map.getInput_height(); i++) {
+            System.out.println(Arrays.toString(map.getMap()[i]));
+            //System.out.println(Arrays.toString(map.getMap_in_array()[i]));
+        }
 
     }
 }

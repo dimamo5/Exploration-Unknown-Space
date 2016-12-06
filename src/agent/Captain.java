@@ -63,11 +63,10 @@ public class Captain extends Human {
                 ACLMessage msg = myAgent.receive();
 
                 try {
-                    System.out.println((String)msg.getContentObject());
+                    System.out.println((String) msg.getContentObject());
                 } catch (UnreadableException e) {
                     e.printStackTrace();
                 }
-
             }
 
         });

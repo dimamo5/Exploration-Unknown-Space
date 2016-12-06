@@ -86,6 +86,7 @@ public class Model extends Repast3Launcher {
 
         display_list = new ArrayList<>();
 
+        //todo width+height must be input params
         Map forest = new Map(10, 10);
 
         forest.print(); //prints map on console
@@ -137,10 +138,7 @@ public class Model extends Repast3Launcher {
         registerDisplaySurface("Heat Display", dsurf2);*/
     }
 
-   /* @Override
-    public Schedule getSchedule() {
-        return schedule;
-    }*/
+
 
     @Override
     public String getName() {

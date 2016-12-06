@@ -15,15 +15,14 @@ public class AgentModel extends MapElement {
 
     protected static Object2DGrid map; //todo verificar se é suposto isto tar aqui
     private final ArrayList<ExplorerAgent> agents_list;
-
-    public ArrayList<ExplorerAgent> getAgents_list() {
-        return agents_list;
-    }
+    private agent_type type;
     //TODO: é necessário obter os vizinhos através do método de vonneuman ? se sim deve ser feito nesta classe?
 
-    public enum agent_type {CAPTAIN, SOLDIER, ROBOT}
-
-    private agent_type type;
+    public AgentModel(int pos_x, int pos_y, Object2DGrid c, agent_type type, ArrayList<ExplorerAgent> agents) {
+        super(pos_x, pos_y, c);
+        this.type = type;
+        this.agents_list = agents;
+    }
 
     public static Object2DGrid getMap() {
         return map;
@@ -33,18 +32,16 @@ public class AgentModel extends MapElement {
         AgentModel.map = map;
     }
 
+    public ArrayList<ExplorerAgent> getAgents_list() {
+        return agents_list;
+    }
+
     public agent_type getType() {
         return type;
     }
 
     public void setType(agent_type type) {
         this.type = type;
-    }
-
-    public AgentModel(int pos_x, int pos_y, Object2DGrid c, agent_type type, ArrayList<ExplorerAgent> agents) {
-        super(pos_x, pos_y, c);
-        this.type = type;
-        this.agents_list = agents;
     }
 
     protected Vector<MapElement> get_closest_neighbors() {
@@ -62,10 +59,11 @@ public class AgentModel extends MapElement {
     public void draw(SimGraphics simGraphics) {
         switch (type) {
             case CAPTAIN:
-                simGraphics.drawFastCircle(Color.ORANGE);
+                //TODO agentModel receives label param and uses it in last param of bellow call at <"agent">
+                simGraphics.drawStringInOval(Color.cyan,Color.white, "agent");
                 break;
             case SOLDIER:
-                simGraphics.drawFastCircle(Color.cyan);
+                simGraphics.drawFastCircle(Color.ORANGE);
                 break;
             case ROBOT:
                 simGraphics.drawFastCircle(Color.red);
@@ -74,4 +72,6 @@ public class AgentModel extends MapElement {
                 break;
         }
     }
+
+    public enum agent_type {CAPTAIN, SOLDIER, ROBOT}
 }

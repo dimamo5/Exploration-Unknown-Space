@@ -1,9 +1,11 @@
 package model.map;
 
+import agent.ExplorerAgent;
 import uchicago.src.sim.gui.SimGraphics;
 import uchicago.src.sim.space.Object2DGrid;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.Vector;
 
 /**
@@ -12,6 +14,11 @@ import java.util.Vector;
 public class AgentModel extends MapElement {
 
     protected static Object2DGrid map; //todo verificar se é suposto isto tar aqui
+    private final ArrayList<ExplorerAgent> agents_list;
+
+    public ArrayList<ExplorerAgent> getAgents_list() {
+        return agents_list;
+    }
     //TODO: é necessário obter os vizinhos através do método de vonneuman ? se sim deve ser feito nesta classe?
 
     public enum agent_type {CAPTAIN, SOLDIER, ROBOT}
@@ -34,9 +41,10 @@ public class AgentModel extends MapElement {
         this.type = type;
     }
 
-    public AgentModel(int pos_x, int pos_y, Object2DGrid c, agent_type type) {
+    public AgentModel(int pos_x, int pos_y, Object2DGrid c, agent_type type, ArrayList<ExplorerAgent> agents) {
         super(pos_x, pos_y, c);
         this.type = type;
+        this.agents_list = agents;
     }
 
     protected Vector<MapElement> get_closest_neighbors() {

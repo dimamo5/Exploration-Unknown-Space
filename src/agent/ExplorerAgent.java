@@ -43,35 +43,11 @@ public class ExplorerAgent extends Agent {
     }
 
 
-    private Codec codec;
-    private Ontology serviceOntology;
     //==================================== METHODS ====================================================//
 
     public ExplorerAgent(int id, int vision_range) {
         this.id = id;
         this.vision_range = vision_range;
-    }
-
-    private class DFSubscInit extends SubscriptionInitiator {
-
-        private static final long serialVersionUID = 1L;
-
-        DFSubscInit(Agent agent, DFAgentDescription dfad) {
-            super(agent, DFService.createSubscriptionMessage(agent, getDefaultDF(), dfad, null));
-        }
-
-        protected void handleInform(ACLMessage inform) {
-            try {
-                DFAgentDescription[] dfads = DFService.decodeNotification(inform.getContent());
-               /* for(int i = 0; i < dfads.length; i++) {
-                    AID agent = dfads[i].getName();
-                    ((ConsumerAgent) myAgent).addProvider(agent);
-                }*/
-            } catch (FIPAException fe) {
-                fe.printStackTrace();
-            }
-        }
-
     }
 
 

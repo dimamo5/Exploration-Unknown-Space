@@ -1,6 +1,7 @@
 package model;
 
 import agent.Captain;
+import agent.ExplorerAgent;
 import jade.core.Profile;
 import jade.core.ProfileImpl;
 import jade.wrapper.StaleProxyException;
@@ -36,12 +37,12 @@ public class Model extends Repast3Launcher {
     private Object2DDisplay heat_map_display;
 
     private Schedule schedule;
-    private ContainerController mainContainer;
+    private ContainerController agentContainer;
 
     private ArrayList<Object> display_list;
     public static long tick = 0;
 
-    private ContainerController agentContainer;
+    private ArrayList<ExplorerAgent> agents_list;
 
     public Model() {
         super();
@@ -55,15 +56,15 @@ public class Model extends Repast3Launcher {
 
     @Override
     public void begin() {
+
+        createModel();
+        createDisplay();
+        buildSchedule();
         super.begin();
-        //createModel();
-        //createDisplay();
     }
 
 
     private void createDisplay() {
-
-
         Object2DDisplay display = new Object2DDisplay(forest_space);
         display.setObjectList(display_list);
         //heat_map_display = new Object2DDisplay(heat_map_space);
@@ -79,13 +80,6 @@ public class Model extends Repast3Launcher {
         dsurf.setBackground(Color.LIGHT_GRAY);
         dsurf.setLocation(10, 10);
         dsurf.display();
-
-        /*dsurf.addDisplayableProbeable(getPrettyMap, "Agents Space");
-        dsurf.setBackground(new Color(50,100,50));
-        dsurf.setSize(100, 100);
-        dsurf.setVisible(true);
-        dsurf.getPrettyMap();
-        dsurf.setVisible(true);*/
     }
 
     private void createModel() {
@@ -99,8 +93,6 @@ public class Model extends Repast3Launcher {
         //Map model
         forest_space = new Object2DGrid(forest.getWidth() - 1, forest.getHeight()); //-1 ignores '\n'
         heat_map_space = new Object2DGrid(forest.getWidth() - 1, forest.getHeight());
-
-        System.out.println(forest_space.getSizeX()+ " " + forest_space.getSizeY());
 
 
         for (int y = 0; y < forest_space.getSizeY(); y++) {
@@ -136,8 +128,6 @@ public class Model extends Repast3Launcher {
         super.setup();
         //change properties of gui
 
-        schedule = new Schedule();
-
         if (dsurf != null) dsurf.dispose();
         dsurf = new DisplaySurface(this, "Forest Display");
         registerDisplaySurface("Forest Display", dsurf);
@@ -147,10 +137,10 @@ public class Model extends Repast3Launcher {
         registerDisplaySurface("Heat Display", dsurf2);*/
     }
 
-    @Override
+   /* @Override
     public Schedule getSchedule() {
         return schedule;
-    }
+    }*/
 
     @Override
     public String getName() {
@@ -159,10 +149,7 @@ public class Model extends Repast3Launcher {
 
 
     private void buildSchedule() {
-        //schedule.scheduleActionBeginning(0, new MainAction());
-        schedule.scheduleActionBeginning(1, this, "step");
-        schedule.scheduleActionAtInterval(1, dsurf, "updateDisplay", Schedule.LAST);
-        //schedule.scheduleActionAtInterval(1, dsurf2, "updateDisplay", Schedule.LAST);
+        getSchedule().scheduleActionAtInterval(1, dsurf, "updateDisplay", Schedule.LAST);
     }
 
 
@@ -177,10 +164,6 @@ public class Model extends Repast3Launcher {
                 agentList.get(i).step();
             }*/
         }
-    }
-
-    public void step() {
-        tick++;
     }
 
     private void spread_agents( /*empty_spaces*/) {
@@ -198,15 +181,11 @@ public class Model extends Repast3Launcher {
 
     @Override
     protected void launchJADE() {
-        System.out.println("ahsahdhaskdb");
-
         Runtime rt = Runtime.instance();
         Profile p1 = new ProfileImpl();
 
-        mainContainer = rt.createMainContainer(p1);
+        agentContainer = rt.createMainContainer(p1);
 
-        createModel();
-        createDisplay();
         launchAgents();
     }
 
@@ -216,20 +195,23 @@ public class Model extends Repast3Launcher {
         //use input params: N_CAPTAIN, N_SOLDIER, N_ROBOT
         //use random to generate agent's position
 
+        agents_list = new ArrayList<>();
         int n = 2;
 
         for (int i = 0; i < n; i++) {
-            Captain cap = new Captain(5,5,5,5 );
-            cap.setModel_link(new AgentModel(5+i,5+i,forest_space, AgentModel.agent_type.CAPTAIN));
-            display_list.add(cap.getModel_link());
-            forest_space.putObjectAt(5+i,5+i, cap.getModel_link());
+            Captain cap = new Captain(5+i,5,5,5 );
+            cap.setModel_link(new AgentModel(5+i,5+i,forest_space, AgentModel.agent_type.CAPTAIN, agents_list));
+
             try {
-                mainContainer.acceptNewAgent("Captain #"+i,cap).start();
+                agentContainer.acceptNewAgent("Captain #"+i,cap).start();
             } catch (StaleProxyException e) {
                 e.printStackTrace();
             }
-        }
+            agents_list.add(cap);
 
+            display_list.add(cap.getModel_link());
+            forest_space.putObjectAt(5+i,5+i, cap.getModel_link());
+        }
     }
 
 

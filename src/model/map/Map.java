@@ -13,10 +13,7 @@ public class Map {
     private int[][] map;
     private int[][] map_in_array;
     private int[] exit;
-
-    public int[][] getMap_in_array() {
-        return map_in_array;
-    }
+    private DIR exitSide;
 
     public Map(int width, int height) {
 
@@ -34,6 +31,24 @@ public class Map {
         map_in_array[this.exit[1]][this.exit[0]] = 2;
     }
 
+    private static boolean between(int v, int upper) {
+        return (v >= 0) && (v < upper);
+    }
+
+    public static void main(String[] args) {
+
+        Map map = new Map(10, 10);
+        map.print();
+
+        for (int i = 0; i < map.getHeight(); i++)
+            System.out.println(Arrays.toString(map.map_in_array[i]));
+
+    }
+
+    public int[][] getMap_in_array() {
+        return map_in_array;
+    }
+
     public int[][] getMap() {
         return map;
     }
@@ -42,30 +57,8 @@ public class Map {
         this.map = map;
     }
 
-    private static boolean between(int v, int upper) {
-        return (v >= 0) && (v < upper);
-    }
-
-    private enum DIR {
-        N(1, 0, -1), S(2, 0, 1), E(4, 1, 0), W(8, -1, 0);
-        private final int bit;
-        private final int dx;
-        private final int dy;
-        private DIR opposite;
-
-        // use the static initializer to resolve forward references
-        static {
-            N.opposite = S;
-            S.opposite = N;
-            E.opposite = W;
-            W.opposite = E;
-        }
-
-        DIR(int bit, int dx, int dy) {
-            this.bit = bit;
-            this.dx = dx;
-            this.dy = dy;
-        }
+    public DIR getExitSide() {
+        return exitSide;
     }
 
     public int getWidth() {
@@ -184,24 +177,28 @@ public class Map {
                 case 0:
                     if (map_in_array[1][pos] == 0) {
                         this.exit = new int[]{pos, 0};
+                        this.exitSide =DIR.N;
                         return;
                     }
                     break;
                 case 1:
                     if (map_in_array[pos][this.width - 2] == 0) {
                         this.exit = new int[]{this.width - 1, pos};
+                        this.exitSide =DIR.E;
                         return;
                     }
                     break;
                 case 2:
                     if (map_in_array[this.height - 2][pos] == 0) {
                         this.exit = new int[]{pos, this.height - 1};
+                        this.exitSide =DIR.S;
                         return;
                     }
                     break;
                 case 3:
                     if (map_in_array[pos][1] == 0) {
                         this.exit = new int[]{0, pos};
+                        this.exitSide =DIR.W;
                         return;
                     }
                     break;
@@ -209,13 +206,25 @@ public class Map {
         }
     }
 
-    public static void main(String[] args) {
+    private enum DIR {
+        N(1, 0, -1), S(2, 0, 1), E(4, 1, 0), W(8, -1, 0);
+        // use the static initializer to resolve forward references
+        static {
+            N.opposite = S;
+            S.opposite = N;
+            E.opposite = W;
+            W.opposite = E;
+        }
 
-        Map map = new Map(10, 10);
-        map.print();
+        private final int bit;
+        private final int dx;
+        private final int dy;
+        private DIR opposite;
 
-        for (int i = 0; i < map.getHeight(); i++)
-            System.out.println(Arrays.toString(map.map_in_array[i]));
-
+        DIR(int bit, int dx, int dy) {
+            this.bit = bit;
+            this.dx = dx;
+            this.dy = dy;
+        }
     }
 }

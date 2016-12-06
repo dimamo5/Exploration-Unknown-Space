@@ -87,13 +87,13 @@ public class Model extends Repast3Launcher {
 
         display_list = new ArrayList<>();
 
-        Map forest = new Map(10, 10);
+        Map forest = new Map(20, 20);
 
         forest.print(); //prints map on console
 
         //Map model
-        forest_space = new Object2DGrid(forest.getWidth() - 1, forest.getHeight()); //-1 ignores '\n'
-        heat_map_space = new Object2DGrid(forest.getWidth() - 1, forest.getHeight());
+        forest_space = new Object2DGrid(forest.getWidth(), forest.getHeight());
+        heat_map_space = new Object2DGrid(forest.getWidth(), forest.getHeight());
 
 
         for (int y = 0; y < forest_space.getSizeY(); y++) {

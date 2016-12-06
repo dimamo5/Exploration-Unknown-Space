@@ -1,47 +1,21 @@
 package model.map;
 
-import java.io.*;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Random;
 
 /**
  * Created by sergi on 16/10/2016.
  */
 public class Map {
 
-    private int input_width,input_height, width, height;
+    private int input_width, input_height, width, height;
     private int[][] map;
-    private char[][] map_in_array;
+    private int[][] map_in_array;
+    private int[] exit;
 
-    public char[][] getMap_in_array() {
+    public int[][] getMap_in_array() {
         return map_in_array;
-    }
-
-    public void setMap_in_array(char[][] map_in_array) {
-        this.map_in_array = map_in_array;
-    }
-
-    public int getInput_width() {
-        return input_width;
-    }
-
-    public void setInput_width(int input_width) {
-        this.input_width = input_width;
-    }
-
-    public int getInput_height() {
-        return input_height;
-    }
-
-    public void setInput_height(int input_height) {
-        this.input_height = input_height;
-    }
-
-    public Map(String filename) {
-        load_map(filename);
     }
 
     public Map(int width, int height) {
@@ -52,9 +26,12 @@ public class Map {
         map = new int[this.input_width][this.input_height];
         generateMaze(0, 0);
 
-        this.width = width*2+2;
-        this.height = height*2+1;
-        this.map_in_array = getMapInArray();
+        this.width = width * 2 + 1;
+        this.height = height * 2 + 1;
+        map_in_array = new int[this.height][this.width];
+        getMapInArray();
+        createExit();
+        map_in_array[this.exit[1]][this.exit[0]] = 2;
     }
 
     public int[][] getMap() {
@@ -84,7 +61,7 @@ public class Map {
             W.opposite = E;
         }
 
-        private DIR(int bit, int dx, int dy) {
+        DIR(int bit, int dx, int dy) {
             this.bit = bit;
             this.dx = dx;
             this.dy = dy;
@@ -95,16 +72,8 @@ public class Map {
         return width;
     }
 
-    public void setWidth(int width) {
-        this.width = width;
-    }
-
     public int getHeight() {
         return height;
-    }
-
-    public void setHeight(int height) {
-        this.height = height;
     }
 
     private void generateMaze(int cx, int cy) {
@@ -121,48 +90,6 @@ public class Map {
             }
         }
     }
-
-    private void load_map(String filename) {
-
-        int width, height;
-
-        Path file = FileSystems.getDefault().getPath("input", filename);
-
-        try (InputStream in = Files.newInputStream(file);
-             BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
-
-            String[] size; //dimensions format : width|height
-            String line = null;
-            line = reader.readLine();
-
-            if (line != null) {
-                size = line.split("-");
-                width = Integer.valueOf(size[0]);
-                height = Integer.valueOf(size[1]);
-                map = new int[width][height];
-            } else {
-                System.err.println("load_map() - error reading dimensions from map file");
-                return;
-            }
-
-            for (int i = 0; i < width; i++) {
-                line = reader.readLine();
-
-                if (line == null || line.length() != map[i].length) {
-                    System.err.println("load_map(): Error in map file dimensions.");
-                    break;
-                }
-                for (int j = 0; j < line.length(); j++) {
-                    map[j][i] = (int) line.charAt(j) - '0';
-                }
-            }
-
-        } catch (IOException x) {
-            System.err.println("load_map(): " + x.getMessage());
-        }
-
-    }
-
 
     public String getPrettyMap() {
         String s = "";
@@ -204,25 +131,91 @@ public class Map {
         System.out.println(getPrettyMap());
     }
 
-    private char[][] getMapInArray(){
+    private void getMapInArray() {
+        //String s = "";
 
-        String s = getPrettyMap();
-        char x[] = s.toCharArray();
+        for (int i = 0; i < input_height; i++) {
+            // draw the north edge
+            for (int j = 0; j < input_width; j++) {
+                //System.out.print((map[j][i] & 1) == 0 ? "+-" : "+ ");
+                if ((map[j][i] & 1) == 0) {
+                    map_in_array[i * 2][j * 2] = 1;
+                    map_in_array[i * 2][j * 2 + 1] = 1;
+                } else {
+                    map_in_array[i * 2][j * 2] = 1;
+                    map_in_array[i * 2][j * 2 + 1] = 0;
+                }
+            }
 
-        char c[][] = new char[height][width]; //newline
-
-        for (int i = 0, index = 0; i < height; i++, index += width) {
-            c[i] = Arrays.copyOfRange(x, index, index+width);
+            map_in_array[i * 2][this.width - 1] = 1;
+            //System.out.println("+");
+            //s += "+\n";
+            // draw the west edge
+            for (int j = 0; j < input_width; j++) {
+                //System.out.print((map[j][i] & 8) == 0 ? "| " : "  ");
+                if ((map[j][i] & 8) == 0) {
+                    map_in_array[i * 2 + 1][j * 2] = 1;
+                    map_in_array[i * 2 + 1][j * 2 + 1] = 0;
+                } else {
+                    map_in_array[i * 2 + 1][j * 2] = 0;
+                    map_in_array[i * 2 + 1][j * 2 + 1] = 0;
+                }
+            }
+            //System.out.println("|");
+            //s += "|\n";
+            map_in_array[i * 2 + 1][this.width - 1] = 1;
         }
+        // draw the bottom line
+        for (int j = 0; j < input_width; j++) {
+            //System.out.print("+-");
+            map_in_array[this.height - 1][j * 2] = 1;
+            map_in_array[this.height - 1][j * 2 + 1] = 1;
+        }
+        //System.out.println("+");
+        map_in_array[this.width - 1][this.height - 1] = 1;
+        //s += "+\n";
+    }
 
-        return c;
+    private void createExit() {
+        while (this.exit == null) {
+            int side = new Random().nextInt(3);
+            int pos = new Random().nextInt(this.width);
+            switch (side) {
+                case 0:
+                    if (map_in_array[1][pos] == 0) {
+                        this.exit = new int[]{pos, 0};
+                        return;
+                    }
+                    break;
+                case 1:
+                    if (map_in_array[pos][this.width - 2] == 0) {
+                        this.exit = new int[]{this.width - 1, pos};
+                        return;
+                    }
+                    break;
+                case 2:
+                    if (map_in_array[this.height - 2][pos] == 0) {
+                        this.exit = new int[]{pos, this.height - 1};
+                        return;
+                    }
+                    break;
+                case 3:
+                    if (map_in_array[pos][1] == 0) {
+                        this.exit = new int[]{0, pos};
+                        return;
+                    }
+                    break;
+            }
+        }
     }
 
     public static void main(String[] args) {
 
         Map map = new Map(10, 10);
-        for(int i = 0; i< map.getHeight(); i++)
-            System.out.println(Arrays.toString(map.getMap_in_array()[i]));
+        map.print();
+
+        for (int i = 0; i < map.getHeight(); i++)
+            System.out.println(Arrays.toString(map.map_in_array[i]));
 
     }
 }

@@ -7,6 +7,7 @@ import jade.core.ProfileImpl;
 import jade.wrapper.StaleProxyException;
 import model.map.AgentModel;
 import model.map.Map;
+import model.map.MapExit;
 import model.map.Obstacle;
 import sajas.core.Runtime;
 import sajas.sim.repast3.Repast3Launcher;
@@ -98,9 +99,7 @@ public class Model extends Repast3Launcher {
         for (int y = 0; y < forest_space.getSizeY(); y++) {
             for (int x = 0; x < forest_space.getSizeX(); x++) {
 
-                char c = forest.getMap_in_array()[y][x];
-
-                if (c != ' ' && c != '\n') {
+                if (forest.getMap_in_array()[y][x]==1) {
                     Obstacle tree = new Obstacle(x, y, forest_space);
                     try {
                         tree.setImage(ImageIO.read(new File("res/icons/tree.png")));
@@ -110,12 +109,17 @@ public class Model extends Repast3Launcher {
                     display_list.add(tree);
                     forest_space.putObjectAt(x, y, tree);
 
-                } else if (c != '\n') {
+                } else if (forest.getMap_in_array()[y][x]==2) {
+                    MapExit exit = new MapExit(x, y, forest_space);
+                    try {
+                        exit.setImage(ImageIO.read(new File("res/icons/door.png")));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    display_list.add(exit);
+                    forest_space.putObjectAt(x, y, exit);
+                }else if(forest.getMap_in_array()[y][x]==0){
 
-                    //Node n = new Node(i,j);
-                    //prevgraph.add(n);
-                    //EmptySpace empty_space = new EmptySpace(i,j, forest_space);
-                    //displayList.add(empty_space);
                 }
                 //ForestHeat fh = new ForestHeat(i,j);
                 //HeatSpace.putObjectAt(i, j, fh);

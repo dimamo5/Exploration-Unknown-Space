@@ -11,4 +11,5 @@ public class MapExit extends MapElement {
         super(pos_x, pos_y, c);
     }
 
+
 }

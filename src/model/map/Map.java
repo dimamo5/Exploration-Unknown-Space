@@ -177,28 +177,28 @@ public class Map {
                 case 0:
                     if (map_in_array[1][pos] == 0) {
                         this.exit = new int[]{pos, 0};
-                        this.exitSide =DIR.N;
+                        this.exitSide = DIR.N;
                         return;
                     }
                     break;
                 case 1:
                     if (map_in_array[pos][this.width - 2] == 0) {
                         this.exit = new int[]{this.width - 1, pos};
-                        this.exitSide =DIR.E;
+                        this.exitSide = DIR.E;
                         return;
                     }
                     break;
                 case 2:
                     if (map_in_array[this.height - 2][pos] == 0) {
                         this.exit = new int[]{pos, this.height - 1};
-                        this.exitSide =DIR.S;
+                        this.exitSide = DIR.S;
                         return;
                     }
                     break;
                 case 3:
                     if (map_in_array[pos][1] == 0) {
                         this.exit = new int[]{0, pos};
-                        this.exitSide =DIR.W;
+                        this.exitSide = DIR.W;
                         return;
                     }
                     break;
@@ -208,6 +208,7 @@ public class Map {
 
     private enum DIR {
         N(1, 0, -1), S(2, 0, 1), E(4, 1, 0), W(8, -1, 0);
+
         // use the static initializer to resolve forward references
         static {
             N.opposite = S;
@@ -226,5 +227,46 @@ public class Map {
             this.dx = dx;
             this.dy = dy;
         }
+    }
+
+    private int[] createCapitains() {
+        int[] a = new int[]{};
+
+        while (a == null) {
+            int posY = new Random().nextInt(this.height);
+            int posX = new Random().nextInt(this.width);
+
+            switch (exitSide) {
+                case N:
+                    posY = posY / 4;
+                    if (map_in_array[this.height - posY][posX] == 0) {
+                        a = new int[]{this.height - posY, posX};
+                        return a;
+                    }
+                    break;
+                case E:
+                    posX = posX / 4;
+                    if (map_in_array[posY][posX] == 0) {
+                        a = new int[]{posY,posX};
+                        return a;
+                    }
+                    break;
+                case S:
+                    posY = posY / 4;
+                    if (map_in_array[posY][posX] == 0) {
+                        a = new int[]{posY,posX};
+                        return a;
+                    }
+                    break;
+                case W:
+                    posX = posX/ 4;
+                    if (map_in_array[posY][this.width - posX] == 0) {
+                        a = new int[]{posY,this.width - posX};
+                        return a;
+                    }
+                    break;
+            }
+        }
+        return a;
     }
 }

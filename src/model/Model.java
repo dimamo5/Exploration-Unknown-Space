@@ -49,7 +49,6 @@ public class Model extends Repast3Launcher {
         super();
     }
 
-
     @Override
     public String[] getInitParam() {
         return new String[]{};
@@ -57,30 +56,10 @@ public class Model extends Repast3Launcher {
 
     @Override
     public void begin() {
-
         createModel();
         createDisplay();
         buildSchedule();
         super.begin();
-    }
-
-
-    private void createDisplay() {
-        Object2DDisplay display = new Object2DDisplay(forest_space);
-        display.setObjectList(display_list);
-        //heat_map_display = new Object2DDisplay(heat_map_space);
-
-        /*dsurf2.addDisplayableProbeable(heat_map_display,"ExplorerAgent View");
-        addSimEventListener(dsurf2);
-        //dsurf2.setBackground(Color.GREEN);
-        dsurf2.setSize(400,50);
-        dsurf2.setLocation(280,80);
-        //dsurf2.print();*/
-
-        dsurf.addDisplayableProbeable(display, "ExplorerAgent Space");
-        dsurf.setBackground(Color.LIGHT_GRAY);
-        dsurf.setLocation(10, 10);
-        dsurf.display();
     }
 
     private void createModel() {
@@ -127,6 +106,28 @@ public class Model extends Repast3Launcher {
         }
     }
 
+    private void createDisplay() {
+        Object2DDisplay display = new Object2DDisplay(forest_space);
+        display.setObjectList(display_list);
+        //heat_map_display = new Object2DDisplay(heat_map_space);
+
+        /*dsurf2.addDisplayableProbeable(heat_map_display,"ExplorerAgent View");
+        addSimEventListener(dsurf2);
+        //dsurf2.setBackground(Color.GREEN);
+        dsurf2.setSize(400,50);
+        dsurf2.setLocation(280,80);
+        //dsurf2.print();*/
+
+        dsurf.addDisplayableProbeable(display, "ExplorerAgent Space");
+        dsurf.setBackground(Color.LIGHT_GRAY);
+        dsurf.setLocation(10, 10);
+        dsurf.display();
+    }
+
+    private void buildSchedule() {
+        getSchedule().scheduleActionAtInterval(1, dsurf, "updateDisplay", Schedule.LAST);
+    }
+
     @Override
     public void setup() {
         super.setup();
@@ -149,11 +150,6 @@ public class Model extends Repast3Launcher {
     @Override
     public String getName() {
         return "Exploration of Unknown Space -- SAJaS Repast3 Test";
-    }
-
-
-    private void buildSchedule() {
-        getSchedule().scheduleActionAtInterval(1, dsurf, "updateDisplay", Schedule.LAST);
     }
 
 

@@ -3,6 +3,7 @@ package model;
 import agent.Captain;
 import jade.core.Profile;
 import jade.core.ProfileImpl;
+import jade.wrapper.StaleProxyException;
 import model.map.AgentModel;
 import model.map.Map;
 import model.map.Obstacle;
@@ -43,6 +44,7 @@ public class Model extends Repast3Launcher {
     private ContainerController agentContainer;
 
     public Model() {
+        super();
     }
 
 
@@ -53,19 +55,17 @@ public class Model extends Repast3Launcher {
 
     @Override
     public void begin() {
-        forest_space = new Object2DGrid(10, 10);
-        heat_map_space = new Object2DGrid(10, 10);
-
-        createModel();
-        createDisplay();
+        super.begin();
+        //createModel();
+        //createDisplay();
     }
 
 
     private void createDisplay() {
 
+
         Object2DDisplay display = new Object2DDisplay(forest_space);
         display.setObjectList(display_list);
-
         //heat_map_display = new Object2DDisplay(heat_map_space);
 
         /*dsurf2.addDisplayableProbeable(heat_map_display,"ExplorerAgent View");
@@ -89,6 +89,7 @@ public class Model extends Repast3Launcher {
     }
 
     private void createModel() {
+
         display_list = new ArrayList<>();
 
         Map forest = new Map(10, 10);
@@ -98,6 +99,8 @@ public class Model extends Repast3Launcher {
         //Map model
         forest_space = new Object2DGrid(forest.getWidth() - 1, forest.getHeight()); //-1 ignores '\n'
         heat_map_space = new Object2DGrid(forest.getWidth() - 1, forest.getHeight());
+
+        System.out.println(forest_space.getSizeX()+ " " + forest_space.getSizeY());
 
 
         for (int y = 0; y < forest_space.getSizeY(); y++) {
@@ -126,24 +129,22 @@ public class Model extends Repast3Launcher {
                 //HeatSpace.putObjectAt(i, j, fh);
             }
         }
-
-        launchAgents();
-
     }
 
     @Override
     public void setup() {
-
+        super.setup();
         //change properties of gui
 
         schedule = new Schedule();
+
         if (dsurf != null) dsurf.dispose();
         dsurf = new DisplaySurface(this, "Forest Display");
         registerDisplaySurface("Forest Display", dsurf);
 
-        if (dsurf2 != null) dsurf2.dispose();
+       /* if (dsurf2 != null) dsurf2.dispose();
         dsurf2 = new DisplaySurface(this, "Heat Display");
-        registerDisplaySurface("Heat Display", dsurf2);
+        registerDisplaySurface("Heat Display", dsurf2);*/
     }
 
     @Override
@@ -161,7 +162,7 @@ public class Model extends Repast3Launcher {
         //schedule.scheduleActionBeginning(0, new MainAction());
         schedule.scheduleActionBeginning(1, this, "step");
         schedule.scheduleActionAtInterval(1, dsurf, "updateDisplay", Schedule.LAST);
-        schedule.scheduleActionAtInterval(1, dsurf2, "updateDisplay", Schedule.LAST);
+        //schedule.scheduleActionAtInterval(1, dsurf2, "updateDisplay", Schedule.LAST);
     }
 
 
@@ -197,12 +198,16 @@ public class Model extends Repast3Launcher {
 
     @Override
     protected void launchJADE() {
+        System.out.println("ahsahdhaskdb");
+
         Runtime rt = Runtime.instance();
         Profile p1 = new ProfileImpl();
 
         mainContainer = rt.createMainContainer(p1);
 
-        //launchAgents();
+        createModel();
+        createDisplay();
+        launchAgents();
     }
 
     private void launchAgents() {
@@ -213,14 +218,16 @@ public class Model extends Repast3Launcher {
 
         int n = 2;
 
-        ArrayList<Captain> agents = new ArrayList<>();
-
         for (int i = 0; i < n; i++) {
             Captain cap = new Captain(5,5,5,5 );
             cap.setModel_link(new AgentModel(5+i,5+i,forest_space, AgentModel.agent_type.CAPTAIN));
             display_list.add(cap.getModel_link());
             forest_space.putObjectAt(5+i,5+i, cap.getModel_link());
-            agents.add(cap);
+            try {
+                mainContainer.acceptNewAgent("Captain #"+i,cap).start();
+            } catch (StaleProxyException e) {
+                e.printStackTrace();
+            }
         }
 
     }
@@ -231,7 +238,7 @@ public class Model extends Repast3Launcher {
         boolean runMode = !BATCH_MODE;   // BATCH_MODE or !BATCH_MODE = GUI_MODE
 
         SimInit init = new SimInit();
-        init.setNumRuns(1);   // works only in batch mode
+        //init.setNumRuns(1);   // works only in batch mode
 
         init.loadModel(new Model(), null, runMode);  //setting last param to true only displays surfaces
     }

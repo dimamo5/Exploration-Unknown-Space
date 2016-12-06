@@ -199,6 +199,7 @@ public class Model extends Repast3Launcher {
         int n = 2;
 
         for (int i = 0; i < n; i++) {
+
             Captain cap = new Captain(5+i,5,5,5 );
             cap.setModel_link(new AgentModel(5+i,5+i,forest_space, AgentModel.agent_type.CAPTAIN, agents_list));
 

@@ -1,5 +1,7 @@
 package model.map;
 
+import agent.Captain;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Random;
@@ -40,8 +42,12 @@ public class Map {
         Map map = new Map(10, 10);
         map.print();
 
-        for (int i = 0; i < map.getHeight(); i++)
+        int[] posCapitain = map.createCapitainPosition();
+        System.out.println(Arrays.toString(posCapitain));
+
+        for (int i = 0; i < map.getHeight(); i++) {
             System.out.println(Arrays.toString(map.map_in_array[i]));
+        }
 
     }
 
@@ -229,10 +235,10 @@ public class Map {
         }
     }
 
-    private int[] createCapitains() {
+    public int[] createCapitainPosition() {
         int[] a = new int[]{};
 
-        while (a == null) {
+        while (a.length==0) {
             int posY = new Random().nextInt(this.height);
             int posX = new Random().nextInt(this.width);
 

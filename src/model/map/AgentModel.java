@@ -1,6 +1,7 @@
 package model.map;
 
-import agent.ExplorerAgent;
+import agent.*;
+import jade.core.AID;
 import uchicago.src.sim.gui.SimGraphics;
 import uchicago.src.sim.space.Object2DGrid;
 
@@ -23,6 +24,19 @@ public class AgentModel extends MapElement {
         this.type = type;
         this.agents_list = agents;
     }
+
+    public ArrayList<AID> getRobotsFromAgentList(){  //testing purposes
+        ArrayList<AID> robots = new ArrayList<>();
+
+        for(ExplorerAgent agent : agents_list){
+            if(agent instanceof agent.Robot){
+                robots.add(agent.getAID());
+            }
+        }
+
+        return robots;
+    }
+
 
     public static Object2DGrid getMap() {
         return map;

@@ -1,7 +1,7 @@
 package model;
 
-import agent.Captain;
-import agent.ExplorerAgent;
+import agent.*;
+import agent.Robot;
 import jade.core.Profile;
 import jade.core.ProfileImpl;
 import jade.wrapper.StaleProxyException;
@@ -210,6 +210,22 @@ public class Model extends Repast3Launcher {
             display_list.add(cap.getModel_link());
             forest_space.putObjectAt(5+i,5+i, cap.getModel_link());
         }
+
+        for (int i = 0; i < n; i++) {
+            agent.Robot robot = new Robot(i,5,5);
+            robot.setModel_link(new AgentModel(3+i,3+i,forest_space, AgentModel.agent_type.ROBOT, agents_list));
+
+            try {
+                agentContainer.acceptNewAgent("Robot #"+i,robot).start();
+            } catch (StaleProxyException e) {
+                e.printStackTrace();
+            }
+            agents_list.add(robot);
+
+            display_list.add(robot.getModel_link());
+            forest_space.putObjectAt(3+i,3+i, robot.getModel_link());
+        }
+
     }
 
 

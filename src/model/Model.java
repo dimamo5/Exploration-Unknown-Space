@@ -26,6 +26,7 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Created by sergi on 12/11/2016.
@@ -34,8 +35,8 @@ public class Model extends Repast3Launcher {
 
     private static final boolean BATCH_MODE = true;
     private static int NUM_CAP = 2;
-    private static int NUM_SOL = 6;
-    private static int NUM_ROBOT = 2;
+    private static int NUM_SOL = 2;
+    private static int NUM_ROBOT = 3;
 
     public DisplaySurface dsurf;
     public DisplaySurface dsurf2;
@@ -75,7 +76,7 @@ public class Model extends Repast3Launcher {
 
         display_list = new ArrayList<>();
 
-        this.forest = new Map(20, 20);
+        this.forest = new Map(15, 15);
 
         forest.print(); //prints map on console
 
@@ -227,12 +228,18 @@ public class Model extends Repast3Launcher {
         agents_list = new ArrayList<>();
 
         //Gerar Capitães
-        for (int i = 0; i < numCap; i++) {
-            int[] pos = forest.createCapitainPosition();
+        ArrayList<int[]> capitains = forest.createCapitainsPosition(numCap, 15);
+
+
+        for (int i = 0; i < capitains.size(); i++) {
 
             Captain cap = new Captain(5 + i, 5, 5, 5);
-            cap.setModel_link(new AgentModel(pos[0], pos[1], forest_space, AgentModel.agent_type.CAPTAIN,
+            cap.setModel_link(new AgentModel(capitains.get(i)[0],
+                    capitains.get(i)[1],
+                    forest_space,
+                    AgentModel.agent_type.CAPTAIN,
                     agents_list));
+
 
             try {
                 agentContainer.acceptNewAgent("Captain #" + i, cap).start();
@@ -242,29 +249,45 @@ public class Model extends Repast3Launcher {
             agents_list.add(cap);
 
             display_list.add(cap.getModel_link());
-            forest_space.putObjectAt(pos[0], pos[1], cap.getModel_link());
+            forest_space.putObjectAt(capitains.get(i)[0], capitains.get(i)[1], cap.getModel_link());
         }
 
-        //Gerar Soldados
-        for (int i = 0; i < numSol; i++) {
-            Soldier sol = new Soldier(5 + i, 5, 5);
-            sol.setModel_link(new AgentModel(5 + i, 5 + i, forest_space, AgentModel.agent_type.SOLDIER, agents_list));
+        for (int i = 0; i < capitains.size(); i++) {
 
-            try {
-                agentContainer.acceptNewAgent("Soldier #" + i, sol).start();
-            } catch (StaleProxyException e) {
-                e.printStackTrace();
+            ArrayList<int[]> soldiers = forest.createSoldiersPosition(capitains.get(i), numSol, 5);
+
+            //Gerar Soldados
+            for (int j = 0; j < soldiers.size(); j++) {
+                Soldier sol = new Soldier(5 + j, 5, 5);
+                sol.setModel_link(new AgentModel(soldiers.get(j)[0],
+                        soldiers.get(j)[1],
+                        forest_space,
+                        AgentModel.agent_type.SOLDIER,
+                        agents_list));
+
+                try {
+                    agentContainer.acceptNewAgent("Soldier #" + j, sol).start();
+                } catch (StaleProxyException e) {
+                    e.printStackTrace();
+                }
+                agents_list.add(sol);
+
+                display_list.add(sol.getModel_link());
+                forest_space.putObjectAt(soldiers.get(j)[0], soldiers.get(j)[1], sol.getModel_link());
             }
-            agents_list.add(sol);
-
-            display_list.add(sol.getModel_link());
-            forest_space.putObjectAt(5 + i, 5 + i, sol.getModel_link());
         }
+
+
+        ArrayList<int[]> robots = forest.createRobotsPosition(numRobot);
 
         //Gerar Robot
-        for (int i = 0; i < numRobot; i++) {
+        for (int i = 0; i < robots.size(); i++) {
             Robot robot = new Robot(5 + i, 5, 5);
-            robot.setModel_link(new AgentModel(5 + i, 5 + i, forest_space, AgentModel.agent_type.CAPTAIN, agents_list));
+            robot.setModel_link(new AgentModel(robots.get(i)[0],
+                    robots.get(i)[1],
+                    forest_space,
+                    AgentModel.agent_type.ROBOT,
+                    agents_list));
 
             try {
                 agentContainer.acceptNewAgent("Robot #" + i, robot).start();
@@ -274,7 +297,7 @@ public class Model extends Repast3Launcher {
             agents_list.add(robot);
 
             display_list.add(robot.getModel_link());
-            forest_space.putObjectAt(5 + i, 5 + i, robot.getModel_link());
+            forest_space.putObjectAt(robots.get(i)[0], robots.get(i)[1], robot.getModel_link());
         }
     }
 

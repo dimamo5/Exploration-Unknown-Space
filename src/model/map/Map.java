@@ -44,14 +44,14 @@ public class Map {
         Map map = new Map(10, 10);
         map.print();
 
-        int[] posCapitain = map.createPositions();
+     /*   int[] posCapitain = map.createPositions();
         System.out.println("capitain " + Arrays.toString(posCapitain));
-
-        ArrayList<int[]> soldiers = map.createSoldiersPosition(posCapitain, 5, 5);
+*/
+      /*  ArrayList<int[]> soldiers = map.createSoldiersPosition(posCapitain, 5, 5);
 
         for (int i = 0; i < soldiers.size(); i++) {
             System.out.println("soldier " + i + ' ' + Arrays.toString(soldiers.get(i)));
-        }
+        }*/
 
         ArrayList<int[]> capitains = map.createCapitainsPosition(8, 15);
 
@@ -59,10 +59,11 @@ public class Map {
             System.out.println("capitain " + i + ' ' + Arrays.toString(capitains.get(i)));
         }
 
-      /*  for (int i = 0; i < map.getHeight(); i++) {
+        System.out.println("exit " + Arrays.toString(map.exit));
+
+        for (int i = 0; i < map.getHeight(); i++) {
             System.out.println(Arrays.toString(map.map_in_array[i]));
         }
-        */
 
     }
 
@@ -260,37 +261,29 @@ public class Map {
             switch (exitSide) {
                 case N:
                     posY = posY / 4;
-                    System.out.println("Y: " + posY);
-                    System.out.println("X: " + posX);
-                    if (map_in_array[this.height - posY][posX] == 0) {
-                        a = new int[]{this.height - posY, posX};
+                    if (map_in_array[this.height - posY-1][posX] == 0) {
+                        a = new int[]{posX, this.height-1 - posY};
                         return a;
                     }
                     break;
                 case E:
                     posX = posX / 4;
-                    System.out.println("Y: " + posY);
-                    System.out.println("X: " + posX);
                     if (map_in_array[posY][posX] == 0) {
-                        a = new int[]{posY, posX};
+                        a = new int[]{posX, posY};
                         return a;
                     }
                     break;
                 case S:
                     posY = posY / 4;
-                    System.out.println("Y: " + posY);
-                    System.out.println("X: " + posX);
                     if (map_in_array[posY][posX] == 0) {
-                        a = new int[]{posY, posX};
+                        a = new int[]{posX, posY};
                         return a;
                     }
                     break;
                 case W:
                     posX = posX / 4;
-                    System.out.println("Y: " + posY);
-                    System.out.println("X: " + posX);
-                    if (map_in_array[posY][this.width - posX] == 0) {
-                        a = new int[]{posY, this.width - posX};
+                    if (map_in_array[posY][this.width-1 - posX] == 0) {
+                        a = new int[]{this.width-1 - posX, posY};
                         return a;
                     }
                     break;
@@ -336,7 +329,7 @@ public class Map {
 
     public ArrayList<int[]> createRobotsPosition(int numRobots) {
         ArrayList<int[]> robots = new ArrayList<int[]>();
-        for (int i = 1; i < numRobots; i++) {
+        for (int i = 0; i < numRobots; i++) {
             robots.add(createPositions());
         }
         return robots;

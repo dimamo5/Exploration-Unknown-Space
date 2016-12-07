@@ -60,18 +60,20 @@ public class AgentModel extends MapElement {
 
     @Override
     public void draw(SimGraphics simGraphics) {
+
         switch (type) {
             case CAPTAIN:
-                simGraphics.drawFastCircle(Color.ORANGE);
+                simGraphics.drawRect(Color.ORANGE);
                 break;
             case SOLDIER:
-                simGraphics.drawFastCircle(Color.cyan);
+                simGraphics.drawRect(Color.cyan);
                 break;
             case ROBOT:
-                simGraphics.drawFastCircle(Color.red);
+                simGraphics.drawRect(Color.red);
                 break;
             default:
                 break;
         }
+
     }
 }

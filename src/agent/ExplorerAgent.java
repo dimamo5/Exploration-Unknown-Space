@@ -1,16 +1,9 @@
 package agent;
 
-import jade.domain.FIPAAgentManagement.DFAgentDescription;
-import jade.domain.FIPAException;
-import jade.lang.acl.ACLMessage;
 import javafx.util.Pair;
 import model.map.AgentModel;
 import model.map.ViewMap;
 import sajas.core.Agent;
-import jade.content.lang.Codec;
-import jade.content.onto.Ontology;
-import sajas.domain.DFService;
-import sajas.proto.SubscriptionInitiator;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,7 +24,7 @@ public class ExplorerAgent extends Agent {
 
     private static final int DEFAULT_VISION_RANGE = 5;
 
-    private int id, vision_range = DEFAULT_VISION_RANGE,    //cells count
+    private int vision_range = DEFAULT_VISION_RANGE,    //cells count
             current_dir = -1, previous_dir = -1;            //no current/previous direction at the begining
 
     // TODO: 16/10/2016 add agent's own globalMap
@@ -59,31 +52,31 @@ public class ExplorerAgent extends Agent {
 
     //==================================== METHODS ====================================================//
 
-    public ExplorerAgent(int id, int vision_range) {
-        this.id = id;
+    public ExplorerAgent(int vision_range) {
         this.vision_range = vision_range;
     }
 
 
-    protected Pair<Integer,Integer> move(ViewMap.DIR dirToMove){
+    protected Pair<Integer, Integer> move(ViewMap.DIR dirToMove) {
 
-        ArrayList<ViewMap.DIR> dirs = new ArrayList<ViewMap.DIR>(Arrays.asList(ViewMap.DIR.N, ViewMap.DIR.S, ViewMap.DIR.E, ViewMap.DIR.W));
+        ArrayList<ViewMap.DIR> dirs = new ArrayList<ViewMap.DIR>(Arrays.asList(ViewMap.DIR.N, ViewMap.DIR.S, ViewMap
+                .DIR.E, ViewMap.DIR.W));
 
         int index = dirs.indexOf(dirToMove);
-        Pair<Integer,Integer> coos = new Pair<>(getModel_link().getX(), getModel_link().getY());
+        Pair<Integer, Integer> coos = new Pair<>(getModel_link().getX(), getModel_link().getY());
 
-        switch(index){
+        switch (index) {
             case 0: //N
-                return new Pair<>(coos.getKey(), coos.getValue()-1);
+                return new Pair<>(coos.getKey(), coos.getValue() - 1);
 
             case 1: //S
-                return new Pair<>(coos.getKey(), coos.getValue()+1);
+                return new Pair<>(coos.getKey(), coos.getValue() + 1);
 
             case 2: //E
-                return new Pair<>(coos.getKey()+1, coos.getValue());
+                return new Pair<>(coos.getKey() + 1, coos.getValue());
 
             case 3: //W
-                return new Pair<>(coos.getKey()-1, coos.getValue());
+                return new Pair<>(coos.getKey() - 1, coos.getValue());
 
             default:
                 System.out.println("Unexpected direction");
@@ -108,13 +101,6 @@ public class ExplorerAgent extends Agent {
         this.previous_dir = previous_dir;
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
 
     public int getVision_range() {
         return vision_range;

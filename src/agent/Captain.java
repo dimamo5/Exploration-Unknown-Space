@@ -7,15 +7,11 @@ import javafx.util.Pair;
 import message.InformViewMap;
 import message.Message;
 import message.RequestViewMap;
-import sajas.core.behaviours.Behaviour;
 import sajas.core.behaviours.CyclicBehaviour;
 import sajas.core.behaviours.TickerBehaviour;
-import uchicago.src.sim.space.Object2DGrid;
 
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Base64;
 
 /**
  * Created by sergi on 16/10/2016.
@@ -24,10 +20,13 @@ public class Captain extends Human {
 
     public int cellphone_range;
 
+    private enum agent_state {FINDING_EXIT}
+
     private agent_state state = agent_state.FINDING_EXIT;
 
-    public Captain(int id, int vision_range, int radio_range, int cellphone_range) {
-        super(id, vision_range, radio_range);
+
+    public Captain(int vision_range, int radio_range, int cellphone_range) {
+        super(vision_range, radio_range);
         this.cellphone_range = cellphone_range;
     }
 
@@ -74,7 +73,8 @@ public class Captain extends Human {
                     } else if (msg.getPerformative() == Message.INFORM) {
                         try {
                             if (msg.getContentObject() instanceof InformViewMap) {
-                                System.out.println("Received response from robot. COOs:" + ((InformViewMap) msg.getContentObject()).getPosition());
+                                System.out.println("Received response from robot. COOs:" + ((InformViewMap) msg
+                                        .getContentObject()).getPosition());
                             }
                         } catch (UnreadableException e) {
                             e.printStackTrace();
@@ -102,7 +102,7 @@ public class Captain extends Human {
 
                 ArrayList<jade.core.AID> robots = getModel_link().getRobotsFromAgentList();
 
-                System.out.println("Captain#"+getId()+"  Requesting info from robots.");
+                System.out.println("Captain#" + getAID() + "  Requesting info from robots.");
                 requestRobotForInfo(robots);
 
 

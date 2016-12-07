@@ -24,6 +24,8 @@ public class Soldier extends Human {
 
     public Soldier(int id, int vision_range, int radio_range) {
         super(id, vision_range, radio_range);
+    public Soldier(int vision_range, int radio_range) {
+        super(vision_range, radio_range);
     }
 
     @Override

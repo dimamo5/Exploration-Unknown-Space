@@ -24,7 +24,6 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * Created by sergi on 12/11/2016.
@@ -159,7 +158,6 @@ public class Model extends Repast3Launcher {
     }
 
 
-
     @Override
     public String getName() {
         return "Exploration of Unknown Space -- SAJaS Repast3 Test";
@@ -236,7 +234,7 @@ public class Model extends Repast3Launcher {
 
         for (int i = 0; i < capitains.size(); i++) {
 
-            Captain cap = new Captain(5 + i, 5, 5, 5);
+            Captain cap = new Captain(5, 5, 5);
 
             AgentModel agModel = new AgentModel(capitains.get(i)[0],
                     capitains.get(i)[1],
@@ -247,7 +245,8 @@ public class Model extends Repast3Launcher {
             cap.setModel_link(agModel);
 
             cap.setMyViewMap(new ViewMap(Model.forest.getWidth()));
-            cap.getMyViewMap().addViewRange(new Pair<>(agModel.getX(), agModel.getY()), Model.getForest(), cap.getVision_range());
+            cap.getMyViewMap().addViewRange(new Pair<>(agModel.getX(), agModel.getY()), Model.getForest(), cap
+                    .getVision_range());
 
             try {
                 agentContainer.acceptNewAgent("Captain #" + i, cap).start();
@@ -255,7 +254,6 @@ public class Model extends Repast3Launcher {
                 e.printStackTrace();
             }
             agents_list.add(cap);
-
             display_list.add(cap.getModel_link());
             forest_space.putObjectAt(capitains.get(i)[0], capitains.get(i)[1], cap.getModel_link());
         }
@@ -266,7 +264,7 @@ public class Model extends Repast3Launcher {
 
             //Gerar Soldados
             for (int j = 0; j < soldiers.size(); j++) {
-                Soldier sol = new Soldier(5 + j, 5, 5);
+                Soldier sol = new Soldier(5, 5);
 
                 AgentModel agModel = new AgentModel(soldiers.get(j)[0],
                         soldiers.get(j)[1],
@@ -276,7 +274,8 @@ public class Model extends Repast3Launcher {
 
                 sol.setModel_link(agModel);
                 sol.setMyViewMap(new ViewMap(Model.forest.getWidth()));
-                sol.getMyViewMap().addViewRange(new Pair<>(agModel.getX(), agModel.getY()), Model.getForest(), sol.getVision_range());
+                sol.getMyViewMap().addViewRange(new Pair<>(agModel.getX(), agModel.getY()), Model.getForest(), sol
+                        .getVision_range());
 
 
                 try {
@@ -296,7 +295,7 @@ public class Model extends Repast3Launcher {
 
         //Gerar Robot
         for (int i = 0; i < robots.size(); i++) {
-            Robot robot = new Robot(5 + i, 5, 5);
+            Robot robot = new Robot(5, 5);
 
             AgentModel agModel = new AgentModel(robots.get(i)[0],
                     robots.get(i)[1],
@@ -306,7 +305,8 @@ public class Model extends Repast3Launcher {
 
             robot.setModel_link(agModel);
             robot.setMyViewMap(new ViewMap(Model.forest.getWidth()));
-            robot.getMyViewMap().addViewRange(new Pair<>(agModel.getX(), agModel.getY()), Model.getForest(), robot.getVision_range());
+            robot.getMyViewMap().addViewRange(new Pair<>(agModel.getX(), agModel.getY()), Model.getForest(), robot
+                    .getVision_range());
 
             try {
                 agentContainer.acceptNewAgent("Robot #" + i, robot).start();

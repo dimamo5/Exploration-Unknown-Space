@@ -95,15 +95,15 @@ public class ViewMap {
             return true;
         }
         //south
-        if (map[pos.getValue() + 1][pos.getKey()].heat == -2) {
+        if (map[pos.getValue() + 1][pos.getKey()].heat != -2) {
             return true;
         }
         //este
-        if (map[pos.getValue()][pos.getKey() + 1].heat == -2) {
+        if (map[pos.getValue()][pos.getKey() + 1].heat != -2) {
             return true;
         }
         //oeste
-        if (map[pos.getValue()][pos.getKey() - 1].heat == -2) {
+        if (map[pos.getValue()][pos.getKey() - 1].heat != -2) {
             return true;
         }
         return false;

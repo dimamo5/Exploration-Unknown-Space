@@ -2,6 +2,8 @@ package model.map;
 
 import agent.Captain;
 
+import javax.media.protocol.SourceTransferHandler;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Random;
@@ -42,12 +44,25 @@ public class Map {
         Map map = new Map(10, 10);
         map.print();
 
-        int[] posCapitain = map.createCapitainPosition();
-        System.out.println(Arrays.toString(posCapitain));
+        int[] posCapitain = map.createPositions();
+        System.out.println("capitain " + Arrays.toString(posCapitain));
 
-        for (int i = 0; i < map.getHeight(); i++) {
+        ArrayList<int[]> soldiers = map.createSoldiersPosition(posCapitain, 5, 5);
+
+        for (int i = 0; i < soldiers.size(); i++) {
+            System.out.println("soldier " + i + ' ' + Arrays.toString(soldiers.get(i)));
+        }
+
+        ArrayList<int[]> capitains = map.createCapitainsPosition(8, 15);
+
+        for (int i = 0; i < capitains.size(); i++) {
+            System.out.println("capitain " + i + ' ' + Arrays.toString(capitains.get(i)));
+        }
+
+      /*  for (int i = 0; i < map.getHeight(); i++) {
             System.out.println(Arrays.toString(map.map_in_array[i]));
         }
+        */
 
     }
 
@@ -235,16 +250,18 @@ public class Map {
         }
     }
 
-    public int[] createCapitainPosition() {
+    public int[] createPositions() {
         int[] a = new int[]{};
 
-        while (a.length==0) {
+        while (a.length == 0) {
             int posY = new Random().nextInt(this.height);
             int posX = new Random().nextInt(this.width);
 
             switch (exitSide) {
                 case N:
                     posY = posY / 4;
+                    System.out.println("Y: " + posY);
+                    System.out.println("X: " + posX);
                     if (map_in_array[this.height - posY][posX] == 0) {
                         a = new int[]{this.height - posY, posX};
                         return a;
@@ -252,22 +269,28 @@ public class Map {
                     break;
                 case E:
                     posX = posX / 4;
+                    System.out.println("Y: " + posY);
+                    System.out.println("X: " + posX);
                     if (map_in_array[posY][posX] == 0) {
-                        a = new int[]{posY,posX};
+                        a = new int[]{posY, posX};
                         return a;
                     }
                     break;
                 case S:
                     posY = posY / 4;
+                    System.out.println("Y: " + posY);
+                    System.out.println("X: " + posX);
                     if (map_in_array[posY][posX] == 0) {
-                        a = new int[]{posY,posX};
+                        a = new int[]{posY, posX};
                         return a;
                     }
                     break;
                 case W:
-                    posX = posX/ 4;
+                    posX = posX / 4;
+                    System.out.println("Y: " + posY);
+                    System.out.println("X: " + posX);
                     if (map_in_array[posY][this.width - posX] == 0) {
-                        a = new int[]{posY,this.width - posX};
+                        a = new int[]{posY, this.width - posX};
                         return a;
                     }
                     break;
@@ -275,4 +298,48 @@ public class Map {
         }
         return a;
     }
+
+    public ArrayList<int[]> createSoldiersPosition(int[] capitainPosition, int numSoldiers, int distance) {
+
+        ArrayList<int[]> soldiers = new ArrayList<int[]>();
+
+        for (int i = 0; i < numSoldiers; i++) {
+            while (soldiers.size() <= i) {
+                int[] soldier = createPositions();
+                double dst = Math.sqrt((soldier[0] - capitainPosition[0]) * (soldier[0] - capitainPosition[0]) + (soldier[1] - capitainPosition[1]) * (soldier[1] - capitainPosition[1]));
+                if (dst < distance && distance > 0 && !soldiers.contains(soldier) && soldier != capitainPosition) {
+                    soldiers.add(soldier);
+                }
+            }
+        }
+        return soldiers;
+    }
+
+    public ArrayList<int[]> createCapitainsPosition(int numCapitains, int distance) {
+
+        ArrayList<int[]> capitains = new ArrayList<int[]>();
+        int[] capitain = createPositions();
+        capitains.add(capitain);
+
+        for (int i = 1; i < numCapitains; i++) {
+            while (capitains.size() <= i) {
+                capitain = createPositions();
+                double dst = Math.sqrt((capitains.get(i - 1)[0] - capitain[0]) * (capitains.get(i - 1)[0] - capitain[0]) + (capitains
+                        .get(i - 1)[1] - capitain[1]) * (capitains.get(i - 1)[1] - capitain[1]));
+                if (dst < distance && distance > 0 && !capitains.contains(capitain) && capitain != capitains.get(i - 1)) {
+                    capitains.add(capitain);
+                }
+            }
+        }
+        return capitains;
+    }
+
+    public ArrayList<int[]> createRobotsPosition(int numRobots) {
+        ArrayList<int[]> robots = new ArrayList<int[]>();
+        for (int i = 1; i < numRobots; i++) {
+            robots.add(createPositions());
+        }
+    }
+
+
 }

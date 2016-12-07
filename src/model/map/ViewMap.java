@@ -18,17 +18,17 @@ public class ViewMap {
 
     public ViewMap(int size) {
         this.size = size;
-        map = new HeatElement[size][size];
+        this.map = new HeatElement[size][size];
     }
 
     public HeatElement[][] getMap() {
         return map;
     }
 
-    public void addViewRange(Pair<Integer, Integer> pos, Map map, int range) {
+    public void addViewRange(Pair<Integer, Integer> pos, Map map, int viewRange) {
         //Norte
-        for (int i = 0; i < range && i + pos.getKey() > 0; i++) {
-            if (map.getMap()[pos.getValue()][pos.getKey() + i] == 0 && i == 0) {
+        for (int i = 0; i < viewRange && i + pos.getKey() > 0; i++) {
+            if (map.getMap_in_array()[pos.getValue()][pos.getKey() + i] == 0) {
                 if (i == 0) {
                     this.map[pos.getValue()][pos.getKey() + i].addMyHeat();
                 } else {
@@ -40,11 +40,9 @@ public class ViewMap {
             }
         }
         //Sul
-        for (int i = 0; i < range && i + pos.getKey() > 0; i++) {
-            if (map.getMap()[pos.getValue()][pos.getKey() - i] == 0 && i == 0) {
-                if (i == 0) {
-                    this.map[pos.getValue()][pos.getKey() - i].addMyHeat();
-                } else {
+        for (int i = 0; i < viewRange && i + pos.getKey() > 0; i++) {
+            if (map.getMap_in_array()[pos.getValue()][pos.getKey() - i] == 0) {
+                if (i != 0) {
                     this.map[pos.getValue()][pos.getKey() - i].addVisionHeat();
                 }
             } else {
@@ -53,11 +51,9 @@ public class ViewMap {
             }
         }
         //Este
-        for (int i = 0; i < range && i + pos.getKey() > 0; i++) {
-            if (map.getMap()[pos.getValue() + i][pos.getKey()] == 0 && i == 0) {
-                if (i == 0) {
-                    this.map[pos.getValue() + i][pos.getKey()].addMyHeat();
-                } else {
+        for (int i = 0; i < viewRange && i + pos.getKey() > 0; i++) {
+            if (map.getMap_in_array()[pos.getValue() + i][pos.getKey()] == 0) {
+                if (i != 0) {
                     this.map[pos.getValue() + i][pos.getKey()].addVisionHeat();
                 }
             } else {
@@ -66,11 +62,9 @@ public class ViewMap {
             }
         }
         //Oeste
-        for (int i = 0; i < range && i + pos.getKey() > 0; i++) {
-            if (map.getMap()[pos.getValue() - i][pos.getKey()] == 0 && i == 0) {
-                if (i == 0) {
-                    this.map[pos.getValue() - i][pos.getKey()].addMyHeat();
-                } else {
+        for (int i = 0; i < viewRange && i + pos.getKey() > 0; i++) {
+            if (map.getMap_in_array()[pos.getValue() - i][pos.getKey()] == 0) {
+                if (i != 0) {
                     this.map[pos.getValue() - i][pos.getKey()].addVisionHeat();
                 }
             } else {

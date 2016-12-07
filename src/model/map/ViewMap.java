@@ -92,19 +92,19 @@ public class ViewMap {
     public ArrayList<DIR> getPossibleDir(Pair<Integer, Integer> pos) {
         ArrayList<DIR> posDir = new ArrayList<>();
         //north
-        if (map[pos.getKey() + 1][pos.getValue()].heat == 0) {
+        if (map[pos.getValue() - 1][pos.getKey()].heat == 0) {
             posDir.add(DIR.N);
         }
         //south
-        if (map[pos.getKey() - 1][pos.getValue()].heat == 0) {
+        if (map[pos.getValue() + 1][pos.getKey()].heat == 0) {
             posDir.add(DIR.S);
         }
         //este
-        if (map[pos.getKey()][pos.getValue() + 1].heat == 0) {
+        if (map[pos.getValue()][pos.getKey() + 1].heat == 0) {
             posDir.add(DIR.E);
         }
         //oeste
-        if (map[pos.getKey()][pos.getValue() - 1].heat == 0) {
+        if (map[pos.getValue()][pos.getKey() - 1].heat == 0) {
             posDir.add(DIR.W);
         }
         return posDir;

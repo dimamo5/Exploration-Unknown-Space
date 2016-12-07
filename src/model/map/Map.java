@@ -339,6 +339,7 @@ public class Map {
         for (int i = 1; i < numRobots; i++) {
             robots.add(createPositions());
         }
+        return robots;
     }
 
 

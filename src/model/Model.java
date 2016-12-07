@@ -279,7 +279,7 @@ public class Model extends Repast3Launcher {
 
 
                 try {
-                    agentContainer.acceptNewAgent("Soldier #" + j, sol).start();
+                    agentContainer.acceptNewAgent("Soldier #" + (i*soldiers.size() + j), sol).start();
                 } catch (StaleProxyException e) {
                     e.printStackTrace();
                 }

@@ -22,8 +22,6 @@ public class Soldier extends Human {
 
     private agent_state state = agent_state.FINDING_EXIT;
 
-    public Soldier(int id, int vision_range, int radio_range) {
-        super(id, vision_range, radio_range);
     public Soldier(int vision_range, int radio_range) {
         super(vision_range, radio_range);
     }
@@ -59,7 +57,7 @@ public class Soldier extends Human {
 
                 try {
                     if (msg != null && msg.getPerformative() == Message.REQUEST && msg.getContentObject() instanceof RequestViewMap) {
-                        System.out.println("Robot#"+getId()+"  sending viewmap");
+                        System.out.println("Robot#"+getAID()+"  sending viewmap");
                         sendMyInfoToAgent(msg);
                     }
                 } catch (UnreadableException e) {

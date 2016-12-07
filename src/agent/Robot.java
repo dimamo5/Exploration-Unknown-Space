@@ -141,6 +141,7 @@ public class Robot extends ExplorerAgent {
         ArrayList<ViewMap.DIR> possibleDirs = getMyViewMap().getPossibleDir(oldPos);
 
         Random r = new Random();
+        System.out.println("Dirs:"+possibleDirs.size());
         int dir = r.nextInt(possibleDirs.size());
 
         //new coordinates

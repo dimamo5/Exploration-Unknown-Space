@@ -91,19 +91,19 @@ public class ViewMap {
 
     public boolean canMoveDir(DIR dir, Pair<Integer, Integer> pos) {
         //north
-        if (map[pos.getValue() - 1][pos.getKey()].heat != -2) {
+        if (dir == DIR.N && map[pos.getValue() - 1][pos.getKey()].heat != -2) {
             return true;
         }
         //south
-        if (map[pos.getValue() + 1][pos.getKey()].heat != -2) {
+        if (dir == DIR.S && map[pos.getValue() + 1][pos.getKey()].heat != -2) {
             return true;
         }
         //este
-        if (map[pos.getValue()][pos.getKey() + 1].heat != -2) {
+        if (dir == DIR.E && map[pos.getValue()][pos.getKey() + 1].heat != -2) {
             return true;
         }
         //oeste
-        if (map[pos.getValue()][pos.getKey() - 1].heat != -2) {
+        if (dir == DIR.W && map[pos.getValue()][pos.getKey() - 1].heat != -2) {
             return true;
         }
         return false;

@@ -152,10 +152,7 @@ public class Model extends Repast3Launcher {
         registerDisplaySurface("Heat Display", dsurf2);*/
     }
 
-   /* @Override
-    public Schedule getSchedule() {
-        return schedule;
-    }*/
+
 
     @Override
     public String getName() {

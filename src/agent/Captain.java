@@ -28,6 +28,7 @@ public class Captain extends Human {
     public Captain(int vision_range, int radio_range, int cellphone_range) {
         super(vision_range, radio_range);
         this.cellphone_range = cellphone_range;
+
     }
 
     public int getCellphone_range() {

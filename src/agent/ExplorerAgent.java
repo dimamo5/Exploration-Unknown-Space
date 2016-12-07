@@ -53,7 +53,9 @@ public class ExplorerAgent extends Agent {
     //==================================== METHODS ====================================================//
 
     public ExplorerAgent(int vision_range) {
+        super();
         this.vision_range = vision_range;
+        System.out.println(this.getAID());
     }
 
 

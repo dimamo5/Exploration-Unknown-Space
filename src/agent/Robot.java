@@ -36,6 +36,7 @@ public class Robot extends ExplorerAgent {
     public Robot(int vision_range, int energy) {
         super(vision_range);
         this.energy = energy;
+
     }
 
     public int getEnergy() {

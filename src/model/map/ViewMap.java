@@ -19,9 +19,9 @@ public class ViewMap {
     public ViewMap(int size) {
         this.size = size;
         map = new HeatElement[size][size];
-        for(int i = 0;i<map.length;i++){
-            for (int m=0;m<map.length;m++){
-                map[i][m]=new HeatElement(m,i);
+        for (int i = 0; i < map.length; i++) {
+            for (int m = 0; m < map.length; m++) {
+                map[i][m] = new HeatElement(m, i);
             }
         }
     }
@@ -87,6 +87,26 @@ public class ViewMap {
                 }
             }
         }
+    }
+
+    public boolean canMoveDir(DIR dir, Pair<Integer, Integer> pos) {
+        //north
+        if (map[pos.getValue() - 1][pos.getKey()].heat != -2) {
+            return true;
+        }
+        //south
+        if (map[pos.getValue() + 1][pos.getKey()].heat == -2) {
+            return true;
+        }
+        //este
+        if (map[pos.getValue()][pos.getKey() + 1].heat == -2) {
+            return true;
+        }
+        //oeste
+        if (map[pos.getValue()][pos.getKey() - 1].heat == -2) {
+            return true;
+        }
+        return false;
     }
 
     public ArrayList<DIR> getPossibleDir(Pair<Integer, Integer> pos) {

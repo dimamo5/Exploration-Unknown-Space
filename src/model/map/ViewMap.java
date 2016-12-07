@@ -2,6 +2,8 @@ package model.map;
 
 import javafx.util.Pair;
 
+import java.util.ArrayList;
+
 /**
  * Created by sergi on 05/12/2016.
  */
@@ -87,4 +89,28 @@ public class ViewMap {
             }
         }
     }
+
+    public ArrayList<DIR> getPossibleDir(Pair<Integer, Integer> pos) {
+        ArrayList<DIR> posDir = new ArrayList<>();
+        //north
+        if (map[pos.getKey() + 1][pos.getValue()].heat == 0) {
+            posDir.add(DIR.N);
+        }
+        //south
+        if (map[pos.getKey() - 1][pos.getValue()].heat == 0) {
+            posDir.add(DIR.S);
+        }
+        //este
+        if (map[pos.getKey()][pos.getValue() + 1].heat == 0) {
+            posDir.add(DIR.E);
+        }
+        //oeste
+        if (map[pos.getKey()][pos.getValue() - 1].heat == 0) {
+            posDir.add(DIR.W);
+        }
+        return posDir;
+    }
+
+
+    public enum DIR {N, S, E, W}
 }

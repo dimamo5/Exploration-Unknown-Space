@@ -12,6 +12,9 @@ import jade.content.onto.Ontology;
 import sajas.domain.DFService;
 import sajas.proto.SubscriptionInitiator;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 
 /**
  * Created by sergi on 16/10/2016.
@@ -61,14 +64,31 @@ public class ExplorerAgent extends Agent {
         this.vision_range = vision_range;
     }
 
-    public Pair<Integer,Integer> move(ViewMap.DIR dirToMove){
 
-        switch(ViewMap.DIR){
+    protected Pair<Integer,Integer> move(ViewMap.DIR dirToMove){
 
-            case ViewMap.DIR.
+        ArrayList<ViewMap.DIR> dirs = new ArrayList<ViewMap.DIR>(Arrays.asList(ViewMap.DIR.N, ViewMap.DIR.S, ViewMap.DIR.E, ViewMap.DIR.W));
 
+        int index = dirs.indexOf(dirToMove);
+        Pair<Integer,Integer> coos = new Pair<>(getModel_link().getX(), getModel_link().getY());
+
+        switch(index){
+            case 0: //N
+                return new Pair<>(coos.getKey(), coos.getValue()-1);
+
+            case 1: //S
+                return new Pair<>(coos.getKey(), coos.getValue()+1);
+
+            case 2: //E
+                return new Pair<>(coos.getKey()+1, coos.getValue());
+
+            case 3: //W
+                return new Pair<>(coos.getKey()-1, coos.getValue());
+
+            default:
+                System.out.println("Unexpected direction");
+                return null;
         }
-
     }
 
 

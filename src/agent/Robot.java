@@ -7,6 +7,7 @@ import javafx.util.Pair;
 import message.InformViewMap;
 import message.Message;
 import message.RequestViewMap;
+import model.Model;
 import model.map.AgentModel;
 import model.map.MapElement;
 import model.map.Obstacle;
@@ -135,19 +136,26 @@ public class Robot extends ExplorerAgent {
 
     private void move_random() {
 
-        ArrayList<ViewMap.DIR> dirs = AgentModel.getPossibleDir();
+        Pair<Integer,Integer> oldPos = new Pair<>(getModel_link().getX(),getModel_link().getY());
+        ArrayList<ViewMap.DIR> possibleDirs = getMyViewMap().getPossibleDir(oldPos);
 
         Random r = new Random();
-        int dir = r.nextInt(dirs.size());
+        int dir = r.nextInt(possibleDirs.size());
 
-        Pair<Integer,Integer> newPos= move(dirs.get(dir));
+        //new coordinates
+        Pair<Integer,Integer> newPos = move(possibleDirs.get(dir));
+
+        //move on globalMap
         getModel_link().move(newPos.getKey(), newPos.getValue());
 
-        AgentModel.setGlobalMap();
+        AgentModel.setGlobalMap(AgentModel.getGlobalMap()); //extract these calls to 1 method
 
+        //update pos
+        getModel_link().setPos_x(newPos.getKey());
+        getModel_link().setPos_y(newPos.getValue());
 
-        //update this.coords
         //update viewmap
+        getMyViewMap().addViewRange(newPos, Model.getForest(),getVision_range());
     }
 
     private ArrayList<MapElement> get_neighbors_empty_spaces(Vector<MapElement> neighbors) {

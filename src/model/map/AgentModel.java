@@ -57,20 +57,21 @@ public class AgentModel extends MapElement {
 
     @Override
     public void draw(SimGraphics simGraphics) {
+
         switch (type) {
             case CAPTAIN:
-                //TODO agentModel receives label param and uses it in last param of bellow call at <"agent">
-                simGraphics.drawStringInOval(Color.cyan,Color.white, "agent");
+                simGraphics.drawRect(Color.ORANGE);
                 break;
             case SOLDIER:
-                simGraphics.drawFastCircle(Color.ORANGE);
+                simGraphics.drawRect(Color.cyan);
                 break;
             case ROBOT:
-                simGraphics.drawFastCircle(Color.red);
+                simGraphics.drawRect(Color.red);
                 break;
             default:
                 break;
         }
+
     }
 
     public enum agent_type {CAPTAIN, SOLDIER, ROBOT}

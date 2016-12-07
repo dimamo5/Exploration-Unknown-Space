@@ -26,4 +26,5 @@ public class Human extends ExplorerAgent {
         this.radio_range = radio_range;
     }
 
+    protected enum agent_state {FINDING_EXIT, AT_EXIT}
 }

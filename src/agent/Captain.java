@@ -24,10 +24,7 @@ public class Captain extends Human {
 
     public int cellphone_range;
 
-    private enum agent_state {FINDING_EXIT}
-
     private agent_state state = agent_state.FINDING_EXIT;
-
 
     public Captain(int id, int vision_range, int radio_range, int cellphone_range) {
         super(id, vision_range, radio_range);

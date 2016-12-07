@@ -48,6 +48,7 @@ public class Robot extends ExplorerAgent {
     }
 
     public void getInfo() {
+
     }
 
     @Override

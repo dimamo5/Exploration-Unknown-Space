@@ -1,24 +1,90 @@
 package model.map;
 
-import jade.content.Predicate;
+import javafx.util.Pair;
 
 /**
  * Created by sergi on 05/12/2016.
  */
-public class ViewMap implements Predicate{
+public class ViewMap {
 
-    private boolean map[][];
+    private int size;
 
-    public ViewMap(boolean[][] map) {
-        this.map = map;
+    private HeatElement map[][];
+
+    public ViewMap(HeatElement[][] map) {
     }
 
-    public boolean[][] getMap() {
+    public ViewMap(int size) {
+        this.size = size;
+        map = new HeatElement[size][size];
+    }
+
+    public HeatElement[][] getMap() {
         return map;
     }
 
-    public void setMap(boolean[][] map) {
-        this.map = map;
+    public void addViewRange(Pair<Integer, Integer> pos, Map map, int range) {
+        //Norte
+        for (int i = 0; i < range && i + pos.getKey() > 0; i++) {
+            if (map.getMap()[pos.getValue()][pos.getKey() + i] == 0 && i == 0) {
+                if (i == 0) {
+                    this.map[pos.getValue()][pos.getKey() + i].addMyHeat();
+                } else {
+                    this.map[pos.getValue()][pos.getKey() + i].addVisionHeat();
+                }
+            } else {
+                this.map[pos.getValue()][pos.getKey() + i].addWallHeat();
+                break;
+            }
+        }
+        //Sul
+        for (int i = 0; i < range && i + pos.getKey() > 0; i++) {
+            if (map.getMap()[pos.getValue()][pos.getKey() - i] == 0 && i == 0) {
+                if (i == 0) {
+                    this.map[pos.getValue()][pos.getKey() - i].addMyHeat();
+                } else {
+                    this.map[pos.getValue()][pos.getKey() - i].addVisionHeat();
+                }
+            } else {
+                this.map[pos.getValue()][pos.getKey() - i].addWallHeat();
+                break;
+            }
+        }
+        //Este
+        for (int i = 0; i < range && i + pos.getKey() > 0; i++) {
+            if (map.getMap()[pos.getValue() + i][pos.getKey()] == 0 && i == 0) {
+                if (i == 0) {
+                    this.map[pos.getValue() + i][pos.getKey()].addMyHeat();
+                } else {
+                    this.map[pos.getValue() + i][pos.getKey()].addVisionHeat();
+                }
+            } else {
+                this.map[pos.getValue() + i][pos.getKey()].addWallHeat();
+                break;
+            }
+        }
+        //Oeste
+        for (int i = 0; i < range && i + pos.getKey() > 0; i++) {
+            if (map.getMap()[pos.getValue() - i][pos.getKey()] == 0 && i == 0) {
+                if (i == 0) {
+                    this.map[pos.getValue() - i][pos.getKey()].addMyHeat();
+                } else {
+                    this.map[pos.getValue() - i][pos.getKey()].addVisionHeat();
+                }
+            } else {
+                this.map[pos.getValue() - i][pos.getKey()].addWallHeat();
+                break;
+            }
+        }
     }
 
+    public void addViewMap(ViewMap map) {
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                if (this.map[i][j].heat == 0 && this.map[i][j].heat != map.getMap()[i][j].heat) {
+                    this.map[i][j].heat = map.getMap()[i][j].heat;
+                }
+            }
+        }
+    }
 }

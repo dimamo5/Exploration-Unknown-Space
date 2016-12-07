@@ -117,6 +117,7 @@ public class Repast3ServiceConsumerProviderLauncher extends Repast3Launcher {
 		Runtime rt = Runtime.instance();
 		Profile p1 = new ProfileImpl();
 		mainContainer = rt.createMainContainer(p1);
+
 		
 		if(SEPARATE_CONTAINERS) {
 			Profile p2 = new ProfileImpl();

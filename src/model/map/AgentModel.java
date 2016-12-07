@@ -14,7 +14,7 @@ import java.util.Vector;
  */
 public class AgentModel extends MapElement {
 
-    protected static Object2DGrid map; //todo verificar se é suposto isto tar aqui
+    protected static Object2DGrid globalMap; //todo verificar se é suposto isto tar aqui
     private final ArrayList<ExplorerAgent> agents_list;
     private agent_type type;
     //TODO: é necessário obter os vizinhos através do método de vonneuman ? se sim deve ser feito nesta classe?
@@ -38,12 +38,12 @@ public class AgentModel extends MapElement {
     }
 
 
-    public static Object2DGrid getMap() {
-        return map;
+    public static Object2DGrid getGlobalMap() {
+        return globalMap;
     }
 
-    public static void setMap(Object2DGrid map) {
-        AgentModel.map = map;
+    public static void setGlobalMap(Object2DGrid globalMap) {
+        AgentModel.globalMap = globalMap;
     }
 
     public ArrayList<ExplorerAgent> getAgents_list() {
@@ -61,12 +61,13 @@ public class AgentModel extends MapElement {
     protected Vector<MapElement> get_closest_neighbors() {
         //call to object2dGrid method
         //vonneuman neighbours -> https://pt.wikipedia.org/wiki/Vizinhan%C3%A7a_de_von_Neumann
-        return map.getVonNeumannNeighbors(this.getX(), this.getY(), true);
+        return globalMap.getVonNeumannNeighbors(this.getX(), this.getY(), true);
     }
 
     public void move(int new_x, int new_y) {
-        map.putObjectAt(getX(), getY(), null);
-        map.putObjectAt(new_x, new_y, this);
+
+        globalMap.putObjectAt(getX(), getY(), null);
+        globalMap.putObjectAt(new_x, new_y, this);
     }
 
     @Override

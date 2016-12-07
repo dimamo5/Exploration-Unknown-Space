@@ -7,10 +7,8 @@ import agent.Soldier;
 import jade.core.Profile;
 import jade.core.ProfileImpl;
 import jade.wrapper.StaleProxyException;
-import model.map.AgentModel;
-import model.map.Map;
-import model.map.MapExit;
-import model.map.Obstacle;
+import javafx.util.Pair;
+import model.map.*;
 import sajas.core.Runtime;
 import sajas.sim.repast3.Repast3Launcher;
 import sajas.wrapper.ContainerController;
@@ -53,7 +51,15 @@ public class Model extends Repast3Launcher {
     private int numRobot = NUM_ROBOT;
 
     private ArrayList<ExplorerAgent> agents_list;
-    private Map forest;
+    private static Map forest;
+
+    public static Map getForest() {
+        return forest;
+    }
+
+    public static void setForest(Map forest) {
+        Model.forest = forest;
+    }
 
     public Model() {
         super();
@@ -78,7 +84,7 @@ public class Model extends Repast3Launcher {
 
         this.forest = new Map(15, 15);
 
-        forest.print(); //prints map on console
+        forest.print(); //prints globalMap on console
 
         //Map model
         forest_space = new Object2DGrid(forest.getWidth(), forest.getHeight());
@@ -231,12 +237,17 @@ public class Model extends Repast3Launcher {
         for (int i = 0; i < capitains.size(); i++) {
 
             Captain cap = new Captain(5 + i, 5, 5, 5);
-            cap.setModel_link(new AgentModel(capitains.get(i)[0],
+
+            AgentModel agModel = new AgentModel(capitains.get(i)[0],
                     capitains.get(i)[1],
                     forest_space,
                     AgentModel.agent_type.CAPTAIN,
-                    agents_list));
+                    agents_list);
 
+            cap.setModel_link(agModel);
+
+            cap.setMyViewMap(new ViewMap(Model.forest.getWidth()));
+            cap.getMyViewMap().addViewRange(new Pair<>(agModel.getX(), agModel.getY()), Model.getForest(), cap.getVision_range());
 
             try {
                 agentContainer.acceptNewAgent("Captain #" + i, cap).start();
@@ -256,11 +267,17 @@ public class Model extends Repast3Launcher {
             //Gerar Soldados
             for (int j = 0; j < soldiers.size(); j++) {
                 Soldier sol = new Soldier(5 + j, 5, 5);
-                sol.setModel_link(new AgentModel(soldiers.get(j)[0],
+
+                AgentModel agModel = new AgentModel(soldiers.get(j)[0],
                         soldiers.get(j)[1],
                         forest_space,
                         AgentModel.agent_type.SOLDIER,
-                        agents_list));
+                        agents_list);
+
+                sol.setModel_link(agModel);
+                sol.setMyViewMap(new ViewMap(Model.forest.getWidth()));
+                sol.getMyViewMap().addViewRange(new Pair<>(agModel.getX(), agModel.getY()), Model.getForest(), sol.getVision_range());
+
 
                 try {
                     agentContainer.acceptNewAgent("Soldier #" + j, sol).start();
@@ -280,11 +297,16 @@ public class Model extends Repast3Launcher {
         //Gerar Robot
         for (int i = 0; i < robots.size(); i++) {
             Robot robot = new Robot(5 + i, 5, 5);
-            robot.setModel_link(new AgentModel(robots.get(i)[0],
+
+            AgentModel agModel = new AgentModel(robots.get(i)[0],
                     robots.get(i)[1],
                     forest_space,
                     AgentModel.agent_type.ROBOT,
-                    agents_list));
+                    agents_list);
+
+            robot.setModel_link(agModel);
+            robot.setMyViewMap(new ViewMap(Model.forest.getWidth()));
+            robot.getMyViewMap().addViewRange(new Pair<>(agModel.getX(), agModel.getY()), Model.getForest(), robot.getVision_range());
 
             try {
                 agentContainer.acceptNewAgent("Robot #" + i, robot).start();

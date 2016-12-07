@@ -1,11 +1,13 @@
 package agent;
 
+import com.bbn.openmap.omGraphics.grid.GridData;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.UnreadableException;
 import javafx.util.Pair;
 import message.InformViewMap;
 import message.Message;
 import message.RequestViewMap;
+import model.map.AgentModel;
 import model.map.MapElement;
 import model.map.Obstacle;
 import model.map.ViewMap;
@@ -15,6 +17,7 @@ import sajas.core.behaviours.TickerBehaviour;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.Vector;
 
 /**
@@ -28,6 +31,7 @@ public class Robot extends ExplorerAgent {
 
     private static final int DEFAULT_ENERGY = 15; //15 cells/turns by default
     private int energy = DEFAULT_ENERGY;
+
 
     public Robot(int id, int vision_range, int energy) {
         super(id, vision_range);
@@ -59,6 +63,8 @@ public class Robot extends ExplorerAgent {
         });
     }
 
+
+//TODO CREATE beahviour class 4 this
     private void beginMsgListener() {
         addBehaviour(new CyclicBehaviour(this) {
             private static final long serialVersionUID = 1L;
@@ -83,7 +89,7 @@ public class Robot extends ExplorerAgent {
 
         switch (state) {
             case MOVING:
-                //move()  // --energy > 0 -> moverandomly..
+                moveRobot();   // --energy > 0 -> moverandomly..
                 break;
             case OUT_OF_ENERGY:
                 break;
@@ -96,7 +102,7 @@ public class Robot extends ExplorerAgent {
 
         try {
             Pair<Integer, Integer> pos = new Pair<>(getModel_link().getX(), getModel_link().getY());
-            InformViewMap inform = new InformViewMap(pos,new ViewMap(new boolean[][]{})); //TODO get viewmap
+            InformViewMap inform = new InformViewMap(pos,new ViewMap(15)); //TODO get viewmap
             reply.setContentObject(inform);
         } catch (IOException e) {
             e.printStackTrace();
@@ -117,26 +123,31 @@ public class Robot extends ExplorerAgent {
     }
 
 
-    private void move() {
+    private void moveRobot() {
 
         //se modo ñ eficient estiver ligado:
-        //move_random();
+        if(--energy > 0) {
+            move_random();
+        }
         //se nao
         //move_efficient
     }
 
-    private void move_random() { //can the robot move after finding the exit????
+    private void move_random() {
 
-        // Vector<MapElement> neighbors = get_closest_neighbors();
+        ArrayList<ViewMap.DIR> dirs = AgentModel.getPossibleDir();
 
-        // get_neighbors_empty_spaces(neighbors);
+        Random r = new Random();
+        int dir = r.nextInt(dirs.size());
 
-        //TODO.....move
+        Pair<Integer,Integer> newPos= move(dirs.get(dir));
+        getModel_link().move(newPos.getKey(), newPos.getValue());
 
-        if (is_At_map_exit()) {
-            setAt_map_exit(true);
-            setFound_map_exit(true);
-        }
+        AgentModel.setGlobalMap();
+
+
+        //update this.coords
+        //update viewmap
     }
 
     private ArrayList<MapElement> get_neighbors_empty_spaces(Vector<MapElement> neighbors) {

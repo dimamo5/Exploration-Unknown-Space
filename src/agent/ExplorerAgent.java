@@ -3,7 +3,9 @@ package agent;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAException;
 import jade.lang.acl.ACLMessage;
+import javafx.util.Pair;
 import model.map.AgentModel;
+import model.map.ViewMap;
 import sajas.core.Agent;
 import jade.content.lang.Codec;
 import jade.content.onto.Ontology;
@@ -29,10 +31,19 @@ public class ExplorerAgent extends Agent {
     private int id, vision_range = DEFAULT_VISION_RANGE,    //cells count
             current_dir = -1, previous_dir = -1;            //no current/previous direction at the begining
 
-    // TODO: 16/10/2016 add agent's own map
+    // TODO: 16/10/2016 add agent's own globalMap
 
     private boolean at_map_exit = false, found_map_exit = false;
     private AgentModel model_link;
+    private ViewMap myViewMap;
+
+    public ViewMap getMyViewMap() {
+        return myViewMap;
+    }
+
+    public void setMyViewMap(ViewMap myViewMap) {
+        this.myViewMap = myViewMap;
+    }
 
     public AgentModel getModel_link() {
         return model_link;
@@ -48,6 +59,16 @@ public class ExplorerAgent extends Agent {
     public ExplorerAgent(int id, int vision_range) {
         this.id = id;
         this.vision_range = vision_range;
+    }
+
+    public Pair<Integer,Integer> move(ViewMap.DIR dirToMove){
+
+        switch(ViewMap.DIR){
+
+            case ViewMap.DIR.
+
+        }
+
     }
 
 

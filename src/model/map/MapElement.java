@@ -14,7 +14,7 @@ import java.awt.image.BufferedImage;
  */
 
 /**
- * Represents a map's element (human/robot/obstacle/exit)
+ * Represents a globalMap's element (human/robot/obstacle/exit)
  */
 
 public class MapElement implements Drawable, Stepable {
@@ -33,7 +33,7 @@ public class MapElement implements Drawable, Stepable {
     public MapElement(int pos_x, int pos_y, Object2DGrid c) {
         this.pos_x = pos_x;
         this.pos_y = pos_y;
-        //map = c;
+        //globalMap = c;
     }
 
     @Override

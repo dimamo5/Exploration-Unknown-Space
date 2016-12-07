@@ -44,10 +44,10 @@ public class Map {
         Map map = new Map(10, 10);
         map.print();
 
-     /*   int[] posCapitain = map.createPositions();
+     /*   int[] posCapitain = globalMap.createPositions();
         System.out.println("capitain " + Arrays.toString(posCapitain));
 */
-      /*  ArrayList<int[]> soldiers = map.createSoldiersPosition(posCapitain, 5, 5);
+      /*  ArrayList<int[]> soldiers = globalMap.createSoldiersPosition(posCapitain, 5, 5);
 
         for (int i = 0; i < soldiers.size(); i++) {
             System.out.println("soldier " + i + ' ' + Arrays.toString(soldiers.get(i)));
@@ -112,14 +112,14 @@ public class Map {
         for (int i = 0; i < input_height; i++) {
             // draw the north edge
             for (int j = 0; j < input_width; j++) {
-                //System.out.print((map[j][i] & 1) == 0 ? "+-" : "+ ");
+                //System.out.print((globalMap[j][i] & 1) == 0 ? "+-" : "+ ");
                 s += (map[j][i] & 1) == 0 ? "+-" : "+ ";
             }
             //System.out.println("+");
             s += "+\n";
             // draw the west edge
             for (int j = 0; j < input_width; j++) {
-                //System.out.print((map[j][i] & 8) == 0 ? "| " : "  ");
+                //System.out.print((globalMap[j][i] & 8) == 0 ? "| " : "  ");
                 s += (map[j][i] & 8) == 0 ? "| " : "  ";
             }
             //System.out.println("|");
@@ -138,7 +138,7 @@ public class Map {
     @Override
     public String toString() {
         return "Map{" +
-                "map=" + Arrays.toString(map) +
+                "globalMap=" + Arrays.toString(map) +
                 '}';
     }
 
@@ -152,7 +152,7 @@ public class Map {
         for (int i = 0; i < input_height; i++) {
             // draw the north edge
             for (int j = 0; j < input_width; j++) {
-                //System.out.print((map[j][i] & 1) == 0 ? "+-" : "+ ");
+                //System.out.print((globalMap[j][i] & 1) == 0 ? "+-" : "+ ");
                 if ((map[j][i] & 1) == 0) {
                     map_in_array[i * 2][j * 2] = 1;
                     map_in_array[i * 2][j * 2 + 1] = 1;
@@ -167,7 +167,7 @@ public class Map {
             //s += "+\n";
             // draw the west edge
             for (int j = 0; j < input_width; j++) {
-                //System.out.print((map[j][i] & 8) == 0 ? "| " : "  ");
+                //System.out.print((globalMap[j][i] & 8) == 0 ? "| " : "  ");
                 if ((map[j][i] & 8) == 0) {
                     map_in_array[i * 2 + 1][j * 2] = 1;
                     map_in_array[i * 2 + 1][j * 2 + 1] = 0;

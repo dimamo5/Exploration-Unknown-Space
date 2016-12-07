@@ -1,24 +1,23 @@
 package model.map;
 
-import jade.content.Predicate;
-
 /**
  * Created by sergi on 05/12/2016.
  */
-public class ViewMap implements Predicate{
+public class ViewMap {
 
-    private boolean map[][];
+    private int size;
 
-    public ViewMap(boolean[][] map) {
-        this.map = map;
+    private HeatElement map[][];
+
+    public ViewMap(HeatElement[][] map) {
     }
 
-    public boolean[][] getMap() {
+    public ViewMap(int size) {
+        this.size = size;
+        map = new HeatElement[size][size];
+    }
+
+    public HeatElement[][] getMap() {
         return map;
     }
-
-    public void setMap(boolean[][] map) {
-        this.map = map;
-    }
-
 }

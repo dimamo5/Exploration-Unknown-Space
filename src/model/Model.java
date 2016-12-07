@@ -2,6 +2,8 @@ package model;
 
 import agent.Captain;
 import agent.ExplorerAgent;
+import agent.Robot;
+import agent.Soldier;
 import jade.core.Profile;
 import jade.core.ProfileImpl;
 import jade.wrapper.StaleProxyException;
@@ -15,7 +17,8 @@ import sajas.wrapper.ContainerController;
 import uchicago.src.sim.engine.BasicAction;
 import uchicago.src.sim.engine.Schedule;
 import uchicago.src.sim.engine.SimInit;
-import uchicago.src.sim.gui.*;
+import uchicago.src.sim.gui.DisplaySurface;
+import uchicago.src.sim.gui.Object2DDisplay;
 import uchicago.src.sim.space.Object2DGrid;
 
 import javax.imageio.ImageIO;
@@ -30,6 +33,9 @@ import java.util.ArrayList;
 public class Model extends Repast3Launcher {
 
     private static final boolean BATCH_MODE = true;
+    private static int NUM_CAP = 2;
+    private static int NUM_SOL = 6;
+    private static int NUM_ROBOT = 2;
 
     public DisplaySurface dsurf;
     public DisplaySurface dsurf2;
@@ -37,13 +43,16 @@ public class Model extends Repast3Launcher {
     private Object2DGrid heat_map_space;
     private Object2DDisplay heat_map_display;
 
-    private Schedule schedule;
     private ContainerController agentContainer;
 
     private ArrayList<Object> display_list;
     public static long tick = 0;
+    private int numCap = NUM_CAP;
+    private int numSol = NUM_SOL;
+    private int numRobot = NUM_ROBOT;
 
     private ArrayList<ExplorerAgent> agents_list;
+    private Map forest;
 
     public Model() {
         super();
@@ -51,7 +60,7 @@ public class Model extends Repast3Launcher {
 
     @Override
     public String[] getInitParam() {
-        return new String[]{};
+        return new String[]{"numCap", "numRobot", "numSol"};
     }
 
     @Override
@@ -66,7 +75,7 @@ public class Model extends Repast3Launcher {
 
         display_list = new ArrayList<>();
 
-        Map forest = new Map(20, 20);
+        this.forest = new Map(20, 20);
 
         forest.print(); //prints map on console
 
@@ -78,7 +87,7 @@ public class Model extends Repast3Launcher {
         for (int y = 0; y < forest_space.getSizeY(); y++) {
             for (int x = 0; x < forest_space.getSizeX(); x++) {
 
-                if (forest.getMap_in_array()[y][x]==1) {
+                if (forest.getMap_in_array()[y][x] == 1) {
                     Obstacle tree = new Obstacle(x, y, forest_space);
                     try {
                         tree.setImage(ImageIO.read(new File("res/icons/tree.png")));
@@ -88,7 +97,7 @@ public class Model extends Repast3Launcher {
                     display_list.add(tree);
                     forest_space.putObjectAt(x, y, tree);
 
-                } else if (forest.getMap_in_array()[y][x]==2) {
+                } else if (forest.getMap_in_array()[y][x] == 2) {
                     MapExit exit = new MapExit(x, y, forest_space);
                     try {
                         exit.setImage(ImageIO.read(new File("res/icons/door.png")));
@@ -97,7 +106,7 @@ public class Model extends Repast3Launcher {
                     }
                     display_list.add(exit);
                     forest_space.putObjectAt(x, y, exit);
-                }else if(forest.getMap_in_array()[y][x]==0){
+                } else if (forest.getMap_in_array()[y][x] == 0) {
 
                 }
                 //ForestHeat fh = new ForestHeat(i,j);
@@ -152,6 +161,30 @@ public class Model extends Repast3Launcher {
         return "Exploration of Unknown Space -- SAJaS Repast3 Test";
     }
 
+    public int getNumCap() {
+        return numCap;
+    }
+
+    public void setNumCap(int numCap) {
+        this.numCap = numCap;
+    }
+
+    public int getNumSol() {
+        return numSol;
+    }
+
+    public void setNumSol(int numSol) {
+        this.numSol = numSol;
+    }
+
+    public int getNumRobot() {
+        return numRobot;
+    }
+
+    public void setNumRobot(int numRobot) {
+        this.numRobot = numRobot;
+    }
+
 
     class MainAction extends BasicAction {
 
@@ -191,27 +224,57 @@ public class Model extends Repast3Launcher {
 
     private void launchAgents() {
 
-        //todo
-        //use input params: N_CAPTAIN, N_SOLDIER, N_ROBOT
-        //use random to generate agent's position
-
         agents_list = new ArrayList<>();
-        int n = 2;
 
-        for (int i = 0; i < n; i++) {
+        //Gerar Capitães
+        for (int i = 0; i < numCap; i++) {
+            int[] pos = forest.createCapitainPosition();
 
-            Captain cap = new Captain(5+i,5,5,5 );
-            cap.setModel_link(new AgentModel(5+i,5+i,forest_space, AgentModel.agent_type.CAPTAIN, agents_list));
+            Captain cap = new Captain(5 + i, 5, 5, 5);
+            cap.setModel_link(new AgentModel(pos[0], pos[1], forest_space, AgentModel.agent_type.CAPTAIN,
+                    agents_list));
 
             try {
-                agentContainer.acceptNewAgent("Captain #"+i,cap).start();
+                agentContainer.acceptNewAgent("Captain #" + i, cap).start();
             } catch (StaleProxyException e) {
                 e.printStackTrace();
             }
             agents_list.add(cap);
 
             display_list.add(cap.getModel_link());
-            forest_space.putObjectAt(5+i,5+i, cap.getModel_link());
+            forest_space.putObjectAt(pos[0], pos[1], cap.getModel_link());
+        }
+
+        //Gerar Soldados
+        for (int i = 0; i < numSol; i++) {
+            Soldier sol = new Soldier(5 + i, 5, 5);
+            sol.setModel_link(new AgentModel(5 + i, 5 + i, forest_space, AgentModel.agent_type.SOLDIER, agents_list));
+
+            try {
+                agentContainer.acceptNewAgent("Soldier #" + i, sol).start();
+            } catch (StaleProxyException e) {
+                e.printStackTrace();
+            }
+            agents_list.add(sol);
+
+            display_list.add(sol.getModel_link());
+            forest_space.putObjectAt(5 + i, 5 + i, sol.getModel_link());
+        }
+
+        //Gerar Robot
+        for (int i = 0; i < numRobot; i++) {
+            Robot robot = new Robot(5 + i, 5, 5);
+            robot.setModel_link(new AgentModel(5 + i, 5 + i, forest_space, AgentModel.agent_type.CAPTAIN, agents_list));
+
+            try {
+                agentContainer.acceptNewAgent("Robot #" + i, robot).start();
+            } catch (StaleProxyException e) {
+                e.printStackTrace();
+            }
+            agents_list.add(robot);
+
+            display_list.add(robot.getModel_link());
+            forest_space.putObjectAt(5 + i, 5 + i, robot.getModel_link());
         }
     }
 

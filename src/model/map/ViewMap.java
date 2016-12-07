@@ -18,7 +18,12 @@ public class ViewMap {
 
     public ViewMap(int size) {
         this.size = size;
-        this.map = new HeatElement[size][size];
+        map = new HeatElement[size][size];
+        for(int i = 0;i<map.length;i++){
+            for (int m=0;m<map.length;m++){
+                map[i][m]=new HeatElement(m,i);
+            }
+        }
     }
 
     public HeatElement[][] getMap() {

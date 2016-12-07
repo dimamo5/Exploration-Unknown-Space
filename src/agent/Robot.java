@@ -1,6 +1,5 @@
 package agent;
 
-import com.bbn.openmap.omGraphics.grid.GridData;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.UnreadableException;
 import javafx.util.Pair;
@@ -34,8 +33,8 @@ public class Robot extends ExplorerAgent {
     private int energy = DEFAULT_ENERGY;
 
 
-    public Robot(int id, int vision_range, int energy) {
-        super(id, vision_range);
+    public Robot(int vision_range, int energy) {
+        super(vision_range);
         this.energy = energy;
     }
 
@@ -65,7 +64,7 @@ public class Robot extends ExplorerAgent {
     }
 
 
-//TODO CREATE beahviour class 4 this
+    //TODO CREATE beahviour class 4 this
     private void beginMsgListener() {
         addBehaviour(new CyclicBehaviour(this) {
             private static final long serialVersionUID = 1L;
@@ -75,8 +74,9 @@ public class Robot extends ExplorerAgent {
                 ACLMessage msg = myAgent.receive();
 
                 try {
-                    if (msg != null && msg.getPerformative() == Message.REQUEST && msg.getContentObject() instanceof RequestViewMap) {
-                        System.out.println("Robot#"+getId()+"  sending viewmap");
+                    if (msg != null && msg.getPerformative() == Message.REQUEST && msg.getContentObject() instanceof
+                            RequestViewMap) {
+                        System.out.println("Robot#" + getAID() + " sending viewmap");
                         sendMyInfoToAgent(msg);
                     }
                 } catch (UnreadableException e) {
@@ -103,7 +103,7 @@ public class Robot extends ExplorerAgent {
 
         try {
             Pair<Integer, Integer> pos = new Pair<>(getModel_link().getX(), getModel_link().getY());
-            InformViewMap inform = new InformViewMap(pos,new ViewMap(15)); //TODO get viewmap
+            InformViewMap inform = new InformViewMap(pos, new ViewMap(15)); //TODO get viewmap
             reply.setContentObject(inform);
         } catch (IOException e) {
             e.printStackTrace();
@@ -127,7 +127,7 @@ public class Robot extends ExplorerAgent {
     private void moveRobot() {
 
         //se modo ñ eficient estiver ligado:
-        if(--energy > 0) {
+        if (--energy > 0) {
             move_random();
         }
         //se nao
@@ -136,14 +136,14 @@ public class Robot extends ExplorerAgent {
 
     private void move_random() {
 
-        Pair<Integer,Integer> oldPos = new Pair<>(getModel_link().getX(),getModel_link().getY());
+        Pair<Integer, Integer> oldPos = new Pair<>(getModel_link().getX(), getModel_link().getY());
         ArrayList<ViewMap.DIR> possibleDirs = getMyViewMap().getPossibleDir(oldPos);
 
         Random r = new Random();
         int dir = r.nextInt(possibleDirs.size());
 
         //new coordinates
-        Pair<Integer,Integer> newPos = move(possibleDirs.get(dir));
+        Pair<Integer, Integer> newPos = move(possibleDirs.get(dir));
 
         //move on globalMap
         getModel_link().move(newPos.getKey(), newPos.getValue());
@@ -155,7 +155,7 @@ public class Robot extends ExplorerAgent {
         getModel_link().setPos_y(newPos.getValue());
 
         //update viewmap
-        getMyViewMap().addViewRange(newPos, Model.getForest(),getVision_range());
+        getMyViewMap().addViewRange(newPos, Model.getForest(), getVision_range());
     }
 
     private ArrayList<MapElement> get_neighbors_empty_spaces(Vector<MapElement> neighbors) {
@@ -168,7 +168,8 @@ public class Robot extends ExplorerAgent {
             }
         }
 
-        //TODO: REPETIDOS- podem haver objs na mesma posição e dar aso a que hajam: k empty_spaces, k = nº agentes no mesmo espaço
+        //TODO: REPETIDOS- podem haver objs na mesma posição e dar aso a que hajam: k empty_spaces, k = nº agentes no
+        // mesmo espaço
         return empty_spaces;
     }
 

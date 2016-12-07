@@ -57,7 +57,7 @@ public class HeatElement implements Drawable {
         else if (heat == -2)  //Paredes
             g.drawFastRect(Color.gray);
         else
-            g.drawFastRect(Color.white);
+            g.drawFastRect(Color.white); //-1
     }
 
     @Override

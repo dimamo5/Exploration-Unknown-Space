@@ -78,7 +78,13 @@ public class ViewMap {
         }
     }
 
-    public void addViewMap(Map map) {
-        //TODO tomorrow
+    public void addViewMap(ViewMap map) {
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                if (this.map[i][j].heat == 0 && this.map[i][j].heat != map.getMap()[i][j].heat) {
+                    this.map[i][j].heat = map.getMap()[i][j].heat;
+                }
+            }
+        }
     }
 }

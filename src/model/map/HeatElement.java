@@ -47,6 +47,7 @@ public class HeatElement implements Drawable {
     }
 
 
+
     @Override
     public void draw(SimGraphics g) {
         if (heat > 0)    //Numero de vezes que passou

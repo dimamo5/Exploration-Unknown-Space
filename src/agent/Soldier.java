@@ -137,6 +137,7 @@ public class Soldier extends Human {
 
     }
 
+
     private void move_random() {
 
 

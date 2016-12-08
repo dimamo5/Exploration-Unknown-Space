@@ -3,9 +3,8 @@ package utilities;
 import javafx.util.Pair;
 import model.map.HeatElement;
 
-import java.awt.*;
-import java.util.*;
-import java.util.List;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Created by diogo on 08/12/2016.

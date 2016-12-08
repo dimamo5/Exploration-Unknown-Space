@@ -1,6 +1,6 @@
 package agent;
 
-import cern.colt.Arrays;
+import jade.core.AID;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.UnreadableException;
 import javafx.util.Pair;
@@ -12,14 +12,12 @@ import model.map.AgentModel;
 import model.map.MapElement;
 import model.map.Obstacle;
 import model.map.ViewMap;
-import sajas.core.behaviours.Behaviour;
 import sajas.core.behaviours.CyclicBehaviour;
-import sajas.core.behaviours.TickerBehaviour;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Random;
-import java.util.Vector;
+import java.util.*;
+
+import static agent.Robot.Robot_state.OUT_OF_ENERGY;
 
 /**
  * Created by sergi on 16/10/2016.
@@ -32,6 +30,8 @@ public class Robot extends ExplorerAgent {
 
     private static final int DEFAULT_ENERGY = 15; //15 cells/turns by default
     private int energy = DEFAULT_ENERGY;
+
+    private ArrayList<AID> outOfEnergyCommAgents;
 
     public Robot(int vision_range, int energy) {
         super(vision_range);
@@ -59,10 +59,11 @@ public class Robot extends ExplorerAgent {
             public void action() {
                 tick++;
 
-                if(tick % 100 == 0 ) { //TODO period nao estar hardcoded
+                if (tick % 100 == 0) { //TODO period nao estar hardcoded
                     update();
                 }
             }
+
             private static final long serialVersionUID = 1L;
 
 
@@ -82,8 +83,27 @@ public class Robot extends ExplorerAgent {
                 try {
                     if (msg != null && msg.getPerformative() == Message.REQUEST && msg.getContentObject() instanceof
                             RequestViewMap) {
-                        System.out.println("Robot#" + getAID() + " sending viewmap");
-                        sendMyInfoToAgent(msg);
+
+                        boolean send = true;
+                        if (state == OUT_OF_ENERGY) {
+
+                            if(outOfEnergyCommAgents == null)
+                                outOfEnergyCommAgents = new ArrayList<>();
+
+                            /*quando energy==0 -> guarda agentes com quem comunicou para evitar
+                            responder com a mesma informação*/
+                            if (!outOfEnergyCommAgents.contains(msg.getSender())) {
+                                System.out.println("O AGENTE\n"+msg.getSender()+"\nNAO ESTA NA LISTA, VOU ENVIAR INFO");
+                                outOfEnergyCommAgents.add(msg.getSender());
+                            }
+                            else
+                                send = false;
+                        }
+
+                        if(send) {
+                            System.out.println(getAID() + " sending info to " + msg.getSender());
+                            sendMyInfoToAgent(msg);
+                        }
                     }
                 } catch (UnreadableException e) {
                     e.printStackTrace();
@@ -99,6 +119,9 @@ public class Robot extends ExplorerAgent {
                 moveRobot();   // --energy > 0 -> moverandomly..
                 break;
             case OUT_OF_ENERGY:
+                if (outOfEnergyCommAgents == null) {
+                    outOfEnergyCommAgents = new ArrayList<>();
+                }
                 break;
         }
     }
@@ -122,54 +145,9 @@ public class Robot extends ExplorerAgent {
 
         if (--energy >= 0) {
             move_random();
-        }else{
-            state = Robot_state.OUT_OF_ENERGY;
+        } else {
+            state = OUT_OF_ENERGY;
         }
     }
-
-    private void move_random() {
-
-        Pair<Integer, Integer> oldPos = new Pair<>(getModel_link().getX(), getModel_link().getY());
-        Pair<Integer, Integer> newPos;
-
-        if (current_dir == null || !getMyViewMap().canMoveDir(current_dir, oldPos)) {
-            ArrayList<ViewMap.DIR> possibleDirs = getMyViewMap().getPossibleDir(oldPos);
-
-            Random r = new Random();
-            int dir = r.nextInt(possibleDirs.size());
-
-            //new coordinates
-            current_dir = possibleDirs.get(dir);
-        }
-
-        newPos = move(current_dir);
-
-        //move on globalMap
-
-        AgentModel.setGlobalMap(AgentModel.getGlobalMap()); //extract these calls to 1 method
-
-        //update pos
-        getModel_link().setPos_x(newPos.getKey());
-        getModel_link().setPos_y(newPos.getValue());
-
-        //update viewmap
-        getMyViewMap().addViewRange(newPos, Model.getForest(), getVision_range());
-    }
-
-    private ArrayList<MapElement> get_neighbors_empty_spaces(Vector<MapElement> neighbors) {
-
-        ArrayList<MapElement> empty_spaces = new ArrayList<>();
-
-        for (MapElement neighbour : neighbors) {
-            if (!(neighbour instanceof Obstacle)) {
-                empty_spaces.add(neighbour);
-            }
-        }
-
-        //TODO: REPETIDOS- podem haver objs na mesma posição e dar aso a que hajam: k empty_spaces, k = nº agentes no
-        // mesmo espaço
-        return empty_spaces;
-    }
-
 
 }

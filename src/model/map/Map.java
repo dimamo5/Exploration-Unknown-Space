@@ -254,7 +254,7 @@ public class Map {
     public int[] createPositions() {
         int[] a = new int[]{};
 
-        while (a.length == 0) {
+            while (a.length == 0) {
             int posY = new Random().nextInt(this.height);
             int posX = new Random().nextInt(this.width);
 
@@ -328,11 +328,23 @@ public class Map {
     }
 
     public ArrayList<int[]> createRobotsPosition(int numRobots) {
+        int[] newPos = new int[]{};
         ArrayList<int[]> robots = new ArrayList<int[]>();
         for (int i = 0; i < numRobots; i++) {
-            robots.add(createPositions());
+            while (newPos.length == 0) {
+                int posY = new Random().nextInt(this.height);
+                int posX = new Random().nextInt(this.width);
+
+                if (map_in_array[this.height - posY - 1][posX] == 0) {
+                    newPos = new int[]{posX, this.height - 1 - posY};
+                    robots.add(newPos);
+                    newPos = new int[]{};
+                    break;
+                }
+            }
         }
         return robots;
+
     }
 
 

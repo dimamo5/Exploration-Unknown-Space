@@ -47,7 +47,6 @@ public class Model extends Repast3Launcher {
     private Object2DGrid heat_map_space;
     private Object2DDisplay heat_map_display;
     private JFrame agentFrame;
-    private ArrayList<ExplorerAgent> agents_list;
     protected JList agentList;
 
     private ContainerController agentContainer;
@@ -58,6 +57,7 @@ public class Model extends Repast3Launcher {
     private int numSol = NUM_SOL;
     private int numRobot = NUM_ROBOT;
 
+    private ArrayList<ExplorerAgent> agents_list;
     private static Map forest;
 
     public static Map getForest() {
@@ -151,6 +151,7 @@ public class Model extends Repast3Launcher {
 
     private void buildSchedule() {
         getSchedule().scheduleActionBeginning(1, this, "step");
+        getSchedule().scheduleActionAtInterval(1, dsurf, "updateDisplay", Schedule.LAST);
         getSchedule().scheduleActionAtInterval(1, dsurf2, "updateDisplay", Schedule.LAST);
     }
 
@@ -346,6 +347,7 @@ public class Model extends Repast3Launcher {
         JScrollPane scroll = new JScrollPane(agentList);
         agentFrame.add(scroll);
         agentFrame.setSize(150, 350);
+        agentFrame.setLocation(270, 70);
         agentFrame.setVisible(true);
         MouseListener mouseListener = new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {

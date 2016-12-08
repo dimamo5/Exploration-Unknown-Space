@@ -42,31 +42,20 @@ public class ViewMap implements Serializable{
 
     public void addViewRange(Pair<Integer, Integer> pos, Map map, int viewRange) {
         //Norte
-        for (int i = 0; i < viewRange && i + pos.getKey() > 0; i++) {
-            if (map.getMap_in_array()[pos.getValue()][pos.getKey() + i] == 0) {
+        for (int i = 0; i < viewRange && pos.getValue() - i > 0; i++) {
+            if (map.getMap_in_array()[pos.getValue() - i][pos.getKey()] == 0) {
                 if (i == 0) {
-                    this.map[pos.getValue()][pos.getKey() + i].addMyHeat();
+                    this.map[pos.getValue() - i][pos.getKey()].addMyHeat();
                 } else {
-                    this.map[pos.getValue()][pos.getKey() + i].addVisionHeat();
+                    this.map[pos.getValue() - i][pos.getKey()].addVisionHeat();
                 }
             } else {
-                this.map[pos.getValue()][pos.getKey() + i].addWallHeat();
+                this.map[pos.getValue() - i][pos.getKey()].addWallHeat();
                 break;
             }
         }
         //Sul
-        for (int i = 0; i < viewRange && i + pos.getKey() > 0; i++) {
-            if (map.getMap_in_array()[pos.getValue()][pos.getKey() - i] == 0) {
-                if (i != 0) {
-                    this.map[pos.getValue()][pos.getKey() - i].addVisionHeat();
-                }
-            } else {
-                this.map[pos.getValue()][pos.getKey() - i].addWallHeat();
-                break;
-            }
-        }
-        //Este
-        for (int i = 0; i < viewRange && i + pos.getKey() > 0; i++) {
+        for (int i = 0; i < viewRange && pos.getValue() + i > 0; i++) {
             if (map.getMap_in_array()[pos.getValue() + i][pos.getKey()] == 0) {
                 if (i != 0) {
                     this.map[pos.getValue() + i][pos.getKey()].addVisionHeat();
@@ -76,14 +65,25 @@ public class ViewMap implements Serializable{
                 break;
             }
         }
-        //Oeste
-        for (int i = 0; i < viewRange && i + pos.getKey() > 0; i++) {
-            if (map.getMap_in_array()[pos.getValue() - i][pos.getKey()] == 0) {
+        //Este
+        for (int i = 0; i < viewRange && pos.getKey() + i > 0; i++) {
+            if (map.getMap_in_array()[pos.getValue()][pos.getKey() + i] == 0) {
                 if (i != 0) {
-                    this.map[pos.getValue() - i][pos.getKey()].addVisionHeat();
+                    this.map[pos.getValue()][pos.getKey() + i].addVisionHeat();
                 }
             } else {
-                this.map[pos.getValue() - i][pos.getKey()].addWallHeat();
+                this.map[pos.getValue()][pos.getKey() + i].addWallHeat();
+                break;
+            }
+        }
+        //Oeste
+        for (int i = 0; i < viewRange && pos.getKey() - i > 0; i++) {
+            if (map.getMap_in_array()[pos.getValue()][pos.getKey() - i] == 0) {
+                if (i != 0) {
+                    this.map[pos.getValue()][pos.getKey() - i].addVisionHeat();
+                }
+            } else {
+                this.map[pos.getValue()][pos.getKey() - i].addWallHeat();
                 break;
             }
         }

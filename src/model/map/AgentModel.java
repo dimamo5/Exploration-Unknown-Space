@@ -21,10 +21,11 @@ public class AgentModel extends MapElement {
     private agent_type type;
     //TODO: é necessário obter os vizinhos através do método de vonneuman ? se sim deve ser feito nesta classe?
 
-    public AgentModel(int pos_x, int pos_y, Object2DGrid c, agent_type type, ArrayList<ExplorerAgent> agents) {
-        super(pos_x, pos_y, c);
+    public AgentModel(int pos_x, int pos_y, Object2DGrid global, agent_type type, ArrayList<ExplorerAgent> agents) {
+        super(pos_x, pos_y);
         this.type = type;
         this.agents_list = agents;
+        globalMap = global;
     }
 
     public ArrayList<AID> getRobotsFromAgentList() {  //testing purposes
@@ -131,7 +132,6 @@ public class AgentModel extends MapElement {
     }
 
     public void move(int new_x, int new_y) {
-
         globalMap.putObjectAt(getX(), getY(), null);
         globalMap.putObjectAt(new_x, new_y, this);
     }

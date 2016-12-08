@@ -59,6 +59,7 @@ public class Captain extends Human {
                 tick++;
 
                 if (tick % 100 == 0) { //TODO destrolhar isto
+                    update();
                     move_random();
                 }
             }
@@ -85,14 +86,7 @@ public class Captain extends Human {
                     } else if (msg.getPerformative() == Message.INFORM) {
                         try {
                             if (msg.getContentObject() instanceof InformViewMap) {
-
-                                System.out.println("Previous viewmap");
-                                getMyViewMap().print();
-
                                 getMyViewMap().addViewMap(((InformViewMap) msg.getContentObject()).getViewMap());
-
-                                System.out.println("Updated viewmap");
-                                getMyViewMap().print();
                             }
                         } catch (UnreadableException e) {
                             e.printStackTrace();

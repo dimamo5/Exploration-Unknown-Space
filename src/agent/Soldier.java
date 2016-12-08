@@ -48,8 +48,10 @@ public class Soldier extends Human {
                 tick++;
 
                 if (tick % 100 == 0) { //TODO destrolhar isto
+                    update();
                     move_random();
                 }
+                //update();
             } //TODO period nao estar hardcoded
             private static final long serialVersionUID = 1L;
 
@@ -74,14 +76,7 @@ public class Soldier extends Human {
                     } else if (msg.getPerformative() == Message.INFORM) {
                         try {
                             if (msg.getContentObject() instanceof InformViewMap) {
-
-                                System.out.println("Previous viewmap");
-                                getMyViewMap().print();
-
                                 getMyViewMap().addViewMap(((InformViewMap) msg.getContentObject()).getViewMap());
-
-                                System.out.println("Updated viewmap");
-                                getMyViewMap().print();
                             }
                         } catch (UnreadableException e) {
                             e.printStackTrace();

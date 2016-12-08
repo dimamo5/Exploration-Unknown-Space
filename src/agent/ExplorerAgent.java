@@ -27,6 +27,7 @@ public class ExplorerAgent extends Agent {
     protected static final int DEFAULT_VISION_RANGE = 5;
 
     protected int vision_range = DEFAULT_VISION_RANGE;   //cells count
+    protected long tick=0;
 
     public ViewMap.DIR getCurrent_dir() {
         return current_dir;

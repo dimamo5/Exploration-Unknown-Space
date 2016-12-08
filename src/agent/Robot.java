@@ -1,5 +1,6 @@
 package agent;
 
+import cern.colt.Arrays;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.UnreadableException;
 import javafx.util.Pair;
@@ -31,7 +32,6 @@ public class Robot extends ExplorerAgent {
 
     private static final int DEFAULT_ENERGY = 15; //15 cells/turns by default
     private int energy = DEFAULT_ENERGY;
-    private long tick=0;
 
     public Robot(int vision_range, int energy) {
         super(vision_range);
@@ -52,7 +52,7 @@ public class Robot extends ExplorerAgent {
 
     @Override
     protected void setup() {
-        //beginMsgListener();
+        beginMsgListener();
 
         addBehaviour(new CyclicBehaviour(this) {
             @Override
@@ -109,7 +109,7 @@ public class Robot extends ExplorerAgent {
 
         try {
             Pair<Integer, Integer> pos = new Pair<>(getModel_link().getX(), getModel_link().getY());
-            InformViewMap inform = new InformViewMap(pos, new ViewMap(15)); //TODO get viewmap
+            InformViewMap inform = new InformViewMap(pos, getMyViewMap());
             reply.setContentObject(inform);
         } catch (IOException e) {
             e.printStackTrace();
@@ -119,8 +119,6 @@ public class Robot extends ExplorerAgent {
     }
 
     private void moveRobot() {
-
-        System.out.println("#"+getAID()+"  >"+energy);
 
         if (--energy >= 0) {
             move_random();
@@ -138,7 +136,6 @@ public class Robot extends ExplorerAgent {
             ArrayList<ViewMap.DIR> possibleDirs = getMyViewMap().getPossibleDir(oldPos);
 
             Random r = new Random();
-            System.out.println("Dirs:" + possibleDirs.size());
             int dir = r.nextInt(possibleDirs.size());
 
             //new coordinates
@@ -148,7 +145,6 @@ public class Robot extends ExplorerAgent {
         newPos = move(current_dir);
 
         //move on globalMap
-        getModel_link().move(newPos.getKey(), newPos.getValue());
 
         AgentModel.setGlobalMap(AgentModel.getGlobalMap()); //extract these calls to 1 method
 

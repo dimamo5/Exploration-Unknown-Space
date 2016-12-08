@@ -81,7 +81,7 @@ public class Model extends Repast3Launcher {
 
         display_list = new ArrayList<>();
 
-        this.forest = new Map(15, 15);
+        forest = new Map(15, 15);
 
         forest.print(); //prints globalMap on console
 
@@ -237,7 +237,6 @@ public class Model extends Repast3Launcher {
         //Gerar Capitães
         ArrayList<int[]> capitains = forest.createCapitainsPosition(numCap, 15);
 
-
         for (int i = 0; i < capitains.size(); i++) {
 
             Captain cap = new Captain(5, 5, 5);
@@ -246,7 +245,7 @@ public class Model extends Repast3Launcher {
                     capitains.get(i)[1],
                     forest_space,
                     AgentModel.agent_type.CAPTAIN,
-                    agents_list);
+            agents_list);
 
             cap.setModel_link(agModel);
 
@@ -261,7 +260,6 @@ public class Model extends Repast3Launcher {
             }
             agents_list.add(cap);
             display_list.add(cap.getModel_link());
-            forest_space.putObjectAt(capitains.get(i)[0], capitains.get(i)[1], cap.getModel_link());
         }
 
         for (int i = 0; i < capitains.size(); i++) {
@@ -292,7 +290,6 @@ public class Model extends Repast3Launcher {
                 agents_list.add(sol);
 
                 display_list.add(sol.getModel_link());
-                forest_space.putObjectAt(soldiers.get(j)[0], soldiers.get(j)[1], sol.getModel_link());
             }
         }
 
@@ -322,7 +319,6 @@ public class Model extends Repast3Launcher {
             agents_list.add(robot);
 
             display_list.add(robot.getModel_link());
-            forest_space.putObjectAt(robots.get(i)[0], robots.get(i)[1], robot.getModel_link());
         }
     }
 

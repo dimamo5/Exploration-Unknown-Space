@@ -57,9 +57,9 @@ public class Human extends ExplorerAgent {
         return robotsToRequest;
     }
 
-    protected enum agent_state {FINDING_EXIT, AT_EXIT}
+    protected enum agent_state {WAITING_4_ORDERS, INITIAL_COMM_WITH_CAPTAINS, EXPLORING, AT_EXIT}
 
-    void requestRobotForInfo(ArrayList<AID> robots) {
+    void requestAgentsForInfo(ArrayList<AID> agents) {
         ACLMessage msg = new ACLMessage(Message.REQUEST);
 
         Pair<Integer, Integer> pos = new Pair<>(getModel_link().getX(), getModel_link().getY());
@@ -69,8 +69,8 @@ public class Human extends ExplorerAgent {
             e.printStackTrace();
         }
 
-        for (AID robot : robots) {
-            msg.addReceiver(robot);
+        for (AID agent : agents) {
+            msg.addReceiver(agent);
         }
         send(msg);
     }

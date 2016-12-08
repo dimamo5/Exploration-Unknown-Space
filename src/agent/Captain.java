@@ -6,13 +6,11 @@ import jade.lang.acl.UnreadableException;
 import javafx.util.Pair;
 import message.InformViewMap;
 import message.Message;
-import message.RequestViewMap;
 import model.Model;
 import model.map.AgentModel;
 import model.map.ViewMap;
 import sajas.core.Agent;
 import sajas.core.behaviours.CyclicBehaviour;
-import sajas.core.behaviours.TickerBehaviour;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -25,15 +23,12 @@ public class Captain extends Human {
 
     public int cellphone_range;
 
-    private enum agent_state {FINDING_EXIT}
-
-    private agent_state state = agent_state.FINDING_EXIT;
+    private agent_state state = agent_state.INITIAL_COMM_WITH_CAPTAINS;
 
 
     public Captain(int vision_range, int radio_range, int cellphone_range) {
         super(vision_range, radio_range);
         this.cellphone_range = cellphone_range;
-
     }
 
     public int getCellphone_range() {
@@ -60,7 +55,7 @@ public class Captain extends Human {
 
                 if (tick % 100 == 0) { //TODO destrolhar isto
                     update();
-                    move_random();
+                    //move_random();
                 }
             }
 
@@ -99,14 +94,18 @@ public class Captain extends Human {
 
     private void update() {
 
+        ArrayList<ExplorerAgent> onRangeAgents = getModel_link().getOnRadioRangeAgents(getRadio_range());
+        ArrayList<AID> robotsOnRange = new ArrayList<>();
+        ArrayList<AID> soldiersOnRange = new ArrayList<>();
+
         switch (state) {
-            case FINDING_EXIT:
 
-                ArrayList<ExplorerAgent> onRangeAgents = getModel_link().getOnRadioRangeAgents(getRadio_range());
-                ArrayList<AID> robotsOnRange = new ArrayList<>();
-                ArrayList<Soldier> soldiersOnRange = new ArrayList<>();
+            case INITIAL_COMM_WITH_CAPTAINS:
+                ArrayList<AID> allCaptains = getAllCaptains();
 
+                break;
 
+            case EXPLORING:
                 for (Agent agent : onRangeAgents) {
 
                     if (agent instanceof Robot) {
@@ -118,7 +117,7 @@ public class Captain extends Human {
                         }
 
                     } else if (agent instanceof Soldier) {
-                        //TODO
+                        soldiersOnRange.add(agent.getAID());
                     }/*else if(agent instanceof Captain ){  //pode ser útil saber os capitães q tao no viewRange
 
                     }*/
@@ -129,7 +128,7 @@ public class Captain extends Human {
                 //comms with robots
                 if (robotsToRequest.size() > 0) {
                     System.out.println(getAID() + "  requested info from robot(s)");
-                    requestRobotForInfo(robotsToRequest);
+                    requestAgentsForInfo(robotsToRequest);
                 }
 
                 //comms with soldiers
@@ -142,36 +141,16 @@ public class Captain extends Human {
         }
     }
 
-    //todo REMOVE THIS METHOD??
-    private void move_random() {
+    private ArrayList<AID> getAllCaptains() {
+        ArrayList<AID> captains = new ArrayList<>();
 
-
-
-        Pair<Integer, Integer> oldPos = new Pair<>(getModel_link().getX(), getModel_link().getY());
-        Pair<Integer, Integer> newPos;
-
-        if (current_dir == null || !getMyViewMap().canMoveDir(current_dir, oldPos)) {
-            ArrayList<ViewMap.DIR> possibleDirs = getMyViewMap().getPossibleDir(oldPos);
-
-            Random r = new Random();
-            int dir = r.nextInt(possibleDirs.size());
-
-            //new coordinates
-            current_dir = possibleDirs.get(dir);
+        for(Agent agent: getModel_link().getAgents_list()){
+            if(agent instanceof Captain){
+                captains.add(agent.getAID());
+            }
         }
 
-        newPos = move(current_dir);
-
-        //move on globalMap
-
-        AgentModel.setGlobalMap(AgentModel.getGlobalMap()); //extract these calls to 1 method
-
-        //update pos
-        getModel_link().setPos_x(newPos.getKey());
-        getModel_link().setPos_y(newPos.getValue());
-
-        //update viewmap
-        getMyViewMap().addViewRange(newPos, Model.getForest(), getVision_range());
+        return captains;
     }
 
 

@@ -1,34 +1,30 @@
 package agent;
 
+import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.UnreadableException;
 import javafx.util.Pair;
 import message.InformViewMap;
 import message.Message;
-import message.RequestViewMap;
 import model.Model;
 import model.map.AgentModel;
 import model.map.ViewMap;
 import sajas.core.Agent;
-import sajas.core.behaviours.Behaviour;
 import sajas.core.behaviours.CyclicBehaviour;
-import sajas.core.behaviours.TickerBehaviour;
-import uchicago.src.sim.space.Object2DGrid;
 
-import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Random;
+
+import static agent.Human.agent_state.WAITING_4_ORDERS;
 
 /**
  * Created by sergi on 16/10/2016.
  */
 public class Soldier extends Human {
 
-    private agent_state state = agent_state.FINDING_EXIT;
+    private agent_state state = WAITING_4_ORDERS;
 
     public Soldier(int vision_range, int radio_range) {
         super(vision_range, radio_range);
@@ -50,10 +46,10 @@ public class Soldier extends Human {
 
                 if (tick % 100 == 0) { //TODO destrolhar isto
                     update();
-                    move_random();
+                    //move_random();
                 }
                 //update();
-            } //TODO period nao estar hardcoded
+            }
             private static final long serialVersionUID = 1L;
 
 
@@ -61,7 +57,7 @@ public class Soldier extends Human {
     }
 
 
-    //TODO CREATE beahviour class 4 this
+    //TODO CREATE behaviour class 4 this
     private void beginMsgListener() {
         addBehaviour(new CyclicBehaviour(this) {
             private static final long serialVersionUID = 1L;
@@ -72,7 +68,8 @@ public class Soldier extends Human {
 
                 if (msg != null) {
 
-                    if (msg.getPerformative() == Message.REQUEST) {
+                    if (msg.getPerformative() == Message.REQUEST) { //TODO CHANGE THIS TO RECEIVE MSG WITH ORDERS FROM CAPTAIN SE TIVER NO ESTADO WAITING 4 ORDERS
+                        System.out.println("SENDING MY INFO>>>" + msg.getSender() );
                         sendMyInfoToAgent(msg);
                     } else if (msg.getPerformative() == Message.INFORM) {
                         try {
@@ -90,87 +87,68 @@ public class Soldier extends Human {
 
     private void update() {
 
+        ArrayList<ExplorerAgent> onRangeAgents = getModel_link().getOnRadioRangeAgents(getRadio_range());
+        ArrayList<AID> robotsOnRange = new ArrayList<>(), soldiersOnRange = new ArrayList<>();
+
+
         switch (state) {
-            case FINDING_EXIT:
-                //TODO
+            case WAITING_4_ORDERS:
 
-                ArrayList<ExplorerAgent> onRangeAgents = getModel_link().getOnRadioRangeAgents(getRadio_range());
-                ArrayList<AID> robotsOnRange = new ArrayList<>();
-                ArrayList<Soldier> soldiersOnRange = new ArrayList<>();
-
-
-                for (Agent agent : onRangeAgents) {
-
-                    if (agent instanceof Robot) {
-                        Pair<Integer, Integer> robotCoos = ((Robot) agent).getModel_link().getMyCoos(),
-                                humanCoos = getModel_link().getMyCoos();
-
-                        if (robotIsInCommRange(humanCoos, robotCoos)) {
-                            robotsOnRange.add(agent.getAID());
-                        }
-
-                    } else if (agent instanceof Soldier) {
-                        //TODO
-                    }/*else if(agent instanceof Captain ){  //pode ser útil saber os capitães q tao no viewRange
-
-                    }*/
-                }
-
-
-                //TODO adaptar para os restantes agentes tb
-
-                ArrayList<AID> robotsToRequest = checkRobotComms(robotsOnRange);
-
-                //comms with robots
-                if (robotsToRequest.size() > 0) {
-                    System.out.println(getAID() + "  requested info from robot(s)");
-                    requestRobotForInfo(robotsToRequest);
-                }
-
-                //comms with soldiers
-
-                //comms with captains  - ALL MAP RANGE VIA TELEFONE
-
+                //communicates with agents(soldiers+robots) on range
+                commWithAgents(onRangeAgents, robotsOnRange, soldiersOnRange);
 
                 break;
+
+            case EXPLORING:
+
+                commWithAgents(onRangeAgents, robotsOnRange, soldiersOnRange);
+
+                //TODO call method moving to target pos
+
+                break;
+
             case AT_EXIT:
                 break;
         }
     }
 
+    private void commWithAgents(ArrayList<ExplorerAgent> onRangeAgents, ArrayList<AID> robotsOnRange, ArrayList<AID> soldiersOnRange) {
+        for (Agent agent : onRangeAgents) {
+
+            if (agent instanceof Robot) {
+                Pair<Integer, Integer> robotCoos = ((Robot) agent).getModel_link().getMyCoos(),
+                        humanCoos = getModel_link().getMyCoos();
+
+                if (robotIsInCommRange(humanCoos, robotCoos)) {
+                    robotsOnRange.add(agent.getAID());
+                }
+
+            } else if (agent instanceof Soldier) {
+                soldiersOnRange.add(agent.getAID());
+            }
+        }
+
+        //TODO adaptar para os restantes agentes tb
+
+        ArrayList<AID> robotsToRequest = checkRobotComms(robotsOnRange);
+
+        //robots + soldiers
+        robotsToRequest.addAll(soldiersOnRange); //quitos trolha mas pronts
+
+        //comms with robots+soldiers
+        if (robotsToRequest.size() > 0) {
+            System.out.println(getAID() + "  requested info from agent(s)");
+            requestAgentsForInfo(robotsToRequest);
+        }
+
+        //comms with soldiers
+
+        //comms with captains  - ALL MAP RANGE VIA TELEFONE
+    }
+
 
     public void move() {
 
-    }
-
-    private void move_random() {
-
-
-        Pair<Integer, Integer> oldPos = new Pair<>(getModel_link().getX(), getModel_link().getY());
-        Pair<Integer, Integer> newPos;
-
-        if (current_dir == null || !getMyViewMap().canMoveDir(current_dir, oldPos)) {
-            ArrayList<ViewMap.DIR> possibleDirs = getMyViewMap().getPossibleDir(oldPos);
-
-            Random r = new Random();
-            int dir = r.nextInt(possibleDirs.size());
-
-            //new coordinates
-            current_dir = possibleDirs.get(dir);
-        }
-
-        newPos = move(current_dir);
-
-        //move on globalMap
-
-        AgentModel.setGlobalMap(AgentModel.getGlobalMap()); //extract these calls to 1 method
-
-        //update pos
-        getModel_link().setPos_x(newPos.getKey());
-        getModel_link().setPos_y(newPos.getValue());
-
-        //update viewmap
-        getMyViewMap().addViewRange(newPos, Model.getForest(), getVision_range());
     }
 
     private void sendMyInfoToAgent(ACLMessage msg) {

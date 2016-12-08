@@ -150,49 +150,4 @@ public class Robot extends ExplorerAgent {
         }
     }
 
-    private void move_random() {
-
-        Pair<Integer, Integer> oldPos = new Pair<>(getModel_link().getX(), getModel_link().getY());
-        Pair<Integer, Integer> newPos;
-
-        if (current_dir == null || !getMyViewMap().canMoveDir(current_dir, oldPos)) {
-            ArrayList<ViewMap.DIR> possibleDirs = getMyViewMap().getPossibleDir(oldPos);
-
-            Random r = new Random();
-            int dir = r.nextInt(possibleDirs.size());
-
-            //new coordinates
-            current_dir = possibleDirs.get(dir);
-        }
-
-        newPos = move(current_dir);
-
-        //move on globalMap
-
-        AgentModel.setGlobalMap(AgentModel.getGlobalMap()); //extract these calls to 1 method
-
-        //update pos
-        getModel_link().setPos_x(newPos.getKey());
-        getModel_link().setPos_y(newPos.getValue());
-
-        //update viewmap
-        getMyViewMap().addViewRange(newPos, Model.getForest(), getVision_range());
-    }
-
-    private ArrayList<MapElement> get_neighbors_empty_spaces(Vector<MapElement> neighbors) {
-
-        ArrayList<MapElement> empty_spaces = new ArrayList<>();
-
-        for (MapElement neighbour : neighbors) {
-            if (!(neighbour instanceof Obstacle)) {
-                empty_spaces.add(neighbour);
-            }
-        }
-
-        //TODO: REPETIDOS- podem haver objs na mesma posição e dar aso a que hajam: k empty_spaces, k = nº agentes no
-        // mesmo espaço
-        return empty_spaces;
-    }
-
-
 }

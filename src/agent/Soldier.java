@@ -139,6 +139,7 @@ public class Soldier extends Human {
 
     private void move_random() {
 
+
         Pair<Integer, Integer> oldPos = new Pair<>(getModel_link().getX(), getModel_link().getY());
         Pair<Integer, Integer> newPos;
 

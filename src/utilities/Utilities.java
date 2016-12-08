@@ -26,7 +26,11 @@ public class Utilities {
         return list;
     }
 
+    public static boolean posEqual(Pair<Integer, Integer> pos1, Pair<Integer, Integer> pos2) {
+        return pos1.getKey().equals(pos2.getKey()) && pos1.getValue().equals(pos2.getValue());
+    }
+
     public static void main(String[] args) {
-        System.out.println(distPos(new Pair<>(1, 1), new Pair<>(1, 2)));
+        System.out.println(posEqual(new Pair<>(1, 1), new Pair<>(1, 1)));
     }
 }

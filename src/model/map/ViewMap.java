@@ -4,14 +4,15 @@ import javafx.util.Pair;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
 
 /**
  * Created by sergi on 05/12/2016.
  */
-public class ViewMap implements Serializable{
+public class ViewMap implements Serializable {
 
     private int size;
+
+    private boolean[][] wasHere;
 
     public int getSize() {
         return size;
@@ -34,6 +35,10 @@ public class ViewMap implements Serializable{
                 map[i][m] = new HeatElement(m, i);
             }
         }
+    }
+
+    public HeatElement getHeat(Pair<Integer, Integer> pos) {
+        return this.map[pos.getValue()][pos.getKey()];
     }
 
     public HeatElement[][] getMap() {
@@ -101,7 +106,7 @@ public class ViewMap implements Serializable{
 
     public boolean canMoveDir(DIR dir, Pair<Integer, Integer> pos) {
         //north
-        if (dir == DIR.N && pos.getValue() - 1 > 0 &&  map[pos.getValue() - 1][pos.getKey()].heat != -2) {
+        if (dir == DIR.N && pos.getValue() - 1 > 0 && map[pos.getValue() - 1][pos.getKey()].heat != -2) {
             return true;
         }
         //south
@@ -147,6 +152,48 @@ public class ViewMap implements Serializable{
             }
             System.out.print("\n");
         }
+    }
+
+    //Returns null
+    public ArrayList<Pair<Integer, Integer>> getPath(Pair<Integer, Integer> start, Pair<Integer, Integer> end) {
+        ArrayList<Pair<Integer, Integer>> path = new ArrayList<>();
+        if (getHeat(start).heat == -1 || getHeat(end).heat == -2) {
+            return null;
+        } else {
+            recursiveSolve(start.getKey(), start.getValue(), end, path);
+        }
+        return path;
+    }
+
+    public boolean recursiveSolve(int x, int y, Pair<Integer, Integer> end, ArrayList<Pair<Integer, Integer>> path) {
+        if (x == end.getKey() && y == end.getValue()) return true; // If you reached the end
+        if (this.map[y][x].heat == -2 || wasHere[x][y]) return false;
+        // If you are on a wall or already were here
+        wasHere[x][y] = true;
+        if (x != 0) // Checks if not on left edge
+            if (recursiveSolve(x - 1, y, end, path)) { // Recalls method one to the left
+                //correctPath[x][y] = true; // Sets that path value to true;
+                path.add(new Pair<>(x, y));
+                return true;
+            }
+        if (x != this.size - 1) // Checks if not on right edge
+            if (recursiveSolve(x + 1, y, end, path)) { // Recalls method one to the right
+                //correctPath[x][y] = true;
+                return true;
+            }
+        if (y != 0)  // Checks if not on top edge
+            if (recursiveSolve(x, y - 1, end, path)) { // Recalls method one up
+                //correctPath[x][y] = true;
+                path.add(new Pair<>(x, y));
+                return true;
+            }
+        if (y != this.size - 1) // Checks if not on bottom edge
+            if (recursiveSolve(x, y + 1, end, path)) { // Recalls method one down
+                //correctPath[x][y] = true;
+                path.add(new Pair<>(x, y));
+                return true;
+            }
+        return false;
     }
 
 

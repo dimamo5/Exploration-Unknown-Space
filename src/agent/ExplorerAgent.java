@@ -130,5 +130,4 @@ public class ExplorerAgent extends Agent {
         this.found_map_exit = found_map_exit;
     }
 
-
 }

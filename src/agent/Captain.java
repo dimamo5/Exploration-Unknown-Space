@@ -143,8 +143,6 @@ public class Captain extends Human {
     //todo REMOVE THIS METHOD??
     private void move_random() {
 
-
-
         Pair<Integer, Integer> oldPos = new Pair<>(getModel_link().getX(), getModel_link().getY());
         Pair<Integer, Integer> newPos;
 

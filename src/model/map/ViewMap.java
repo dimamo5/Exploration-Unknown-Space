@@ -101,19 +101,19 @@ public class ViewMap implements Serializable{
 
     public boolean canMoveDir(DIR dir, Pair<Integer, Integer> pos) {
         //north
-        if (dir == DIR.N && map[pos.getValue() - 1][pos.getKey()].heat != -2) {
+        if (dir == DIR.N && pos.getValue() - 1 > 0 &&  map[pos.getValue() - 1][pos.getKey()].heat != -2) {
             return true;
         }
         //south
-        if (dir == DIR.S && map[pos.getValue() + 1][pos.getKey()].heat != -2) {
+        if (dir == DIR.S && pos.getValue() + 1 < map.length && map[pos.getValue() + 1][pos.getKey()].heat != -2) {
             return true;
         }
         //este
-        if (dir == DIR.E && map[pos.getValue()][pos.getKey() + 1].heat != -2) {
+        if (dir == DIR.E && pos.getKey() + 1 < map.length && map[pos.getValue()][pos.getKey() + 1].heat != -2) {
             return true;
         }
         //oeste
-        if (dir == DIR.W && map[pos.getValue()][pos.getKey() - 1].heat != -2) {
+        if (dir == DIR.W && pos.getKey() - 1 > 0 && map[pos.getValue()][pos.getKey() - 1].heat != -2) {
             return true;
         }
         return false;

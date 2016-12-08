@@ -3,6 +3,7 @@ package model.map;
 import javafx.util.Pair;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Created by sergi on 05/12/2016.

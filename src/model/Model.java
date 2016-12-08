@@ -18,12 +18,18 @@ import uchicago.src.sim.engine.SimInit;
 import uchicago.src.sim.gui.DisplaySurface;
 import uchicago.src.sim.gui.Object2DDisplay;
 import uchicago.src.sim.space.Object2DGrid;
+import utilities.Utilities;
 
 import javax.imageio.ImageIO;
+import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Created by sergi on 12/11/2016.
@@ -40,6 +46,9 @@ public class Model extends Repast3Launcher {
     private Object2DGrid forest_space;
     private Object2DGrid heat_map_space;
     private Object2DDisplay heat_map_display;
+    private JFrame agentFrame;
+    private ArrayList<ExplorerAgent> agents_list;
+    protected JList agentList;
 
     private ContainerController agentContainer;
 
@@ -49,7 +58,6 @@ public class Model extends Repast3Launcher {
     private int numSol = NUM_SOL;
     private int numRobot = NUM_ROBOT;
 
-    private ArrayList<ExplorerAgent> agents_list;
     private static Map forest;
 
     public static Map getForest() {
@@ -89,7 +97,6 @@ public class Model extends Repast3Launcher {
         forest_space = new Object2DGrid(forest.getWidth(), forest.getHeight());
         heat_map_space = new Object2DGrid(forest.getWidth(), forest.getHeight());
 
-
         for (int y = 0; y < forest_space.getSizeY(); y++) {
             for (int x = 0; x < forest_space.getSizeX(); x++) {
 
@@ -117,6 +124,9 @@ public class Model extends Repast3Launcher {
                 }
                 //ForestHeat fh = new ForestHeat(i,j);
                 //HeatSpace.putObjectAt(i, j, fh);
+
+                HeatElement vm = new HeatElement(x, y);
+                heat_map_space.putObjectAt(x, y, vm);
             }
         }
     }
@@ -124,13 +134,13 @@ public class Model extends Repast3Launcher {
     private void createDisplay() {
         Object2DDisplay display = new Object2DDisplay(forest_space);
         display.setObjectList(display_list);
-        //heat_map_display = new Object2DDisplay(heat_map_space);
+        heat_map_display = new Object2DDisplay(heat_map_space);
 
-        /*dsurf2.addDisplayableProbeable(heat_map_display,"ExplorerAgent View");
-        addSimEventListener(dsurf2);
-        //dsurf2.setBackground(Color.GREEN);
-        dsurf2.setSize(400,50);
-        dsurf2.setLocation(280,80);
+        dsurf2.addDisplayableProbeable(heat_map_display, "ExplorerAgent View");
+        //addSimEventListener(dsurf2);
+        dsurf2.setBackground(Color.LIGHT_GRAY);
+        dsurf2.setLocation(280, 80);
+        dsurf2.display();
         //dsurf2.print();*/
 
         dsurf.addDisplayableProbeable(display, "ExplorerAgent Space");
@@ -140,11 +150,11 @@ public class Model extends Repast3Launcher {
     }
 
     private void buildSchedule() {
-        getSchedule().scheduleActionBeginning(1,this, "step");
-        getSchedule().scheduleActionAtInterval(1, dsurf, "updateDisplay", Schedule.LAST);
+        getSchedule().scheduleActionBeginning(1, this, "step");
+        getSchedule().scheduleActionAtInterval(1, dsurf2, "updateDisplay", Schedule.LAST);
     }
 
-    public void step(){
+    public void step() {
         tick++;
     }
 
@@ -158,9 +168,9 @@ public class Model extends Repast3Launcher {
         dsurf = new DisplaySurface(this, "Forest Display");
         registerDisplaySurface("Forest Display", dsurf);
 
-       /* if (dsurf2 != null) dsurf2.dispose();
+        if (dsurf2 != null) dsurf2.dispose();
         dsurf2 = new DisplaySurface(this, "Heat Display");
-        registerDisplaySurface("Heat Display", dsurf2);*/
+        registerDisplaySurface("Heat Display", dsurf2);
     }
 
 
@@ -283,7 +293,7 @@ public class Model extends Repast3Launcher {
 
 
                 try {
-                    agentContainer.acceptNewAgent("Soldier #" + (i*soldiers.size() + j), sol).start();
+                    agentContainer.acceptNewAgent("Soldier #" + (i * soldiers.size() + j), sol).start();
                 } catch (StaleProxyException e) {
                     e.printStackTrace();
                 }
@@ -320,6 +330,33 @@ public class Model extends Repast3Launcher {
 
             display_list.add(robot.getModel_link());
         }
+
+        agentFrame = new JFrame("Select an Agent");
+        ArrayList<String> names = new ArrayList<String>();
+
+        for (int i = 0; i < agents_list.size(); i++) {
+            names.add(agents_list.get(i).getName().substring(0, agents_list.get(i).getName().indexOf('@')));
+        }
+        agentList = new JList(names.toArray());
+        agentFrame.add(agentList);
+        agentFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        agentFrame.setVisible(true);
+
+
+        JScrollPane scroll = new JScrollPane(agentList);
+        agentFrame.add(scroll);
+        agentFrame.setSize(150, 350);
+        agentFrame.setVisible(true);
+        MouseListener mouseListener = new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+                int i = agentList.locationToIndex(e.getPoint());
+                System.out.println("Showing map from agent #" + i);
+                heat_map_display.setObjectList(Utilities.twoDArrayToList(agents_list.get(i).getMyViewMap().getMap()));
+            }
+        };
+        agentList.addMouseListener(mouseListener);
+
+
     }
 
 

@@ -1,6 +1,11 @@
 package utilities;
 
 import javafx.util.Pair;
+import model.map.HeatElement;
+
+import java.awt.*;
+import java.util.*;
+import java.util.List;
 
 /**
  * Created by diogo on 08/12/2016.
@@ -14,6 +19,13 @@ public class Utilities {
                 pos2.getValue()), 2)));
     }
 
+    public static ArrayList<HeatElement> twoDArrayToList(HeatElement[][] twoDArray) {
+        ArrayList<HeatElement> list = new ArrayList<HeatElement>();
+        for (HeatElement[] array : twoDArray) {
+            list.addAll(Arrays.asList(array));
+        }
+        return list;
+    }
 
     public static void main(String[] args) {
         System.out.println(distPos(new Pair<>(1, 1), new Pair<>(1, 2)));

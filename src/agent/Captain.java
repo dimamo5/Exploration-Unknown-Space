@@ -25,10 +25,20 @@ public class Captain extends Human {
 
     private agent_state state = agent_state.INITIAL_COMM_WITH_CAPTAINS;
 
+    public ArrayList<AID> getTeamSoldiers() {
+        return teamSoldiers;
+    }
+
+    public void setTeamSoldiers(ArrayList<AID> teamSoldiers) {
+        this.teamSoldiers = teamSoldiers;
+    }
+
+    private ArrayList<AID> teamSoldiers;
 
     public Captain(int vision_range, int radio_range, int cellphone_range) {
         super(vision_range, radio_range);
         this.cellphone_range = cellphone_range;
+        teamSoldiers = new ArrayList<>();
     }
 
     public int getCellphone_range() {
@@ -41,6 +51,10 @@ public class Captain extends Human {
 
     public void move() {
 
+    }
+
+    public void addSoldierToTeam(AID sol){
+        teamSoldiers.add(sol);
     }
 
     @Override
@@ -103,6 +117,7 @@ public class Captain extends Human {
             case INITIAL_COMM_WITH_CAPTAINS:
                 ArrayList<AID> allCaptains = getAllCaptains();
 
+                //todo desenvolver isto
                 break;
 
             case EXPLORING:

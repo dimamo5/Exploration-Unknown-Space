@@ -130,6 +130,14 @@ public class ViewMap {
         return posDir;
     }
 
+    public void print() {
+        for (int i = 0; i < this.size; i++) {
+            for (int j = 0; j < this.size; j++) {
+                System.out.println(this.map[i][j].heat);
+            }
+        }
+    }
+
 
     public enum DIR {N, S, E, W}
 }

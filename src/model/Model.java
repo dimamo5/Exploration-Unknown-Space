@@ -133,7 +133,7 @@ public class Model extends Repast3Launcher {
     private void createDisplay() {
         Object2DDisplay display = new Object2DDisplay(forest_space);
         display.setObjectList(display_list);
-        heat_map_display = new Object2DDisplay(heat_map_space);
+        //heat_map_display = new Object2DDisplay(heat_map_space);
 
         dsurf2.addDisplayableProbeable(heat_map_display, "ExplorerAgent View");
         //addSimEventListener(dsurf2);
@@ -149,8 +149,7 @@ public class Model extends Repast3Launcher {
     }
 
     private void buildSchedule() {
-        getSchedule().scheduleActionBeginning(1, this, "step");
-        getSchedule().scheduleActionAtInterval(1, dsurf, "updateDisplay", Schedule.LAST);
+        getSchedule().scheduleActionBeginning(1,this, "step");
         getSchedule().scheduleActionAtInterval(1, dsurf2, "updateDisplay", Schedule.LAST);
     }
 
@@ -337,7 +336,7 @@ public class Model extends Repast3Launcher {
 
         agentFrame = new JFrame("Select an Agent");
         ArrayList<String> names = new ArrayList<String>();
-        
+
         for(int i=0; i < agents_list.size(); i++ ){
             names.add(agents_list.get(i).getName().substring(0,agents_list.get(i).getName().indexOf('@')));
         }

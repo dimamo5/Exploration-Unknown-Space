@@ -31,7 +31,7 @@ public class Robot extends ExplorerAgent {
 
     private static final int DEFAULT_ENERGY = 15; //15 cells/turns by default
     private int energy = DEFAULT_ENERGY;
-
+    private long tick=0;
 
     public Robot(int vision_range, int energy) {
         super(vision_range);
@@ -52,15 +52,20 @@ public class Robot extends ExplorerAgent {
 
     @Override
     protected void setup() {
-        beginMsgListener();
+        //beginMsgListener();
 
-        addBehaviour(new TickerBehaviour(this, 1000) { //TODO period nao estar hardcoded
+        addBehaviour(new CyclicBehaviour(this) {
+            @Override
+            public void action() {
+                tick++;
+
+                if(tick % 100 == 0 ) { //TODO period nao estar hardcoded
+                    update();
+                }
+            }
             private static final long serialVersionUID = 1L;
 
-            @Override
-            protected void onTick() {
-                update();
-            }
+
         });
     }
 
@@ -113,39 +118,34 @@ public class Robot extends ExplorerAgent {
         send(reply);
     }
 
-
-    @Override
-    protected void takeDown() {
-        super.takeDown();
-    }
-
-    @Override
-    public void addBehaviour(Behaviour b) {
-        super.addBehaviour(b);
-    }
-
-
     private void moveRobot() {
 
-        //se modo ñ eficient estiver ligado:
-        if (--energy > 0) {
+        System.out.println("#"+getAID()+"  >"+energy);
+
+        if (--energy >= 0) {
             move_random();
+        }else{
+            state = Robot_state.OUT_OF_ENERGY;
         }
-        //se nao
-        //move_efficient
     }
 
     private void move_random() {
 
         Pair<Integer, Integer> oldPos = new Pair<>(getModel_link().getX(), getModel_link().getY());
-        ArrayList<ViewMap.DIR> possibleDirs = getMyViewMap().getPossibleDir(oldPos);
+        Pair<Integer, Integer> newPos;
 
-        Random r = new Random();
-        System.out.println("Dirs:"+possibleDirs.size());
-        int dir = r.nextInt(possibleDirs.size());
+        if (current_dir == null || !getMyViewMap().canMoveDir(current_dir, oldPos)) {
+            ArrayList<ViewMap.DIR> possibleDirs = getMyViewMap().getPossibleDir(oldPos);
 
-        //new coordinates
-        Pair<Integer, Integer> newPos = move(possibleDirs.get(dir));
+            Random r = new Random();
+            System.out.println("Dirs:" + possibleDirs.size());
+            int dir = r.nextInt(possibleDirs.size());
+
+            //new coordinates
+            current_dir = possibleDirs.get(dir);
+        }
+
+        newPos = move(current_dir);
 
         //move on globalMap
         getModel_link().move(newPos.getKey(), newPos.getValue());

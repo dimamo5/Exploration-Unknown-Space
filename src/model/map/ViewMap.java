@@ -19,9 +19,9 @@ public class ViewMap {
     public ViewMap(int size) {
         this.size = size;
         map = new HeatElement[size][size];
-        for(int i = 0;i<map.length;i++){
-            for (int m=0;m<map.length;m++){
-                map[i][m]=new HeatElement(m,i);
+        for (int i = 0; i < map.length; i++) {
+            for (int m = 0; m < map.length; m++) {
+                map[i][m] = new HeatElement(m, i);
             }
         }
     }
@@ -89,25 +89,53 @@ public class ViewMap {
         }
     }
 
+    public boolean canMoveDir(DIR dir, Pair<Integer, Integer> pos) {
+        //north
+        if (dir == DIR.N && map[pos.getValue() - 1][pos.getKey()].heat != -2) {
+            return true;
+        }
+        //south
+        if (dir == DIR.S && map[pos.getValue() + 1][pos.getKey()].heat != -2) {
+            return true;
+        }
+        //este
+        if (dir == DIR.E && map[pos.getValue()][pos.getKey() + 1].heat != -2) {
+            return true;
+        }
+        //oeste
+        if (dir == DIR.W && map[pos.getValue()][pos.getKey() - 1].heat != -2) {
+            return true;
+        }
+        return false;
+    }
+
     public ArrayList<DIR> getPossibleDir(Pair<Integer, Integer> pos) {
         ArrayList<DIR> posDir = new ArrayList<>();
         //north
-        if (map[pos.getValue() - 1][pos.getKey()].heat == 0) {
+        if (map[pos.getValue() - 1][pos.getKey()].heat >= 0) {
             posDir.add(DIR.N);
         }
         //south
-        if (map[pos.getValue() + 1][pos.getKey()].heat == 0) {
+        if (map[pos.getValue() + 1][pos.getKey()].heat >= 0) {
             posDir.add(DIR.S);
         }
         //este
-        if (map[pos.getValue()][pos.getKey() + 1].heat == 0) {
+        if (map[pos.getValue()][pos.getKey() + 1].heat >= 0) {
             posDir.add(DIR.E);
         }
         //oeste
-        if (map[pos.getValue()][pos.getKey() - 1].heat == 0) {
+        if (map[pos.getValue()][pos.getKey() - 1].heat >= 0) {
             posDir.add(DIR.W);
         }
         return posDir;
+    }
+
+    public void print() {
+        for (int i = 0; i < this.size; i++) {
+            for (int j = 0; j < this.size; j++) {
+                System.out.println(this.map[i][j].heat);
+            }
+        }
     }
 
 

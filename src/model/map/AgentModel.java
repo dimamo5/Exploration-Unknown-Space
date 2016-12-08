@@ -1,9 +1,11 @@
 package model.map;
 
-import agent.*;
+import agent.ExplorerAgent;
 import jade.core.AID;
+import javafx.util.Pair;
 import uchicago.src.sim.gui.SimGraphics;
 import uchicago.src.sim.space.Object2DGrid;
+import utilities.Utilities;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -19,17 +21,18 @@ public class AgentModel extends MapElement {
     private agent_type type;
     //TODO: é necessário obter os vizinhos através do método de vonneuman ? se sim deve ser feito nesta classe?
 
-    public AgentModel(int pos_x, int pos_y, Object2DGrid c, agent_type type, ArrayList<ExplorerAgent> agents) {
-        super(pos_x, pos_y, c);
+    public AgentModel(int pos_x, int pos_y, Object2DGrid global, agent_type type, ArrayList<ExplorerAgent> agents) {
+        super(pos_x, pos_y);
         this.type = type;
         this.agents_list = agents;
+        globalMap = global;
     }
 
-    public ArrayList<AID> getRobotsFromAgentList(){  //testing purposes
+    public ArrayList<AID> getRobotsFromAgentList() {  //testing purposes
         ArrayList<AID> robots = new ArrayList<>();
 
-        for(ExplorerAgent agent : agents_list){
-            if(agent instanceof agent.Robot){
+        for (ExplorerAgent agent : agents_list) {
+            if (agent instanceof agent.Robot) {
                 robots.add(agent.getAID());
             }
         }
@@ -37,6 +40,70 @@ public class AgentModel extends MapElement {
         return robots;
     }
 
+    public ArrayList<ExplorerAgent> getOnRadioRangeAgents(int radio_range) {
+        ArrayList<ExplorerAgent> agentsInRange = new ArrayList<>();
+        for (ExplorerAgent agent : this.agents_list) {
+            Pair<Integer, Integer> pos = new Pair<>(agent.getModel_link().getX(), agent.getModel_link().getY());
+            Pair<Integer, Integer> currentpos = new Pair<>(this.getX(), this.getY());
+            int range = Utilities.distPos(pos, currentpos);
+            if (this.type != agent_type.ROBOT && radio_range >= range) {
+                agentsInRange.add(agent);
+            }
+        }
+        return agentsInRange;
+    }
+
+    public ArrayList<ExplorerAgent> getOnViewRangeAgents(int viewRange) {
+        ArrayList<ExplorerAgent> agentsInRange = new ArrayList<>();
+        Pair<Integer, Integer> pos = new Pair<>(getX(), getY());
+        /*//Norte
+        for (int i = 0; i < viewRange && i + pos.getKey() > 0; i++) {
+            if (Model.getForest().getMap_in_array()[pos.getValue()][pos.getKey() + i] == 0) {
+                if (i == 0) {
+                    this.map[pos.getValue()][pos.getKey() + i].addMyHeat();
+                } else {
+                    this.map[pos.getValue()][pos.getKey() + i].addVisionHeat();
+                }
+            } else {
+                this.map[pos.getValue()][pos.getKey() + i].addWallHeat();
+                break;
+            }
+        }
+        //Sul
+        for (int i = 0; i < viewRange && i + pos.getKey() > 0; i++) {
+            if (map.getMap_in_array()[pos.getValue()][pos.getKey() - i] == 0) {
+                if (i != 0) {
+                    this.map[pos.getValue()][pos.getKey() - i].addVisionHeat();
+                }
+            } else {
+                this.map[pos.getValue()][pos.getKey() - i].addWallHeat();
+                break;
+            }
+        }
+        //Este
+        for (int i = 0; i < viewRange && i + pos.getKey() > 0; i++) {
+            if (map.getMap_in_array()[pos.getValue() + i][pos.getKey()] == 0) {
+                if (i != 0) {
+                    this.map[pos.getValue() + i][pos.getKey()].addVisionHeat();
+                }
+            } else {
+                this.map[pos.getValue() + i][pos.getKey()].addWallHeat();
+                break;
+            }
+        }
+        //Oeste
+        for (int i = 0; i < viewRange && i + pos.getKey() > 0; i++) {
+            if (map.getMap_in_array()[pos.getValue() - i][pos.getKey()] == 0) {
+                if (i != 0) {
+                    this.map[pos.getValue() - i][pos.getKey()].addVisionHeat();
+                }
+            } else {
+                this.map[pos.getValue() - i][pos.getKey()].addWallHeat();
+                break;
+            }
+        }*/
+        return agentsInRange;
+    }
 
     public static Object2DGrid getGlobalMap() {
         return globalMap;
@@ -65,7 +132,6 @@ public class AgentModel extends MapElement {
     }
 
     public void move(int new_x, int new_y) {
-
         globalMap.putObjectAt(getX(), getY(), null);
         globalMap.putObjectAt(new_x, new_y, this);
     }

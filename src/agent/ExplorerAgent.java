@@ -8,6 +8,8 @@ import sajas.core.Agent;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import static model.map.ViewMap.DIR.W;
+
 
 /**
  * Created by sergi on 16/10/2016.
@@ -22,12 +24,19 @@ public class ExplorerAgent extends Agent {
     * East- 3
    * */
 
-    private static final int DEFAULT_VISION_RANGE = 5;
+    protected static final int DEFAULT_VISION_RANGE = 5;
 
-    private int vision_range = DEFAULT_VISION_RANGE,    //cells count
-            current_dir = -1, previous_dir = -1;            //no current/previous direction at the begining
+    protected int vision_range = DEFAULT_VISION_RANGE;   //cells count
 
-    // TODO: 16/10/2016 add agent's own globalMap
+    public ViewMap.DIR getCurrent_dir() {
+        return current_dir;
+    }
+
+    public void setCurrent_dir(ViewMap.DIR current_dir) {
+        this.current_dir = current_dir;
+    }
+
+    protected ViewMap.DIR current_dir;
 
     private boolean at_map_exit = false, found_map_exit = false;
     private AgentModel model_link;
@@ -53,52 +62,33 @@ public class ExplorerAgent extends Agent {
     //==================================== METHODS ====================================================//
 
     public ExplorerAgent(int vision_range) {
+        super();
         this.vision_range = vision_range;
+        System.out.println(this.getAID());
     }
 
 
     protected Pair<Integer, Integer> move(ViewMap.DIR dirToMove) {
 
-        ArrayList<ViewMap.DIR> dirs = new ArrayList<ViewMap.DIR>(Arrays.asList(ViewMap.DIR.N, ViewMap.DIR.S, ViewMap
-                .DIR.E, ViewMap.DIR.W));
-
-        int index = dirs.indexOf(dirToMove);
         Pair<Integer, Integer> coos = new Pair<>(getModel_link().getX(), getModel_link().getY());
 
-        switch (index) {
-            case 0: //N
+        switch (dirToMove) {
+            case N: //N
                 return new Pair<>(coos.getKey(), coos.getValue() - 1);
 
-            case 1: //S
+            case S: //S
                 return new Pair<>(coos.getKey(), coos.getValue() + 1);
 
-            case 2: //E
+            case E: //E
                 return new Pair<>(coos.getKey() + 1, coos.getValue());
 
-            case 3: //W
+            case W: //W
                 return new Pair<>(coos.getKey() - 1, coos.getValue());
 
             default:
                 System.out.println("Unexpected direction");
                 return null;
         }
-    }
-
-
-    public int getCurrent_dir() {
-        return current_dir;
-    }
-
-    public void setCurrent_dir(int current_dir) {
-        this.current_dir = current_dir;
-    }
-
-    public int getPrevious_dir() {
-        return previous_dir;
-    }
-
-    public void setPrevious_dir(int previous_dir) {
-        this.previous_dir = previous_dir;
     }
 
 

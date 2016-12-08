@@ -33,7 +33,7 @@ public class Soldier extends Human {
 
     @Override
     protected void setup() {
-        beginMsgListener();
+        /*beginMsgListener();
 
         addBehaviour(new TickerBehaviour(this, 1000) { //TODO period nao estar hardcoded
             private static final long serialVersionUID = 1L;
@@ -42,7 +42,7 @@ public class Soldier extends Human {
             protected void onTick() {
                 update();
             }
-        });
+        });*/
     }
 
 

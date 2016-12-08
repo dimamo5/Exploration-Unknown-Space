@@ -275,7 +275,7 @@ public class Model extends Repast3Launcher {
 
         for (int i = 0; i < capitains.size(); i++) {
 
-            ArrayList<int[]> soldiers = forest.createSoldiersPosition(capitains.get(i), numSol, 5);
+            ArrayList<int[]> soldiers = forest.createSoldiersPosition(capitains.get(i), numSol,5);
 
             //Gerar Soldados
             for (int j = 0; j < soldiers.size(); j++) {

@@ -1,6 +1,7 @@
 package model.map;
 
 import agent.Captain;
+import javafx.util.Pair;
 
 import javax.media.protocol.SourceTransferHandler;
 import java.util.ArrayList;
@@ -254,15 +255,15 @@ public class Map {
     public int[] createPositions() {
         int[] a = new int[]{};
 
-            while (a.length == 0) {
+        while (a.length == 0) {
             int posY = new Random().nextInt(this.height);
             int posX = new Random().nextInt(this.width);
 
             switch (exitSide) {
                 case N:
                     posY = posY / 4;
-                    if (map_in_array[this.height - posY-1][posX] == 0) {
-                        a = new int[]{posX, this.height-1 - posY};
+                    if (map_in_array[this.height - posY - 1][posX] == 0) {
+                        a = new int[]{posX, this.height - 1 - posY};
                         return a;
                     }
                     break;
@@ -282,8 +283,8 @@ public class Map {
                     break;
                 case W:
                     posX = posX / 4;
-                    if (map_in_array[posY][this.width-1 - posX] == 0) {
-                        a = new int[]{this.width-1 - posX, posY};
+                    if (map_in_array[posY][this.width - 1 - posX] == 0) {
+                        a = new int[]{this.width - 1 - posX, posY};
                         return a;
                     }
                     break;
@@ -291,17 +292,81 @@ public class Map {
         }
         return a;
     }
+/*
+    private boolean isinVisionXorY(int[] capitainPosition, int[] soldier, int viewRange) {
+        double dstX = Math.abs(soldier[0] - capitainPosition[0]);
+        double dstY = Math.abs(soldier[1] - capitainPosition[1]);
+        boolean inVisioninY = (soldier[0] == capitainPosition[0]);
+        boolean inVisioninX = (soldier[1] == capitainPosition[1]);
 
-    public ArrayList<int[]> createSoldiersPosition(int[] capitainPosition, int numSoldiers, int distance) {
+        if(inVisioninX){
+            if(capitainPosition[0]>)
+            while(dstX>0){
+             getMap_in_array()[]
+            }
+        }else if(inVisioninY){
+
+        }
+
+        return false;
+
+        ((dstX <= viewRange) && inVisioninY) || ((dstY <= viewRange) && inVisioninX)
+    }
+*/
+
+    public boolean isinVisionXorY(Pair<Integer, Integer> pos, int[] capitainPosition, Map map, int viewRange) {
+
+        boolean inVisionRange = false;
+        //Norte
+        for (int i = 0; i < viewRange && pos.getValue() - i > 0; i++) {
+            if (map.getMap_in_array()[pos.getValue() - i][pos.getKey()] == 0) {
+                if ((pos.getValue() - i) != capitainPosition[1] || (pos.getKey()) != capitainPosition[0])
+                    inVisionRange = false;
+                else
+                    inVisionRange = true;
+                continue;
+            } else {
+                inVisionRange = false;
+            }
+        }
+
+        if (!inVisionRange) {
+            //Sul
+            for (int i = 0; i < viewRange && pos.getValue() + i > 0; i++) {
+                if (map.getMap_in_array()[pos.getValue() + i][pos.getKey()] == 0) {
+                    if ((pos.getValue() + i) != capitainPosition[1] || (pos.getKey()) != capitainPosition[0])
+                        inVisionRange = false;
+                    else
+                        inVisionRange = true;
+                    continue;
+                } else {
+                    inVisionRange = false;
+                }
+            }
+        }
+
+        return inVisionRange;
+
+    }
+
+    public ArrayList<int[]> createSoldiersPosition(int[] capitainPosition, int numSoldiers, int viewRange) {
 
         ArrayList<int[]> soldiers = new ArrayList<int[]>();
 
         for (int i = 0; i < numSoldiers; i++) {
             while (soldiers.size() <= i) {
                 int[] soldier = createPositions();
-                double dst = Math.sqrt((soldier[0] - capitainPosition[0]) * (soldier[0] - capitainPosition[0]) + (soldier[1] - capitainPosition[1]) * (soldier[1] - capitainPosition[1]));
-                if (dst < distance && distance > 0 && !soldiers.contains(soldier) && soldier != capitainPosition) {
+                double dstX = Math.abs(soldier[0] - capitainPosition[0]);
+                double dstY = Math.abs(soldier[1] - capitainPosition[1]);
+                boolean inVisioninX = (soldier[0] == capitainPosition[0]);
+                boolean inVisioninY = (soldier[1] == capitainPosition[1]);
+                if ((inVisioninX || inVisioninY) && isinVisionXorY(new Pair(soldier[0], soldier[1]),
+                        capitainPosition,
+                        this,
+                        viewRange) && viewRange > 0 && !soldiers
+                        .contains(soldier) && soldier != capitainPosition) {
                     soldiers.add(soldier);
+                    System.out.println("Soldier:" + i + soldier);
                 }
             }
         }

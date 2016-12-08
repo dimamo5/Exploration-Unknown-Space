@@ -4,11 +4,12 @@ import uchicago.src.sim.gui.Drawable;
 import uchicago.src.sim.gui.SimGraphics;
 
 import java.awt.*;
+import java.io.Serializable;
 
 /**
  * Created by diogo on 06/12/2016.
  */
-public class HeatElement implements Drawable {
+public class HeatElement implements Drawable, Serializable {
     public int heat; // num of time passed
     public int x, y;
 

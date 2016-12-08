@@ -2,14 +2,23 @@ package model.map;
 
 import javafx.util.Pair;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  * Created by sergi on 05/12/2016.
  */
-public class ViewMap {
+public class ViewMap implements Serializable{
 
     private int size;
+
+    public int getSize() {
+        return size;
+    }
+
+    public void setSize(int size) {
+        this.size = size;
+    }
 
     private HeatElement map[][];
 

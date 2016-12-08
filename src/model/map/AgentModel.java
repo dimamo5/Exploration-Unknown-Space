@@ -28,7 +28,11 @@ public class AgentModel extends MapElement {
         globalMap = global;
     }
 
-    public ArrayList<AID> getRobotsFromAgentList() {  //testing purposes
+    public Pair<Integer,Integer> getMyCoos(){
+        return new Pair<>(getX(),getY());
+    }
+
+    public ArrayList<AID> getRobotsFromAgentList(){  //testing purposes
         ArrayList<AID> robots = new ArrayList<>();
 
         for (ExplorerAgent agent : agents_list) {
@@ -131,10 +135,6 @@ public class AgentModel extends MapElement {
         return globalMap.getVonNeumannNeighbors(this.getX(), this.getY(), true);
     }
 
-    public void move(int new_x, int new_y) {
-        globalMap.putObjectAt(getX(), getY(), null);
-        globalMap.putObjectAt(new_x, new_y, this);
-    }
 
     @Override
     public void draw(SimGraphics simGraphics) {

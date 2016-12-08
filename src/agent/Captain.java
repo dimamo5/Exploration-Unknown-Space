@@ -7,11 +7,16 @@ import javafx.util.Pair;
 import message.InformViewMap;
 import message.Message;
 import message.RequestViewMap;
+import model.Model;
+import model.map.AgentModel;
+import model.map.ViewMap;
+import sajas.core.Agent;
 import sajas.core.behaviours.CyclicBehaviour;
 import sajas.core.behaviours.TickerBehaviour;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * Created by sergi on 16/10/2016.
@@ -45,17 +50,23 @@ public class Captain extends Human {
 
     @Override
     protected void setup() {
-/*
+
         beginMsgListener();
 
-        addBehaviour(new TickerBehaviour(this, 10000) {
+        addBehaviour(new CyclicBehaviour(this) {
+            @Override
+            public void action() {
+                tick++;
+
+                if (tick % 100 == 0) { //TODO destrolhar isto
+                    move_random();
+                }
+            }
+
             private static final long serialVersionUID = 1L;
 
-            @Override
-            public void onTick() {
-                update();
-            }
-        });*/
+
+        });
     }
 
 
@@ -74,21 +85,19 @@ public class Captain extends Human {
                     } else if (msg.getPerformative() == Message.INFORM) {
                         try {
                             if (msg.getContentObject() instanceof InformViewMap) {
-                                System.out.println("Received response from robot. COOs:" + ((InformViewMap) msg
-                                        .getContentObject()).getPosition());
+
+                                System.out.println("Previous viewmap");
+                                getMyViewMap().print();
+
+                                getMyViewMap().addViewMap(((InformViewMap) msg.getContentObject()).getViewMap());
+
+                                System.out.println("Updated viewmap");
+                                getMyViewMap().print();
                             }
                         } catch (UnreadableException e) {
                             e.printStackTrace();
                         }
                     }
-
-                /*
-                try {
-                    if (msg != null)
-                        System.out.println((String) msg.getContentObject());
-                } catch (UnreadableException e) {
-                    e.printStackTrace();
-                }*/
                 }
             }
         });
@@ -99,41 +108,72 @@ public class Captain extends Human {
         switch (state) {
             case FINDING_EXIT:
 
-                //TODO buscar robo mais proximo
-
-                ArrayList<jade.core.AID> robots = getModel_link().getRobotsFromAgentList();
-
-                System.out.println("Captain#" + getAID() + "  Requesting info from robots.");
-                requestRobotForInfo(robots);
+                ArrayList<ExplorerAgent> onRangeAgents = getModel_link().getOnRadioRangeAgents(getRadio_range());
+                ArrayList<AID> robotsOnRange = new ArrayList<>();
+                ArrayList<Soldier> soldiersOnRange = new ArrayList<>();
 
 
-                /*for (ExplorerAgent agent : getModel_link().getAgents_list()) {
-                    if (agent.getAID() != this.getAID()) {
+                for (Agent agent : onRangeAgents) {
 
-                        requestForInfo(agent.getAID());
+                    if (agent instanceof Robot) {
+                        Pair<Integer, Integer> robotCoos = ((Robot) agent).getModel_link().getMyCoos(),
+                                humanCoos = getModel_link().getMyCoos();
 
-                        break;
-                    }
-                }*/
+                        if (robotIsInCommRange(humanCoos, robotCoos)) {
+                            robotsOnRange.add(agent.getAID());
+                        }
+
+                    } else if (agent instanceof Soldier) {
+                        //TODO
+                    }/*else if(agent instanceof Captain ){  //pode ser útil saber os capitães q tao no viewRange
+
+                    }*/
+                }
+
+                //comms with robots
+                if (robotsOnRange.size() > 0) {
+                    System.out.println(getAID() + "  requested info from robot(s)");
+                    requestRobotForInfo(robotsOnRange);
+                }
+
+                //comms with soldiers
+
+                //comms with captains  - ALL MAP RANGE VIA TELEFONE
 
                 break;
+            /*case AT_EXIT:
+                break; */
         }
     }
 
-    private void requestRobotForInfo(ArrayList<AID> robots) {
-        ACLMessage msg = new ACLMessage(Message.REQUEST);
+    //todo REMOVE THIS METHOD??
+    private void move_random() {
 
-        Pair<Integer, Integer> pos = new Pair<>(getModel_link().getX(), getModel_link().getY());
-        try {
-            msg.setContentObject(new RequestViewMap(pos));
-        } catch (IOException e) {
-            e.printStackTrace();
+        Pair<Integer, Integer> oldPos = new Pair<>(getModel_link().getX(), getModel_link().getY());
+        Pair<Integer, Integer> newPos;
+
+        if (current_dir == null || !getMyViewMap().canMoveDir(current_dir, oldPos)) {
+            ArrayList<ViewMap.DIR> possibleDirs = getMyViewMap().getPossibleDir(oldPos);
+
+            Random r = new Random();
+            int dir = r.nextInt(possibleDirs.size());
+
+            //new coordinates
+            current_dir = possibleDirs.get(dir);
         }
 
-        for (AID robot : robots) {
-            msg.addReceiver(robot);
-        }
-        send(msg);
+        newPos = move(current_dir);
+
+        //move on globalMap
+
+        AgentModel.setGlobalMap(AgentModel.getGlobalMap()); //extract these calls to 1 method
+
+        //update pos
+        getModel_link().setPos_x(newPos.getKey());
+        getModel_link().setPos_y(newPos.getValue());
+
+        //update viewmap
+        getMyViewMap().addViewRange(newPos, Model.getForest(), getVision_range());
     }
 
 
@@ -158,9 +198,10 @@ public class Captain extends Human {
 
         ACLMessage reply = msg.createReply();
         reply.setPerformative(Message.INFORM);
+
         try {
             Pair<Integer, Integer> pos = new Pair<>(getModel_link().getX(), getModel_link().getY());
-            reply.setContentObject(new Message(pos));
+            reply.setContentObject(new InformViewMap(pos, getMyViewMap()));
         } catch (IOException e) {
             e.printStackTrace();
         }

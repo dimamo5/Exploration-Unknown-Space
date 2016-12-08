@@ -39,6 +39,24 @@ public class Human extends ExplorerAgent {
         this.radio_range = radio_range;
     }
 
+    protected ArrayList<AID> checkRobotComms(ArrayList<AID> robotsOnRange) {
+        ArrayList<AID> robotsToRequest = new ArrayList<>();
+
+        for(AID ag : robotsOnRange){
+
+            if(!communicatedRobots.containsKey(ag)){
+                communicatedRobots.put(ag,tick);
+                robotsToRequest.add(ag);
+            }else{
+                if(tick - communicatedRobots.get(ag) >= 200){
+                    robotsToRequest.add(ag);
+                    communicatedRobots.replace(ag,tick);
+                }
+            }
+        }
+        return robotsToRequest;
+    }
+
     protected enum agent_state {FINDING_EXIT, AT_EXIT}
 
     void requestRobotForInfo(ArrayList<AID> robots) {
@@ -57,7 +75,7 @@ public class Human extends ExplorerAgent {
         send(msg);
     }
 
-    public boolean robotIsInCommRange(Pair<Integer,Integer> humanCoos, Pair<Integer,Integer> robotCoos){
+    boolean robotIsInCommRange(Pair<Integer, Integer> humanCoos, Pair<Integer, Integer> robotCoos){
         return distPos(humanCoos, robotCoos) <= 1;
     }
 

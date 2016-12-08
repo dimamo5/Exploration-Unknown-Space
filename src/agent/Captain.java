@@ -124,10 +124,26 @@ public class Captain extends Human {
                     }*/
                 }
 
+                ArrayList<AID> robotsToRequest = new ArrayList<>();
+
+                //TODO adaptar para os restantes agentes tb
+                //FILTRAR robots com quem já comunicou nos ultimos k ticks
+                for(AID ag : robotsOnRange){
+                    if(!communicatedRobots.containsKey(ag)){
+                        communicatedRobots.put(ag,tick);
+                        robotsToRequest.add(ag);
+                    }else{
+                        if(tick - communicatedRobots.get(ag) >= 200){
+                            robotsToRequest.add(ag);
+                            communicatedRobots.replace(ag,tick);
+                        }
+                    }
+                }
+
                 //comms with robots
-                if (robotsOnRange.size() > 0) {
+                if (robotsToRequest.size() > 0) {
                     System.out.println(getAID() + "  requested info from robot(s)");
-                    requestRobotForInfo(robotsOnRange);
+                    requestRobotForInfo(robotsToRequest);
                 }
 
                 //comms with soldiers

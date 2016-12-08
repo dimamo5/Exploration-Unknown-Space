@@ -8,6 +8,8 @@ import message.RequestViewMap;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import static utilities.Utilities.distPos;
 
@@ -20,9 +22,13 @@ public class Human extends ExplorerAgent {
 
     private int radio_range = DEFAULT_RADIO_RANGE;
 
+    protected Map<AID,Long> communicatedRobots;
+
+
     public Human(int vision_range, int radio_range) {
         super(vision_range);
         this.radio_range = radio_range;
+        communicatedRobots = new HashMap<>();
     }
 
     public int getRadio_range() {

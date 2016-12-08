@@ -133,8 +133,9 @@ public class ViewMap {
     public void print() {
         for (int i = 0; i < this.size; i++) {
             for (int j = 0; j < this.size; j++) {
-                System.out.println(this.map[i][j].heat);
+                System.out.print(this.map[i][j].heat + " ");
             }
+            System.out.print("\n");
         }
     }
 

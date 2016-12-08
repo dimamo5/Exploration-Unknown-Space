@@ -47,6 +47,10 @@ public class HeatElement implements Drawable, Serializable {
             heat = -2;
     }
 
+    public void addDoorHeat(){
+        heat=-3;
+    }
+
 
 
     @Override
@@ -59,6 +63,8 @@ public class HeatElement implements Drawable, Serializable {
             g.drawFastRect(new Color(10, 50, 100));
         else if (heat == -2)  //Paredes
             g.drawFastRect(Color.gray);
+        else if (heat == -3)
+            g.drawFastRect(Color.GREEN);
         else
             g.drawFastRect(Color.white); //-1
     }

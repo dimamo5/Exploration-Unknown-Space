@@ -54,6 +54,8 @@ public class ViewMap implements Serializable {
                 } else {
                     this.map[pos.getValue() - i][pos.getKey()].addVisionHeat();
                 }
+            } else if (map.getMap_in_array()[pos.getValue() - i][pos.getKey()] == 2) {
+                this.map[pos.getValue() - i][pos.getKey()].addDoorHeat();
             } else {
                 this.map[pos.getValue() - i][pos.getKey()].addWallHeat();
                 break;
@@ -65,6 +67,8 @@ public class ViewMap implements Serializable {
                 if (i != 0) {
                     this.map[pos.getValue() + i][pos.getKey()].addVisionHeat();
                 }
+            } else if (map.getMap_in_array()[pos.getValue() - i][pos.getKey()] == 2) {
+                this.map[pos.getValue() - i][pos.getKey()].addDoorHeat();
             } else {
                 this.map[pos.getValue() + i][pos.getKey()].addWallHeat();
                 break;
@@ -76,6 +80,8 @@ public class ViewMap implements Serializable {
                 if (i != 0) {
                     this.map[pos.getValue()][pos.getKey() + i].addVisionHeat();
                 }
+            } else if (map.getMap_in_array()[pos.getValue() - i][pos.getKey()] == 2) {
+                this.map[pos.getValue() - i][pos.getKey()].addDoorHeat();
             } else {
                 this.map[pos.getValue()][pos.getKey() + i].addWallHeat();
                 break;
@@ -87,6 +93,8 @@ public class ViewMap implements Serializable {
                 if (i != 0) {
                     this.map[pos.getValue()][pos.getKey() - i].addVisionHeat();
                 }
+            } else if (map.getMap_in_array()[pos.getValue() - i][pos.getKey()] == 2) {
+                this.map[pos.getValue() - i][pos.getKey()].addDoorHeat();
             } else {
                 this.map[pos.getValue()][pos.getKey() - i].addWallHeat();
                 break;

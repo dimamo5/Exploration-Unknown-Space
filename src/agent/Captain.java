@@ -45,7 +45,7 @@ public class Captain extends Human {
 
     @Override
     protected void setup() {
-
+/*
         beginMsgListener();
 
         addBehaviour(new TickerBehaviour(this, 10000) {
@@ -55,7 +55,7 @@ public class Captain extends Human {
             public void onTick() {
                 update();
             }
-        });
+        });*/
     }
 
 

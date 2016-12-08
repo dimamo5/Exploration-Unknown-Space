@@ -3,7 +3,6 @@ package model.map;
 import uchicago.src.sim.engine.Stepable;
 import uchicago.src.sim.gui.Drawable;
 import uchicago.src.sim.gui.SimGraphics;
-import uchicago.src.sim.space.Object2DGrid;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -30,10 +29,9 @@ public class MapElement implements Drawable, Stepable {
         this.image = image;
     }
 
-    public MapElement(int pos_x, int pos_y, Object2DGrid c) {
+    public MapElement(int pos_x, int pos_y) {
         this.pos_x = pos_x;
         this.pos_y = pos_y;
-        //globalMap = c;
     }
 
     @Override

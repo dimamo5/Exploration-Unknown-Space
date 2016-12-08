@@ -140,8 +140,14 @@ public class Model extends Repast3Launcher {
     }
 
     private void buildSchedule() {
+        getSchedule().scheduleActionBeginning(1,this, "step");
         getSchedule().scheduleActionAtInterval(1, dsurf, "updateDisplay", Schedule.LAST);
     }
+
+    public void step(){
+        tick++;
+    }
+
 
     @Override
     public void setup() {

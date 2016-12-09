@@ -145,10 +145,14 @@ public class ExplorerAgent extends Agent {
         AgentModel.setGlobalMap(AgentModel.getGlobalMap()); //extract these calls to 1 method
 
         //update pos
-        getModel_link().setPos_x(newPos.getKey());
-        getModel_link().setPos_y(newPos.getValue());
+        updatePosition(newPos);
 
         //update viewmap
         getMyViewMap().addViewRange(newPos, Model.getForest(), getVision_range());
+    }
+
+    protected void updatePosition(Pair<Integer, Integer> newPos) {
+        getModel_link().setPos_x(newPos.getKey());
+        getModel_link().setPos_y(newPos.getValue());
     }
 }

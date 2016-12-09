@@ -243,6 +243,8 @@ public class Model extends Repast3Launcher {
         generateAgents(ROBOT, null);
 
         teamUp();
+
+        //log -> debug purposes
         for(Captain cap : getCaptains()){
             System.out.println(cap.getAID() + " team:");
             for(AID id: cap.getTeamSoldiers()){
@@ -265,6 +267,7 @@ public class Model extends Repast3Launcher {
                 k++;
             }
             caps.get(k).addSoldierToTeam(solds.get(i).getAID());
+            solds.get(i).setTeamLeader(caps.get(k).getAID());
         }
     }
 
@@ -356,8 +359,10 @@ public class Model extends Repast3Launcher {
                     .getVision_range());
 
             try {
-                if (type == SOLDIER)
+                if (type == SOLDIER) {
                     agentContainer.acceptNewAgent(name + (index * agents.size() + j), agent).start();
+
+                }
                 else
                     agentContainer.acceptNewAgent(name + j, agent).start();
             } catch (StaleProxyException e) {

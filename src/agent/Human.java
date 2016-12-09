@@ -5,6 +5,7 @@ import jade.lang.acl.ACLMessage;
 import javafx.util.Pair;
 import message.Message;
 import message.RequestViewMap;
+import sajas.core.Agent;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -57,7 +58,38 @@ public class Human extends ExplorerAgent {
         return robotsToRequest;
     }
 
-    protected enum agent_state {WAITING_4_ORDERS, INITIAL_COMM_WITH_CAPTAINS, EXPLORING, AT_EXIT}
+    protected void commWithAgents(ArrayList<ExplorerAgent> onRangeAgents, ArrayList<AID> robotsOnRange, ArrayList<AID> soldiersOnRange) {
+        for (Agent agent : onRangeAgents) {
+            if (agent instanceof Robot) {
+                Pair<Integer, Integer> robotCoos = ((Robot) agent).getModel_link().getMyCoos(),
+                        humanCoos = getModel_link().getMyCoos();
+
+                if (robotIsInCommRange(humanCoos, robotCoos)) {
+                    robotsOnRange.add(agent.getAID());
+                }
+
+            } else if (agent instanceof Soldier) {
+                soldiersOnRange.add(agent.getAID());
+            }
+        }
+
+        //TODO adaptar para os restantes agentes tb
+
+        ArrayList<AID> robotsToRequest = checkRobotComms(robotsOnRange);
+
+        //robots + soldiers
+        robotsToRequest.addAll(soldiersOnRange); //quitos trolha mas pronts
+
+        //comms with robots+soldiers
+        if (robotsToRequest.size() > 0) {
+            System.out.println(getAID() + "  requested info from agent(s)");
+            requestAgentsForInfo(robotsToRequest);
+        }
+
+        //comms with captains  - ALL MAP RANGE VIA TELEFONE
+    }
+
+    protected enum agent_state {WAITING_4_ORDERS, INITIAL_COMM_WITH_CAPTAINS, WAITING_4_TEAM_RESPONSES, GIVING_ORDERS, EXPLORING, EXPLORATION_DONE, AT_EXIT}
 
     void requestAgentsForInfo(ArrayList<AID> agents) {
         ACLMessage msg = new ACLMessage(Message.REQUEST);

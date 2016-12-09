@@ -6,6 +6,7 @@ import jade.lang.acl.UnreadableException;
 import javafx.util.Pair;
 import message.InformViewMap;
 import message.Message;
+import message.OrderToExplore;
 import message.RequestViewMap;
 import model.Model;
 import model.map.AgentModel;
@@ -15,8 +16,11 @@ import sajas.core.behaviours.CyclicBehaviour;
 import sajas.core.behaviours.TickerBehaviour;
 
 import java.io.IOException;
+import java.security.acl.Acl;
 import java.util.ArrayList;
 import java.util.Random;
+
+import static agent.Human.agent_state.GIVING_ORDERS;
 
 /**
  * Created by sergi on 16/10/2016.
@@ -120,37 +124,34 @@ public class Captain extends Human {
                 ArrayList<AID> allCaptains = getAllCaptains();
 
                 //todo desenvolver isto
+                state = GIVING_ORDERS;
+                break;
+
+            case GIVING_ORDERS:
+
+                //TODO CALL method to obtain all possible coos to explore
+
+                //todo
+                //DESCOMENTAR ESTAS CENAS
+                for(int i = 0; i < teamSoldiers.size() /*&& i < coosToExplore.size()*/ ; i++){
+                    //OrderToExplore order = new OrderToExplore(pos);
+                    ACLMessage msg = new ACLMessage(Message.REQUEST);
+                    //msg.setContentObject(order);
+                    msg.addReceiver(teamSoldiers.get(i));
+                    send(msg);
+                }
+
+               // state = WAITING_4_TEAM_RESPONSES;
+                break;
+
+            case WAITING_4_TEAM_RESPONSES:
+
+                commWithAgents(onRangeAgents, robotsOnRange, soldiersOnRange);
+
                 break;
 
             case EXPLORING:
-                for (Agent agent : onRangeAgents) {
 
-                    if (agent instanceof Robot) {
-                        Pair<Integer, Integer> robotCoos = ((Robot) agent).getModel_link().getMyCoos(),
-                                humanCoos = getModel_link().getMyCoos();
-
-                        if (robotIsInCommRange(humanCoos, robotCoos)) {
-                            robotsOnRange.add(agent.getAID());
-                        }
-
-                    } else if (agent instanceof Soldier) {
-                        soldiersOnRange.add(agent.getAID());
-                    }/*else if(agent instanceof Captain ){  //pode ser útil saber os capitães q tao no viewRange
-
-                    }*/
-                }
-
-                ArrayList<AID> robotsToRequest = checkRobotComms(robotsOnRange);
-
-                //comms with robots
-                if (robotsToRequest.size() > 0) {
-                    System.out.println(getAID() + "  requested info from robot(s)");
-                    requestAgentsForInfo(robotsToRequest);
-                }
-
-                //comms with soldiers
-
-                //comms with captains  - ALL MAP RANGE VIA TELEFONE
 
                 break;
             /*case AT_EXIT:

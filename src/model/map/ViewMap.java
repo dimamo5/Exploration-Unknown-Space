@@ -1,6 +1,7 @@
 package model.map;
 
 import javafx.util.Pair;
+import model.Model;
 import utilities.Utilities;
 
 import java.io.Serializable;
@@ -164,7 +165,7 @@ public class ViewMap implements Serializable {
             posDir.add(DIR.S);
         }
         //este
-        if (pos.getKey() + 1 > this.size && map[pos.getValue()][pos.getKey() + 1].heat != -2) {
+        if (pos.getKey() + 1 < this.size && map[pos.getValue()][pos.getKey() + 1].heat != -2) {
             posDir.add(DIR.E);
         }
         //oeste
@@ -186,17 +187,14 @@ public class ViewMap implements Serializable {
     //Returns null
     public ArrayList<Pair<Integer, Integer>> getPath(Pair<Integer, Integer> start, Pair<Integer, Integer> end) {
         ArrayList<Pair<Integer, Integer>> path = new ArrayList<>();
-        if (getHeat(start).heat == -1 || getHeat(end).heat == -2) {
-            return null;
-        } else {
-            recursiveSolve(start.getKey(), start.getValue(), end, path);
-        }
+        recursiveSolve(start.getKey(), start.getValue(), end, path);
+
         return path;
     }
 
     public boolean recursiveSolve(int x, int y, Pair<Integer, Integer> end, ArrayList<Pair<Integer, Integer>> path) {
         if (x == end.getKey() && y == end.getValue()) return true; // If you reached the end
-        if (this.map[y][x].heat == -2 || this.map[y][x].heat == -1 || wasHere[x][y]) return false;
+        if (Model.getForest().getMap_in_array()[y][x] == 1 || wasHere[x][y]) return false;
         // If you are on a wall or already were here
         wasHere[x][y] = true;
         if (x != 0) // Checks if not on left edge

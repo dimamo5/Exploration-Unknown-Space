@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Random;
+import java.util.stream.IntStream;
 
 /**
  * Created by sergi on 16/10/2016.
@@ -56,6 +57,11 @@ public class Map {
 
         ArrayList<int[]> capitains = map.createCapitainsPosition(8, 15);
 
+        System.out.println(map.countSpaces(capitains.get(0), map, 2).toString());
+
+
+        /*
+
         for (int i = 0; i < capitains.size(); i++) {
             System.out.println("capitain " + i + ' ' + Arrays.toString(capitains.get(i)));
         }
@@ -65,6 +71,8 @@ public class Map {
         for (int i = 0; i < map.getHeight(); i++) {
             System.out.println(Arrays.toString(map.map_in_array[i]));
         }
+        */
+
 
     }
 
@@ -292,85 +300,89 @@ public class Map {
         }
         return a;
     }
-/*
-    private boolean isinVisionXorY(int[] capitainPosition, int[] soldier, int viewRange) {
-        double dstX = Math.abs(soldier[0] - capitainPosition[0]);
-        double dstY = Math.abs(soldier[1] - capitainPosition[1]);
-        boolean inVisioninY = (soldier[0] == capitainPosition[0]);
-        boolean inVisioninX = (soldier[1] == capitainPosition[1]);
 
-        if(inVisioninX){
-            if(capitainPosition[0]>)
-            while(dstX>0){
-             getMap_in_array()[]
-            }
-        }else if(inVisioninY){
+    public int[] countSpaces(int[] capitainPosition, Map map, int numSoldiers) {
+        int[] count = {0, 0, 0, 0};
 
-        }
-
-        return false;
-
-        ((dstX <= viewRange) && inVisioninY) || ((dstY <= viewRange) && inVisioninX)
-    }
-*/
-
-    public boolean isinVisionXorY(Pair<Integer, Integer> pos, int[] capitainPosition, Map map, int viewRange) {
-
-        boolean inVisionRange = false;
-        //Norte
-        for (int i = 0; i < viewRange && pos.getValue() - i > 0; i++) {
-            if (map.getMap_in_array()[pos.getValue() - i][pos.getKey()] == 0) {
-                if ((pos.getValue() - i) != capitainPosition[1] || (pos.getKey()) != capitainPosition[0])
-                    inVisionRange = false;
-                else
-                    inVisionRange = true;
-                continue;
+        for (int i = 1; i <= numSoldiers; i++) {
+            //Norte
+            if (capitainPosition[1] - i > 0 && map.getMap_in_array()[capitainPosition[1] - i][capitainPosition[0]] == 0) {
+                count[0]++;
             } else {
-                inVisionRange = false;
+                break;
             }
         }
 
-        if (!inVisionRange) {
+        for (int i = 1; i <= numSoldiers; i++) {
             //Sul
-            for (int i = 0; i < viewRange && pos.getValue() + i > 0; i++) {
-                if (map.getMap_in_array()[pos.getValue() + i][pos.getKey()] == 0) {
-                    if ((pos.getValue() + i) != capitainPosition[1] || (pos.getKey()) != capitainPosition[0])
-                        inVisionRange = false;
-                    else
-                        inVisionRange = true;
-                    continue;
-                } else {
-                    inVisionRange = false;
-                }
+            if (capitainPosition[1] + i > map.getMap_in_array().length && map.getMap_in_array()[capitainPosition[1] + i][capitainPosition[0]] == 0) {
+                count[1]++;
+            } else {
+                break;
             }
         }
 
-        return inVisionRange;
+        for (int i = 1; i <= numSoldiers; i++) {
+            //Este
+            if (capitainPosition[0] + i > map.getMap_in_array().length && map.getMap_in_array()[capitainPosition[1]][capitainPosition[0] + i] == 0) {
+                count[2]++;
+            } else {
+                break;
+            }
+        }
 
-    }
+        for (int i = 1; i <= numSoldiers; i++) {
+            //Oeste
+            if (capitainPosition[0] - i > 0 && map.getMap_in_array()[capitainPosition[1]][capitainPosition[0] - i] == 0) {
+                count[3]++;
+            } else {
+                break;
+            }
+        }
+
+        return count;
+}
+
 
     public ArrayList<int[]> createSoldiersPosition(int[] capitainPosition, int numSoldiers, int viewRange) {
-
         ArrayList<int[]> soldiers = new ArrayList<int[]>();
+        int[] count = countSpaces(capitainPosition, this, numSoldiers);
+        int sum = IntStream.of(count).sum();
 
-        for (int i = 0; i < numSoldiers; i++) {
-            while (soldiers.size() <= i) {
-                int[] soldier = createPositions();
-                double dstX = Math.abs(soldier[0] - capitainPosition[0]);
-                double dstY = Math.abs(soldier[1] - capitainPosition[1]);
-                boolean inVisioninX = (soldier[0] == capitainPosition[0]);
-                boolean inVisioninY = (soldier[1] == capitainPosition[1]);
-                if ((inVisioninX || inVisioninY) && isinVisionXorY(new Pair(soldier[0], soldier[1]),
-                        capitainPosition,
-                        this,
-                        viewRange) && viewRange > 0 && !soldiers
-                        .contains(soldier) && soldier != capitainPosition) {
-                    soldiers.add(soldier);
-                    System.out.println("Soldier:" + i + soldier);
-                }
+        while (sum < numSoldiers) {
+            capitainPosition = createPositions();
+            count = countSpaces(capitainPosition, this, numSoldiers);
+            sum = IntStream.of(count).sum();
+        }
+        int[] soldier;
+        int i = 0;
+        while (i < numSoldiers) {
+            int rand = new Random().nextInt(4);
+            if (rand == 0 && count[rand] > 0) {
+                soldier = new int[]{capitainPosition[0], capitainPosition[1] - count[rand]};
+                soldiers.add(soldier);
+                count[rand]--;
+                i++;
+            } else if (rand == 1 && count[rand] > 0) {
+                soldier = new int[]{capitainPosition[0], capitainPosition[1] + count[rand]};
+                soldiers.add(soldier);
+                count[rand]--;
+                i++;
+            } else if (rand == 2 && count[rand] > 0) {
+                soldier = new int[]{capitainPosition[0] + count[rand], capitainPosition[1]};
+                soldiers.add(soldier);
+                count[rand]--;
+                i++;
+            } else if (rand == 3 && count[rand] > 0) {
+                soldier = new int[]{capitainPosition[0] - count[rand], capitainPosition[1]};
+                soldiers.add(soldier);
+                count[rand]--;
+                i++;
             }
         }
+
         return soldiers;
+
     }
 
     public ArrayList<int[]> createCapitainsPosition(int numCapitains, int distance) {

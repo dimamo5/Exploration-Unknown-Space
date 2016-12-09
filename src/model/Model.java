@@ -139,7 +139,7 @@ public class Model extends Repast3Launcher {
         dsurf2.addDisplayableProbeable(heat_map_display, "ExplorerAgent View");
         //addSimEventListener(dsurf2);
         dsurf2.setBackground(Color.LIGHT_GRAY);
-        dsurf2.setLocation(280, 80);
+        dsurf2.setLocation(500, 70);
         dsurf2.display();
         //dsurf2.print();*/
 
@@ -276,7 +276,6 @@ public class Model extends Repast3Launcher {
         for (int i = 0; i < capitains.size(); i++) {
 
             ArrayList<int[]> soldiers = forest.createSoldiersPosition(capitains.get(i), numSol,5);
-
             //Gerar Soldados
             for (int j = 0; j < soldiers.size(); j++) {
                 Soldier sol = new Soldier(5, 5);

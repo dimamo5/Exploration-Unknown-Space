@@ -206,6 +206,7 @@ public class ViewMap implements Serializable {
         if (x != this.size - 1) // Checks if not on right edge
             if (recursiveSolve(x + 1, y, end, path)) { // Recalls method one to the right
                 //correctPath[x][y] = true;
+                path.add(new Pair<>(x, y));
                 return true;
             }
         if (y != 0)  // Checks if not on top edge

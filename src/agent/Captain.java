@@ -1,23 +1,18 @@
 package agent;
 
-import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.UnreadableException;
 import javafx.util.Pair;
-import message.*;
-import model.Model;
-import model.map.AgentModel;
-import model.map.ViewMap;
+import message.ExplorationResponse;
+import message.InformViewMap;
+import message.Message;
+import message.OrderToExplore;
 import sajas.core.Agent;
 import sajas.core.behaviours.CyclicBehaviour;
-import sajas.core.behaviours.TickerBehaviour;
 
 import java.io.IOException;
-import java.security.acl.Acl;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Random;
 
 import static agent.Human.agent_state.*;
 
@@ -142,10 +137,12 @@ public class Captain extends Human {
 
                 wentExploringSoldiers = new ArrayList<>();
 
-                ArrayList<Pair<Integer, Integer>> coosToExplore = myViewMap.coosToExplore(getModel_link().getMyCoos(), getRadio_range());
+                ArrayList<Pair<Integer, Integer>> coosToExplore = myViewMap.coosToExplore(getModel_link().getMyCoos()
+                        , getRadio_range());
 
-                for(int i=0; i< coosToExplore.size(); i++){
-                    System.out.println(coosToExplore.get(i).getKey() + " " + coosToExplore.get(i).getValue() );
+                for (int i = 0; i < coosToExplore.size(); i++) { //TODO!!
+                    System.out.println("Pos: " + coosToExplore.get(i).getKey() + " " + coosToExplore.get(i).getValue
+                            ());
                 }
 
                 for (int i = 0; i < teamSoldiers.size() && i < coosToExplore.size(); i++) {

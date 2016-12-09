@@ -26,7 +26,7 @@ public class HeatElement implements Drawable, Serializable {
     }
 
     public void addMyHeat() {
-        if (heat < 0) {
+        if (heat < 1) {
             this.heat = 1;
         } else {
             this.heat++;
@@ -38,27 +38,21 @@ public class HeatElement implements Drawable, Serializable {
             heat = 0;
         }
     }
-    public void addVisionHeat() {
-        if (heat == -1) {
-            heat = 1;
-        }
-    }
+
+
     public void addWallHeat() {
-            heat = -2;
+        heat = -2;
     }
 
-    public void addDoorHeat(){
-        heat=-3;
+    public void addDoorHeat() {
+        heat = -3;
     }
-
 
 
     @Override
     public void draw(SimGraphics g) {
-        if (heat == 1)    //Vision
-            g.drawFastRect(Color.yellow);
-        else if (heat > 1)    //Numero de vezes que passou
-            g.drawFastRect(new Color((heat > 9) ? 255 : heat * 25+25, 0, 0));
+        if (heat > 0)    //Numero de vezes que passou
+            g.drawFastRect(new Color((heat > 9) ? 255 : heat * 25 + 25, 0, 0));
         else if (heat == 0)  //passado pelos outros
             g.drawFastRect(new Color(10, 50, 100));
         else if (heat == -2)  //Paredes

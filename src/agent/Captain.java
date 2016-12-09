@@ -1,5 +1,6 @@
 package agent;
 
+import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.UnreadableException;
@@ -15,6 +16,7 @@ import sajas.core.behaviours.TickerBehaviour;
 import java.io.IOException;
 import java.security.acl.Acl;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
 import static agent.Human.agent_state.*;
@@ -73,6 +75,7 @@ public class Captain extends Human {
                 tick++;
 
                 if (tick % 100 == 0) { //TODO destrolhar isto
+                    System.out.println(state);
                     update();
                     //move_random();
                 }
@@ -91,28 +94,29 @@ public class Captain extends Human {
             public void action() {
                 ACLMessage msg = myAgent.receive();
 
-                if (msg != null) {
+                if (msg == null) {
+                    return;
+                }
 
-                    if (msg.getPerformative() == Message.REQUEST) {
-                        sendMyInfoToAgent(msg);
-                    } else if (msg.getPerformative() == Message.INFORM) {
-                        try {
-                            if (state == WAITING_4_TEAM_RESPONSES && msg.getContentObject() instanceof ExplorationResponse) {
+                if (msg.getPerformative() == Message.REQUEST) {
+                    sendMyInfoToAgent(msg);
+                } else if (msg.getPerformative() == Message.INFORM) {
+                    try {
+                        if (state == WAITING_4_TEAM_RESPONSES && msg.getContentObject() instanceof ExplorationResponse) {
 
-                                wentExploringSoldiers.remove(msg.getSender());
-                                getMyViewMap().addViewMap(((ExplorationResponse) msg.getContentObject()).getViewMap());
+                            wentExploringSoldiers.remove(msg.getSender());
+                            getMyViewMap().addViewMap(((ExplorationResponse) msg.getContentObject()).getViewMap());
 
-                                if (wentExploringSoldiers.size() == 0) {
-                                    state = GIVING_ORDERS;
-                                }
+                            if (wentExploringSoldiers.size() == 0) {
+                                state = GIVING_ORDERS;
                             }
-
-                            if (msg.getContentObject() instanceof InformViewMap) {
-                                getMyViewMap().addViewMap(((InformViewMap) msg.getContentObject()).getViewMap());
-                            }
-                        } catch (UnreadableException e) {
-                            e.printStackTrace();
                         }
+
+                        if (msg.getContentObject() instanceof InformViewMap) {
+                            getMyViewMap().addViewMap(((InformViewMap) msg.getContentObject()).getViewMap());
+                        }
+                    } catch (UnreadableException e) {
+                        e.printStackTrace();
                     }
                 }
             }
@@ -128,7 +132,7 @@ public class Captain extends Human {
         switch (state) {
 
             case INITIAL_COMM_WITH_CAPTAINS:
-               // ArrayList<AID> allCaptains = getAllCaptains();
+                // ArrayList<AID> allCaptains = getAllCaptains();
 
                 //todo desenvolver isto
                 state = GIVING_ORDERS;
@@ -140,6 +144,11 @@ public class Captain extends Human {
 
                 ArrayList<Pair<Integer, Integer>> coosToExplore = myViewMap.coosToExplore(getModel_link().getMyCoos(), getRadio_range());
 
+                for(int i=0; i< coosToExplore.size(); i++){ //TODO!!
+                    System.out.println(coosToExplore.get(i).getKey() + " " + coosToExplore.get(i).getValue() );
+                }
+
+                //TODO CHECK IF SOLDIER IS RECEIVING ORDERTOEXPLORE
                 for (int i = 0; i < teamSoldiers.size() && i < coosToExplore.size(); i++) {
                     try {
                         OrderToExplore order = new OrderToExplore(coosToExplore.get(i));
@@ -152,6 +161,7 @@ public class Captain extends Human {
                         e.printStackTrace();
                     }
                 }
+                System.out.println(wentExploringSoldiers.size());
 
                 state = WAITING_4_TEAM_RESPONSES;
                 break;

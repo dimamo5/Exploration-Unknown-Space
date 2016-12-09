@@ -52,6 +52,7 @@ public class Soldier extends Human {
 
                 if (tick % 100 == 0) { //TODO destrolhar isto
                     update();
+                    System.out.println(state);
                 }
             }
 
@@ -98,6 +99,8 @@ public class Soldier extends Human {
         }
 
         if (toParseMsg instanceof OrderToExplore && state == WAITING_4_ORDERS) {
+            System.out.println("CENANSANSAN");
+
             state = EXPLORING;
             coosToExplore = new Stack<>();
 

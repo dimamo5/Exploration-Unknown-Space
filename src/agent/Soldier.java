@@ -52,7 +52,7 @@ public class Soldier extends Human {
 
                 if (tick % 100 == 0) { //TODO destrolhar isto
                     update();
-                    System.out.println(state);
+                    System.out.println("SOLDIER state: "+state);
                 }
             }
 
@@ -99,7 +99,7 @@ public class Soldier extends Human {
         }
 
         if (toParseMsg instanceof OrderToExplore && state == WAITING_4_ORDERS) {
-            System.out.println("CENANSANSAN");
+            System.out.println(getAID() + " RECEIVED ORDER!!");
 
             state = EXPLORING;
             coosToExplore = new Stack<>();
@@ -108,9 +108,11 @@ public class Soldier extends Human {
             ArrayList<Pair<Integer, Integer>> pathCoos = myViewMap.getPath(getModel_link().getMyCoos(), destiny);
             pushToStack(pathCoos);
 
+            System.out.println("MY COOS TO EXPLORE: " + coosToExplore.toString());
+
         } else if (toParseMsg instanceof RequestViewMap) {
-            System.out.println(getAID() + " SENDING MY INFO>>" + msg.getSender());
-            sendMyInfoToAgent(msg);
+           /* System.out.println(getAID() + ">> SENDING MY INFO >>" + msg.getSender());
+            sendMyInfoToAgent(msg); */
         }
     }
 
@@ -127,7 +129,6 @@ public class Soldier extends Human {
 
         switch (state) {
             case WAITING_4_ORDERS:
-                //communicates with agents(soldiers+robots) on range
                 //commWithAgents(onRangeAgents, robotsOnRange, soldiersOnRange);
 
                 break;

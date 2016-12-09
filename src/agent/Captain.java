@@ -75,7 +75,7 @@ public class Captain extends Human {
                 tick++;
 
                 if (tick % 100 == 0) { //TODO destrolhar isto
-                    System.out.println(state);
+                    System.out.println("CAPTAIN state: " + state);
                     update();
                     //move_random();
                 }
@@ -144,11 +144,10 @@ public class Captain extends Human {
 
                 ArrayList<Pair<Integer, Integer>> coosToExplore = myViewMap.coosToExplore(getModel_link().getMyCoos(), getRadio_range());
 
-                for(int i=0; i< coosToExplore.size(); i++){ //TODO!!
+                for(int i=0; i< coosToExplore.size(); i++){
                     System.out.println(coosToExplore.get(i).getKey() + " " + coosToExplore.get(i).getValue() );
                 }
 
-                //TODO CHECK IF SOLDIER IS RECEIVING ORDERTOEXPLORE
                 for (int i = 0; i < teamSoldiers.size() && i < coosToExplore.size(); i++) {
                     try {
                         OrderToExplore order = new OrderToExplore(coosToExplore.get(i));
@@ -161,14 +160,13 @@ public class Captain extends Human {
                         e.printStackTrace();
                     }
                 }
-                System.out.println(wentExploringSoldiers.size());
 
                 state = WAITING_4_TEAM_RESPONSES;
                 break;
 
             case WAITING_4_TEAM_RESPONSES:
 
-                commWithAgents(onRangeAgents, robotsOnRange, soldiersOnRange);
+                //commWithAgents(onRangeAgents, robotsOnRange, soldiersOnRange);
 
                 break;
 

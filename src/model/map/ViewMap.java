@@ -36,6 +36,7 @@ public class ViewMap implements Serializable {
                 map[i][m] = new HeatElement(m, i);
             }
         }
+        wasHere = new boolean[size][size];
     }
 
     public HeatElement getHeat(Pair<Integer, Integer> pos) {

@@ -273,11 +273,10 @@ public class Model extends Repast3Launcher {
                 sol.getMyViewMap().addViewRange(new Pair<>(agModel.getX(), agModel.getY()), Model.getForest(), sol
                         .getVision_range());
 
-                sol.setTeamLeader(cap.getAID());
-                cap.addSoldierToTeam(sol.getAID());
-
                 try {
                     agentContainer.acceptNewAgent("Soldier #" + (i * soldiers.size() + j), sol).start();
+                    sol.setTeamLeader(cap.getAID());
+                    cap.addSoldierToTeam(sol.getAID());
                 } catch (StaleProxyException e) {
                     e.printStackTrace();
                 }

@@ -188,7 +188,8 @@ public class ViewMap implements Serializable {
     public ArrayList<Pair<Integer, Integer>> getPath(Pair<Integer, Integer> start, Pair<Integer, Integer> end) {
         ArrayList<Pair<Integer, Integer>> path = new ArrayList<>();
         recursiveSolve(start.getKey(), start.getValue(), end, path);
-
+        path.remove(0); //Removed current element
+        path.add(end);  // add end pos
         return path;
     }
 

@@ -100,7 +100,7 @@ public class ViewMap implements Serializable {
         }
 
         if (!hor) {
-            if (pos.getKey() - 1 > 0 && pos.getKey() + 1 < this.size) {
+            if (pos.getKey() - 1 >= 0 && pos.getKey() + 1 < this.size) {
                 if (Model.getForest().getMap_in_array()[pos.getValue()][pos.getKey() - 1] == 1) {
                     this.map[pos.getValue()][pos.getKey() - 1].addWallHeat();
                 }
@@ -109,7 +109,7 @@ public class ViewMap implements Serializable {
                 }
             }
         } else if (hor) {
-            if (pos.getValue() - 1 > 0 && pos.getValue() + 1 < this.size) {
+            if (pos.getValue() - 1 >= 0 && pos.getValue() + 1 < this.size) {
                 if (Model.getForest().getMap_in_array()[pos.getValue() - 1][pos.getKey()] == 1) {
                     this.map[pos.getValue() - 1][pos.getKey()].addWallHeat();
                 }
@@ -218,10 +218,13 @@ public class ViewMap implements Serializable {
         ArrayList<Pair<Integer, Integer>> path = new ArrayList<>();
         recursiveSolve(start.getKey(), start.getValue(), end, path);
         if (path.size() > 0) {
+            if (Utilities.distPos(path.get(path.size() - 1), start) >= 1) {
+                Collections.reverse(path);
+            }
             path.remove(path.size() - 1); //Removed current element
-            Collections.reverse(path);
+            //path.add(end);  // add end pos
+            path.add(0, end);
         }
-        path.add(end);  // add end pos
         return path;
     }
 

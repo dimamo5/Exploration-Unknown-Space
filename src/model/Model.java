@@ -29,7 +29,6 @@ import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * Created by sergi on 12/11/2016.
@@ -249,14 +248,15 @@ public class Model extends Repast3Launcher {
         ArrayList<int[]> capitains = forest.createCapitainsPosition(numCap, 15);
 
         for (int i = 0; i < capitains.size(); i++) {
+            ArrayList<int[]> soldiers = forest.createSoldiersPosition(capitains.get(i), numSol, 5);
 
             Captain cap = new Captain(5, 5, 5);
 
-            AgentModel agModel = new AgentModel(capitains.get(i)[0],
-                    capitains.get(i)[1],
+            AgentModel agModel = new AgentModel(soldiers.get(0)[0],
+                    soldiers.get(0)[1],
                     forest_space,
                     AgentModel.agent_type.CAPTAIN,
-            agents_list);
+                    agents_list);
 
             cap.setModel_link(agModel);
 
@@ -271,16 +271,13 @@ public class Model extends Repast3Launcher {
             }
             agents_list.add(cap);
             display_list.add(cap.getModel_link());
-        }
 
-        for (int i = 0; i < capitains.size(); i++) {
-
-            ArrayList<int[]> soldiers = forest.createSoldiersPosition(capitains.get(i), numSol,5);
             //Gerar Soldados
-            for (int j = 0; j < soldiers.size(); j++) {
+            for (int j = 1; j < soldiers.size(); j++) {
+                System.out.println("Soldados: " + soldiers.get(j)[0] + " " + soldiers.get(j)[1]);
                 Soldier sol = new Soldier(5, 5);
 
-                AgentModel agModel = new AgentModel(soldiers.get(j)[0],
+                agModel = new AgentModel(soldiers.get(j)[0],
                         soldiers.get(j)[1],
                         forest_space,
                         AgentModel.agent_type.SOLDIER,
@@ -345,8 +342,8 @@ public class Model extends Repast3Launcher {
 
         JScrollPane scroll = new JScrollPane(agentList);
         agentFrame.add(scroll);
-        agentFrame.setSize(150, 350);
-        agentFrame.setLocation(270, 70);
+        agentFrame.setSize(300, 350);
+        agentFrame.setLocation(500, 70);
         agentFrame.setVisible(true);
         MouseListener mouseListener = new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {

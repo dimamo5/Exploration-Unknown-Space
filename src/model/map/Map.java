@@ -1,9 +1,5 @@
 package model.map;
 
-import agent.Captain;
-import javafx.util.Pair;
-
-import javax.media.protocol.SourceTransferHandler;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -306,7 +302,8 @@ public class Map {
 
         for (int i = 1; i <= numSoldiers; i++) {
             //Norte
-            if (capitainPosition[1] - i > 0 && map.getMap_in_array()[capitainPosition[1] - i][capitainPosition[0]] == 0) {
+            if (capitainPosition[1] - i > 0 && map.getMap_in_array()[capitainPosition[1] - i][capitainPosition[0]] ==
+                    0) {
                 count[0]++;
             } else {
                 break;
@@ -315,7 +312,8 @@ public class Map {
 
         for (int i = 1; i <= numSoldiers; i++) {
             //Sul
-            if (capitainPosition[1] + i > map.getMap_in_array().length && map.getMap_in_array()[capitainPosition[1] + i][capitainPosition[0]] == 0) {
+            if (capitainPosition[1] + i > map.getMap_in_array().length && map.getMap_in_array()[capitainPosition[1] +
+                    i][capitainPosition[0]] == 0) {
                 count[1]++;
             } else {
                 break;
@@ -324,7 +322,8 @@ public class Map {
 
         for (int i = 1; i <= numSoldiers; i++) {
             //Este
-            if (capitainPosition[0] + i > map.getMap_in_array().length && map.getMap_in_array()[capitainPosition[1]][capitainPosition[0] + i] == 0) {
+            if (capitainPosition[0] + i > map.getMap_in_array().length && map.getMap_in_array()
+                    [capitainPosition[1]][capitainPosition[0] + i] == 0) {
                 count[2]++;
             } else {
                 break;
@@ -333,7 +332,8 @@ public class Map {
 
         for (int i = 1; i <= numSoldiers; i++) {
             //Oeste
-            if (capitainPosition[0] - i > 0 && map.getMap_in_array()[capitainPosition[1]][capitainPosition[0] - i] == 0) {
+            if (capitainPosition[0] - i > 0 && map.getMap_in_array()[capitainPosition[1]][capitainPosition[0] - i] ==
+                    0) {
                 count[3]++;
             } else {
                 break;
@@ -341,11 +341,11 @@ public class Map {
         }
 
         return count;
-}
+    }
 
 
     public ArrayList<int[]> createSoldiersPosition(int[] capitainPosition, int numSoldiers, int viewRange) {
-        ArrayList<int[]> soldiers = new ArrayList<int[]>();
+        ArrayList<int[]> soldiers = new ArrayList<>();
         int[] count = countSpaces(capitainPosition, this, numSoldiers);
         int sum = IntStream.of(count).sum();
 
@@ -354,10 +354,11 @@ public class Map {
             count = countSpaces(capitainPosition, this, numSoldiers);
             sum = IntStream.of(count).sum();
         }
+        soldiers.add(capitainPosition);
         int[] soldier;
-        int i = 0;
+        int i = 0, rand;
         while (i < numSoldiers) {
-            int rand = new Random().nextInt(4);
+            rand = new Random().nextInt(4);
             if (rand == 0 && count[rand] > 0) {
                 soldier = new int[]{capitainPosition[0], capitainPosition[1] - count[rand]};
                 soldiers.add(soldier);
@@ -394,9 +395,11 @@ public class Map {
         for (int i = 1; i < numCapitains; i++) {
             while (capitains.size() <= i) {
                 capitain = createPositions();
-                double dst = Math.sqrt((capitains.get(i - 1)[0] - capitain[0]) * (capitains.get(i - 1)[0] - capitain[0]) + (capitains
+                double dst = Math.sqrt((capitains.get(i - 1)[0] - capitain[0]) * (capitains.get(i - 1)[0] -
+                        capitain[0]) + (capitains
                         .get(i - 1)[1] - capitain[1]) * (capitains.get(i - 1)[1] - capitain[1]));
-                if (dst < distance && distance > 0 && !capitains.contains(capitain) && capitain != capitains.get(i - 1)) {
+                if (dst < distance && distance > 0 && !capitains.contains(capitain) && capitain != capitains.get(i -
+                        1)) {
                     capitains.add(capitain);
                 }
             }

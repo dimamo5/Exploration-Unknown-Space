@@ -4,7 +4,6 @@ import javafx.util.Pair;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
 
 /**
  * Created by sergi on 05/12/2016.

@@ -4,7 +4,6 @@ import agent.Captain;
 import agent.ExplorerAgent;
 import agent.Robot;
 import agent.Soldier;
-import jade.core.AID;
 import jade.core.Profile;
 import jade.core.ProfileImpl;
 import jade.wrapper.StaleProxyException;
@@ -30,6 +29,7 @@ import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import static model.map.AgentModel.agent_type.*;
 
@@ -141,7 +141,7 @@ public class Model extends Repast3Launcher {
         dsurf2.addDisplayableProbeable(heat_map_display, "ExplorerAgent View");
         //addSimEventListener(dsurf2);
         dsurf2.setBackground(Color.LIGHT_GRAY);
-        dsurf2.setLocation(280, 80);
+        dsurf2.setLocation(500, 70);
         dsurf2.display();
         //dsurf2.print();*/
 
@@ -179,7 +179,7 @@ public class Model extends Repast3Launcher {
 
     @Override
     public String getName() {
-        return "";
+        return "Exploration of Unknown Space -- SAJaS Repast3 Test";
     }
 
     public int getNumCap() {
@@ -206,6 +206,19 @@ public class Model extends Repast3Launcher {
         this.numRobot = numRobot;
     }
 
+
+    class MainAction extends BasicAction {
+
+        public void execute() {
+            // shuffle agents
+            //SimUtilities.shuffle(agentList);
+
+            // iterate through all agents
+           /* for(int i = 0; i < agentList.size(); i++) {
+                agentList.get(i).step();
+            }*/
+        }
+    }
 
     private void spread_agents( /*empty_spaces*/) {
         //distribui agentes pelos espaços vazios
@@ -237,139 +250,87 @@ public class Model extends Repast3Launcher {
         //Gerar Capitães
         ArrayList<int[]> capitains = forest.createCapitainsPosition(numCap, 15);
 
-        generateAgents(AgentModel.agent_type.CAPTAIN, capitains);
-        generateAgents(SOLDIER, capitains);
-        generateAgents(ROBOT, null);
+        for (int i = 0; i < capitains.size(); i++) {
+            ArrayList<int[]> soldiers = forest.createSoldiersPosition(capitains.get(i), numSol, 5);
 
-        teamUp();
-        for(Captain cap : getCaptains()){
-            System.out.println(cap.getAID() + " team:");
-            for(AID id: cap.getTeamSoldiers()){
-                System.out.println(id);
-            }
-            System.out.println();
-        }
+            Captain cap = new Captain(5, 5, 5);
 
-        createAgentsFrame();
-    }
-
-    private void teamUp() {
-
-        ArrayList<Captain> caps = getCaptains();
-        ArrayList<Soldier> solds = getSoldiers();
-
-        for (int i = 0, k = 0; i < solds.size(); i++) {
-
-            if (i == numSol) {
-                k++;
-            }
-            caps.get(k).addSoldierToTeam(solds.get(i).getAID());
-        }
-    }
-
-    private ArrayList<Soldier> getSoldiers() {
-        ArrayList<Soldier> solds = new ArrayList<>();
-
-        for(ExplorerAgent agent: agents_list){
-            if(agent instanceof Soldier){
-                solds.add((Soldier)agent);
-            }
-        }
-        return solds;
-    }
-
-    private ArrayList<Captain> getCaptains() {
-
-        ArrayList<Captain> caps = new ArrayList<>();
-
-        for(ExplorerAgent agent: agents_list){
-            if(agent instanceof Captain){
-                caps.add((Captain)agent);
-            }
-        }
-        return caps;
-    }
-
-    private void generateAgents(AgentModel.agent_type agent_type, ArrayList<int[]> captains) {
-
-        String name = "";
-        ArrayList<int[]> new_agents;
-
-        switch (agent_type) {
-
-            case ROBOT:
-                new_agents = forest.createRobotsPosition(numRobot);
-                name = "Robot #";
-                agentFactoy(new_agents, name, ROBOT, -1);
-
-                break;
-
-            case SOLDIER:
-                name = "Soldier #";
-                for (int i = 0; i < captains.size(); i++) {
-                    new_agents = forest.createSoldiersPosition(captains.get(i), numSol, 5);
-                    agentFactoy(new_agents, name, SOLDIER, i);
-                }
-                break;
-
-            case CAPTAIN:
-                name = "Captain #";
-                new_agents = captains;
-                agentFactoy(new_agents, name, CAPTAIN, -1);
-                break;
-
-            default:
-                break;
-        }
-
-    }
-
-    private void agentFactoy(ArrayList<int[]> agents, String name, AgentModel.agent_type type, int index) {
-
-        for (int j = 0; j < agents.size(); j++) {
-            ExplorerAgent agent = null;
-
-            switch (type) {
-                case CAPTAIN:
-                    agent = new Captain(5, 5, 5);
-                    break;
-                case SOLDIER:
-                    agent = new Soldier(5, 5);
-                    break;
-                case ROBOT:
-                    agent = new Robot(5, 5);
-                    break;
-                default:
-                    break;
-            }
-
-            AgentModel agModel = new AgentModel(agents.get(j)[0],
-                    agents.get(j)[1],
+            AgentModel agModel = new AgentModel(soldiers.get(0)[0],
+                    soldiers.get(0)[1],
                     forest_space,
-                    type,
+                    AgentModel.agent_type.CAPTAIN,
                     agents_list);
 
-            agent.setModel_link(agModel);
-            agent.setMyViewMap(new ViewMap(Model.forest.getWidth()));
-            agent.getMyViewMap().addViewRange(new Pair<>(agModel.getX(), agModel.getY()), Model.getForest(), agent
+            cap.setModel_link(agModel);
+
+            cap.setMyViewMap(new ViewMap(Model.forest.getWidth()));
+            cap.getMyViewMap().addViewRange(new Pair<>(agModel.getX(), agModel.getY()), Model.getForest(), cap
                     .getVision_range());
 
             try {
-                if (type == SOLDIER)
-                    agentContainer.acceptNewAgent(name + (index * agents.size() + j), agent).start();
-                else
-                    agentContainer.acceptNewAgent(name + j, agent).start();
+                agentContainer.acceptNewAgent("Captain #" + i, cap).start();
             } catch (StaleProxyException e) {
                 e.printStackTrace();
             }
+            agents_list.add(cap);
+            display_list.add(cap.getModel_link());
 
-            agents_list.add(agent);
-            display_list.add(agent.getModel_link());
+            //Gerar Soldados
+            for (int j = 1; j < soldiers.size(); j++) {
+                System.out.println("Soldados: " + soldiers.get(j)[0] + " " + soldiers.get(j)[1]);
+                Soldier sol = new Soldier(5, 5);
+
+                agModel = new AgentModel(soldiers.get(j)[0],
+                        soldiers.get(j)[1],
+                        forest_space,
+                        AgentModel.agent_type.SOLDIER,
+                        agents_list);
+
+                sol.setModel_link(agModel);
+                sol.setMyViewMap(new ViewMap(Model.forest.getWidth()));
+                sol.getMyViewMap().addViewRange(new Pair<>(agModel.getX(), agModel.getY()), Model.getForest(), sol
+                        .getVision_range());
+
+
+                try {
+                    agentContainer.acceptNewAgent("Soldier #" + (i * soldiers.size() + j), sol).start();
+                } catch (StaleProxyException e) {
+                    e.printStackTrace();
+                }
+                agents_list.add(sol);
+
+                display_list.add(sol.getModel_link());
+            }
         }
-    }
 
 
-    private void createAgentsFrame() {
+        ArrayList<int[]> robots = forest.createRobotsPosition(numRobot);
+
+        //Gerar Robot
+        for (int i = 0; i < robots.size(); i++) {
+            Robot robot = new Robot(5, 5);
+
+            AgentModel agModel = new AgentModel(robots.get(i)[0],
+                    robots.get(i)[1],
+                    forest_space,
+                    AgentModel.agent_type.ROBOT,
+                    agents_list);
+
+            robot.setModel_link(agModel);
+            robot.setMyViewMap(new ViewMap(Model.forest.getWidth()));
+            robot.getMyViewMap().addViewRange(new Pair<>(agModel.getX(), agModel.getY()), Model.getForest(), robot
+                    .getVision_range());
+
+            try {
+                agentContainer.acceptNewAgent("Robot #" + i, robot).start();
+            } catch (StaleProxyException e) {
+                e.printStackTrace();
+            }
+            agents_list.add(robot);
+
+            display_list.add(robot.getModel_link());
+        }
+
         agentFrame = new JFrame("Select an Agent");
         ArrayList<String> names = new ArrayList<String>();
 
@@ -384,8 +345,8 @@ public class Model extends Repast3Launcher {
 
         JScrollPane scroll = new JScrollPane(agentList);
         agentFrame.add(scroll);
-        agentFrame.setSize(150, 350);
-        agentFrame.setLocation(270, 70);
+        agentFrame.setSize(300, 350);
+        agentFrame.setLocation(500, 70);
         agentFrame.setVisible(true);
         MouseListener mouseListener = new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
@@ -395,6 +356,8 @@ public class Model extends Repast3Launcher {
             }
         };
         agentList.addMouseListener(mouseListener);
+
+
     }
 
 

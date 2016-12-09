@@ -42,8 +42,8 @@ public class ExplorerAgent extends Agent {
     protected ViewMap.DIR current_dir;
 
     private boolean at_map_exit = false, found_map_exit = false;
-    private AgentModel model_link;
-    private ViewMap myViewMap;
+    protected AgentModel model_link;
+    protected ViewMap myViewMap;
 
     public ViewMap getMyViewMap() {
         return myViewMap;

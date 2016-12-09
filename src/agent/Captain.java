@@ -20,7 +20,7 @@ import java.security.acl.Acl;
 import java.util.ArrayList;
 import java.util.Random;
 
-import static agent.Human.agent_state.GIVING_ORDERS;
+import static agent.Human.agent_state.*;
 
 /**
  * Created by sergi on 16/10/2016.
@@ -97,7 +97,7 @@ public class Captain extends Human {
                 if (msg != null) {
 
                     if (msg.getPerformative() == Message.REQUEST) {
-                        sendMyInfoToAgent(msg);
+                            sendMyInfoToAgent(msg);
                     } else if (msg.getPerformative() == Message.INFORM) {
                         try {
                             if (msg.getContentObject() instanceof InformViewMap) {
@@ -133,15 +133,15 @@ public class Captain extends Human {
 
                 //todo
                 //DESCOMENTAR ESTAS CENAS
-                for(int i = 0; i < teamSoldiers.size() /*&& i < coosToExplore.size()*/ ; i++){
-                    //OrderToExplore order = new OrderToExplore(pos);
+                /*for(int i = 0; i < teamSoldiers.size() && i < coosToExplore.size() ; i++){
+                    OrderToExplore order = new OrderToExplore(pos);
                     ACLMessage msg = new ACLMessage(Message.REQUEST);
-                    //msg.setContentObject(order);
+                    msg.setContentObject(order);
                     msg.addReceiver(teamSoldiers.get(i));
                     send(msg);
-                }
+                }*/
 
-               // state = WAITING_4_TEAM_RESPONSES;
+                state = WAITING_4_TEAM_RESPONSES;
                 break;
 
             case WAITING_4_TEAM_RESPONSES:

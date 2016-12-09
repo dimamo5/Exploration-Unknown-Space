@@ -5,6 +5,7 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.UnreadableException;
 import javafx.util.Pair;
 import message.*;
+import model.map.ViewMap;
 import sajas.core.Agent;
 import sajas.core.behaviours.CyclicBehaviour;
 
@@ -104,7 +105,7 @@ public class Soldier extends Human {
             coosToExplore = new Stack<>();
 
             Pair<Integer,Integer> destiny = toParseMsg.getPosition();
-            ArrayList<Pair<Integer,Integer> pathCoos = getPath(getModel_link().getMyCoos(), destiny);
+            ArrayList<Pair<Integer,Integer>> pathCoos = myViewMap.getPath(getModel_link().getMyCoos(), destiny);
             pushToStack(pathCoos);
 
         } else if (toParseMsg instanceof RequestViewMap) {

@@ -179,7 +179,7 @@ public class Model extends Repast3Launcher {
 
     @Override
     public String getName() {
-        return "Exploration of Unknown Space -- SAJaS Repast3 Test";
+        return "";
     }
 
     public int getNumCap() {
@@ -206,19 +206,6 @@ public class Model extends Repast3Launcher {
         this.numRobot = numRobot;
     }
 
-
-    class MainAction extends BasicAction {
-
-        public void execute() {
-            // shuffle agents
-            //SimUtilities.shuffle(agentList);
-
-            // iterate through all agents
-           /* for(int i = 0; i < agentList.size(); i++) {
-                agentList.get(i).step();
-            }*/
-        }
-    }
 
     private void spread_agents( /*empty_spaces*/) {
         //distribui agentes pelos espaços vazios

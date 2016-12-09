@@ -50,32 +50,36 @@ public class ViewMap implements Serializable {
         ArrayList<Pair<Integer, Integer>> rip = new ArrayList<>();
         for (int y = 0; y < this.size; y++) {
             for (int x = 0; x < this.size; x++) {
-                Pair h = unexploredArea(this.map[y][x], pos, radioRange);
+                ArrayList<Pair<Integer, Integer>> h = unexploredArea(this.map[y][x], pos, radioRange);
                 if (h != null) {
-                    rip.add(h);
+                    rip.addAll(h);
                 }
             }
         }
         return rip;
     }
 
-    public Pair<Integer, Integer> unexploredArea(HeatElement h, Pair pos, int radioRange) {
+    public ArrayList<Pair<Integer, Integer>> unexploredArea(HeatElement h, Pair pos, int radioRange) {
+        ArrayList<Pair<Integer, Integer>> values = new ArrayList<>();
         if (Utilities.distPos(pos, new Pair<>(h.getX(), h.getY())) < radioRange) {
             return null;
         }
         if (h.heat > 1 || h.heat == 0) {
             return null;
         }
-
         if (h.getY() > 0 && this.map[h.getY() - 1][h.getX()].heat == -2 || this.map[h.getY() - 1][h.getX()].heat == 1) {
-            return new Pair<>(h.getX(), h.getY() - 1);
-        } else if (this.map[h.getY() + 1][h.getX()].heat == -2 || this.map[h.getY() + 1][h.getX()].heat == 1) {
-            return new Pair<>(h.getX(), h.getY() + 1);
-        } else if (this.map[h.getY()][h.getX() + 1].heat == -2 || this.map[h.getY()][h.getX() + 1].heat == 1) {
-            return new Pair<>(h.getX() + 1, h.getY());
-        } else if (this.map[h.getY()][h.getX() - 1].heat == -2 || this.map[h.getY()][h.getX() - 1].heat == 1) {
-            return new Pair<>(h.getX() - 1, h.getY());
-        } else return null;
+            values.add(new Pair<>(h.getX(), h.getY() - 1));
+        }
+        if (this.map[h.getY() + 1][h.getX()].heat == -2 || this.map[h.getY() + 1][h.getX()].heat == 1) {
+            values.add(new Pair<>(h.getX(), h.getY() + 1));
+        }
+        if (this.map[h.getY()][h.getX() + 1].heat == -2 || this.map[h.getY()][h.getX() + 1].heat == 1) {
+            values.add(new Pair<>(h.getX() + 1, h.getY()));
+        }
+        if (this.map[h.getY()][h.getX() - 1].heat == -2 || this.map[h.getY()][h.getX() - 1].heat == 1) {
+            values.add(new Pair<>(h.getX() - 1, h.getY()));
+        }
+        return values;
     }
 
     public void addViewRange(Pair<Integer, Integer> pos, Map map, int viewRange) {
@@ -138,7 +142,8 @@ public class ViewMap implements Serializable {
     public void addViewMap(ViewMap map) {
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
-                if (this.map[i][j].heat == 0 && this.map[i][j].heat != map.getMap()[i][j].heat) {
+                if (this.map[i][j].heat == 0 && map.getMap()[i][j].heat != 1 &&
+                        this.map[i][j].heat != map.getMap()[i][j].heat) {
                     this.map[i][j].heat = map.getMap()[i][j].heat;
                 }
             }

@@ -87,40 +87,68 @@ public class ViewMap implements Serializable {
         return values;
     }
 
+    public boolean addViewMapPos(Pair<Integer, Integer> pos, boolean hor) {
+        boolean wall = false;
+        if (Model.getForest().getMap_in_array()[pos.getValue()][pos.getKey()] == 1) {
+            this.map[pos.getValue()][pos.getKey()].addWallHeat();
+            wall = true;
+        } else if (Model.getForest().getMap_in_array()[pos.getValue()][pos.getKey()] == 2) {
+            this.map[pos.getValue()][pos.getKey()].addDoorHeat();
+            wall = true;
+        } else if (Model.getForest().getMap_in_array()[pos.getValue()][pos.getKey()] == 0) {
+            this.map[pos.getValue()][pos.getKey()].addMyHeat();
+        }
+
+        if (!hor) {
+            if (pos.getKey() - 1 > 0 && pos.getKey() + 1 < this.size) {
+                if (Model.getForest().getMap_in_array()[pos.getValue()][pos.getKey() - 1] == 1) {
+                    this.map[pos.getValue()][pos.getKey() - 1].addWallHeat();
+                }
+                if (Model.getForest().getMap_in_array()[pos.getValue()][pos.getKey() + 1] == 1) {
+                    this.map[pos.getValue()][pos.getKey() + 1].addWallHeat();
+                }
+            }
+        } else if (hor) {
+            if (pos.getValue() - 1 > 0 && pos.getValue() + 1 < this.size) {
+                if (Model.getForest().getMap_in_array()[pos.getValue() - 1][pos.getKey()] == 1) {
+                    this.map[pos.getValue() - 1][pos.getKey()].addWallHeat();
+                }
+                if (Model.getForest().getMap_in_array()[pos.getValue() + 1][pos.getKey()] == 1) {
+                    this.map[pos.getValue() + 1][pos.getKey()].addWallHeat();
+                }
+            }
+        }
+        return wall;
+    }
+
     public boolean addViewRange(Pair<Integer, Integer> pos, Map map, int viewRange) {
         boolean foundExit = false;
         this.map[pos.getValue()][pos.getKey()].addMyHeat();
 
-        //norte
-        if (pos.getValue() - 1 > 0 && map.getMap_in_array()[pos.getValue() - 1][pos.getKey()] == 2) {
-            this.map[pos.getValue() - 1][pos.getKey()].addDoorHeat();
-            foundExit = true;
-        } else if (pos.getValue() - 1 > 0 && map.getMap_in_array()[pos.getValue() - 1][pos.getKey()] == 1) {
-            this.map[pos.getValue() - 1][pos.getKey()].addWallHeat();
+        for (int i = 0; i < viewRange && pos.getValue() - i >= 0; i++) {
+            if (addViewMapPos(new Pair<>(pos.getKey(), pos.getValue() - i), false)) {
+                break;
+            }
         }
 
-        //sul
-        if (pos.getValue() + 1 < this.size && map.getMap_in_array()[pos.getValue() + 1][pos.getKey()] == 2) {
-            this.map[pos.getValue() + 1][pos.getKey()].addDoorHeat();
-            foundExit = true;
-        } else if (pos.getValue() + 1 < this.size && map.getMap_in_array()[pos.getValue() + 1][pos.getKey()] == 1) {
-            this.map[pos.getValue() + 1][pos.getKey()].addWallHeat();
+        for (int i = 0; i < viewRange && pos.getValue() + i < this.size; i++) {
+            if (addViewMapPos(new Pair<>(pos.getKey(), pos.getValue() + i), false)) {
+                break;
+            }
         }
 
-        //este
-        if (pos.getKey() + 1 < this.size && map.getMap_in_array()[pos.getValue()][pos.getKey() + 1] == 2) {
-            this.map[pos.getValue()][pos.getKey() + 1].addDoorHeat();
-            foundExit = true;
-        } else if (pos.getKey() + 1 < this.size && map.getMap_in_array()[pos.getValue()][pos.getKey() + 1] == 1) {
-            this.map[pos.getValue()][pos.getKey() + 1].addWallHeat();
+        for (int i = 0; i < viewRange && pos.getKey() - i >= 0; i++) {
+            if (addViewMapPos(new Pair<>(pos.getKey() - i, pos.getValue()), true)) {
+                break;
+            }
         }
 
-        if (pos.getKey() - 1 > 0 && map.getMap_in_array()[pos.getValue()][pos.getKey() - 1] == 2) {
-            this.map[pos.getValue()][pos.getKey() - 1].addDoorHeat();
-            foundExit = true;
-        } else if (pos.getKey() - 1 > 0 && map.getMap_in_array()[pos.getValue()][pos.getKey() - 1] == 1) {
-            this.map[pos.getValue()][pos.getKey() - 1].addWallHeat();
+        for (int i = 0; i < viewRange && pos.getKey() + i < this.size; i++) {
+            if (addViewMapPos(new Pair<>(pos.getKey() + i, pos.getValue()), true)) {
+                break;
+            }
         }
+
         return foundExit;
     }
 

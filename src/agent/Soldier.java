@@ -1,22 +1,19 @@
 package agent;
 
-import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.UnreadableException;
 import javafx.util.Pair;
-import message.InformViewMap;
-import message.Message;
-import model.Model;
-import model.map.AgentModel;
-import model.map.ViewMap;
+import message.*;
 import sajas.core.Agent;
 import sajas.core.behaviours.CyclicBehaviour;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Random;
+import java.util.Stack;
 
+import static agent.Human.agent_state.EXPLORATION_DONE;
+import static agent.Human.agent_state.EXPLORING;
 import static agent.Human.agent_state.WAITING_4_ORDERS;
 
 /**
@@ -25,15 +22,22 @@ import static agent.Human.agent_state.WAITING_4_ORDERS;
 public class Soldier extends Human {
 
     private agent_state state = WAITING_4_ORDERS;
+    private Stack<Pair<Integer,Integer>> coosToExplore;
+
+    public AID getTeamLeader() {
+        return teamLeader;
+    }
+
+    public void setTeamLeader(AID teamLeader) {
+        this.teamLeader = teamLeader;
+    }
+
+    private AID teamLeader;
 
     public Soldier(int vision_range, int radio_range) {
         super(vision_range, radio_range);
     }
 
-    @Override
-    protected void takeDown() {
-        super.takeDown();
-    }
 
     @Override
     protected void setup() {
@@ -48,8 +52,8 @@ public class Soldier extends Human {
                     update();
                     //move_random();
                 }
-                //update();
             }
+
             private static final long serialVersionUID = 1L;
 
 
@@ -68,9 +72,10 @@ public class Soldier extends Human {
 
                 if (msg != null) {
 
-                    if (msg.getPerformative() == Message.REQUEST) { //TODO CHANGE THIS TO RECEIVE MSG WITH ORDERS FROM CAPTAIN SE TIVER NO ESTADO WAITING 4 ORDERS
-                        System.out.println("SENDING MY INFO>>>" + msg.getSender() );
-                        sendMyInfoToAgent(msg);
+                    if (msg.getPerformative() == Message.REQUEST) {
+
+                        handleRequest(msg);
+
                     } else if (msg.getPerformative() == Message.INFORM) {
                         try {
                             if (msg.getContentObject() instanceof InformViewMap) {
@@ -85,6 +90,35 @@ public class Soldier extends Human {
         });
     }
 
+    private void handleRequest(ACLMessage msg) {
+
+        Message toParseMsg = null;
+        try {
+            toParseMsg = (Message) msg.getContentObject();
+        } catch (UnreadableException e) {
+            e.printStackTrace();
+        }
+
+        if (toParseMsg instanceof OrderToExplore && state != EXPLORING) {
+            state = EXPLORING;
+            coosToExplore = new Stack<>();
+
+            Pair<Integer,Integer> destiny = toParseMsg.getPosition();
+            ArrayList<Pair<Integer,Integer> pathCoos = getPath(getModel_link().getMyCoos(), destiny);
+            pushToStack(pathCoos);
+
+        } else if (toParseMsg instanceof RequestViewMap) {
+            System.out.println(getAID() + " SENDING MY INFO>>" + msg.getSender());
+            sendMyInfoToAgent(msg);
+        }
+    }
+
+    private void pushToStack(ArrayList<Pair<Integer, Integer>> pathCoos) {
+        for(int i = 0; i < pathCoos.size(); i++){
+            coosToExplore.push(pathCoos.get(pathCoos.size()-(i+1)));
+        }
+    }
+
     private void update() {
 
         ArrayList<ExplorerAgent> onRangeAgents = getModel_link().getOnRadioRangeAgents(getRadio_range());
@@ -93,7 +127,6 @@ public class Soldier extends Human {
 
         switch (state) {
             case WAITING_4_ORDERS:
-
                 //communicates with agents(soldiers+robots) on range
                 commWithAgents(onRangeAgents, robotsOnRange, soldiersOnRange);
 
@@ -103,8 +136,16 @@ public class Soldier extends Human {
 
                 commWithAgents(onRangeAgents, robotsOnRange, soldiersOnRange);
 
-                //TODO call method moving to target pos
+                if(coosToExplore.size() > 0)
+                    updatePosition(coosToExplore.pop());
+                else {
+                    notifyTeamLeader(new ExplorationResponse(getModel_link().getMyCoos()), Message.INFORM);
+                    state = EXPLORATION_DONE;
+                }
+                break;
 
+            case EXPLORATION_DONE:
+                commWithAgents(onRangeAgents, robotsOnRange, soldiersOnRange);
                 break;
 
             case AT_EXIT:
@@ -112,44 +153,17 @@ public class Soldier extends Human {
         }
     }
 
-    private void commWithAgents(ArrayList<ExplorerAgent> onRangeAgents, ArrayList<AID> robotsOnRange, ArrayList<AID> soldiersOnRange) {
-        for (Agent agent : onRangeAgents) {
-
-            if (agent instanceof Robot) {
-                Pair<Integer, Integer> robotCoos = ((Robot) agent).getModel_link().getMyCoos(),
-                        humanCoos = getModel_link().getMyCoos();
-
-                if (robotIsInCommRange(humanCoos, robotCoos)) {
-                    robotsOnRange.add(agent.getAID());
-                }
-
-            } else if (agent instanceof Soldier) {
-                soldiersOnRange.add(agent.getAID());
-            }
+    private void notifyTeamLeader(Message myMessage, Integer performative) {
+        ACLMessage msg = new ACLMessage(performative);
+        try {
+            msg.setContentObject(myMessage);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-
-        //TODO adaptar para os restantes agentes tb
-
-        ArrayList<AID> robotsToRequest = checkRobotComms(robotsOnRange);
-
-        //robots + soldiers
-        robotsToRequest.addAll(soldiersOnRange); //quitos trolha mas pronts
-
-        //comms with robots+soldiers
-        if (robotsToRequest.size() > 0) {
-            System.out.println(getAID() + "  requested info from agent(s)");
-            requestAgentsForInfo(robotsToRequest);
-        }
-
-        //comms with soldiers
-
-        //comms with captains  - ALL MAP RANGE VIA TELEFONE
+        msg.addReceiver(teamLeader);
+        send(msg);
     }
 
-
-    public void move() {
-
-    }
 
     private void sendMyInfoToAgent(ACLMessage msg) {
 

@@ -59,14 +59,12 @@ public class Robot extends ExplorerAgent {
             public void action() {
                 tick++;
 
-                if (tick % 100 == 0) { //TODO period nao estar hardcoded
+                if (tick % 50 == 0) { //TODO period nao estar hardcoded
                     update();
                 }
             }
 
             private static final long serialVersionUID = 1L;
-
-
         });
     }
 

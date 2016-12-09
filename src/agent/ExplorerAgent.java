@@ -1,12 +1,14 @@
 package agent;
 
 import javafx.util.Pair;
+import model.Model;
 import model.map.AgentModel;
 import model.map.ViewMap;
 import sajas.core.Agent;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Random;
 
 import static model.map.ViewMap.DIR.W;
 
@@ -121,4 +123,32 @@ public class ExplorerAgent extends Agent {
         this.found_map_exit = found_map_exit;
     }
 
+    protected void move_random() {
+
+        Pair<Integer, Integer> oldPos = new Pair<>(getModel_link().getX(), getModel_link().getY());
+        Pair<Integer, Integer> newPos;
+
+        if (current_dir == null || !getMyViewMap().canMoveDir(current_dir, oldPos)) {
+            ArrayList<ViewMap.DIR> possibleDirs = getMyViewMap().getPossibleDir(oldPos);
+
+            Random r = new Random();
+            int dir = r.nextInt(possibleDirs.size());
+
+            //new coordinates
+            current_dir = possibleDirs.get(dir);
+        }
+
+        newPos = move(current_dir);
+
+        //move on globalMap
+
+        AgentModel.setGlobalMap(AgentModel.getGlobalMap()); //extract these calls to 1 method
+
+        //update pos
+        getModel_link().setPos_x(newPos.getKey());
+        getModel_link().setPos_y(newPos.getValue());
+
+        //update viewmap
+        getMyViewMap().addViewRange(newPos, Model.getForest(), getVision_range());
+    }
 }

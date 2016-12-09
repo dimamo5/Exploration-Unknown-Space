@@ -8,6 +8,8 @@ import message.RequestViewMap;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import static utilities.Utilities.distPos;
 
@@ -20,9 +22,13 @@ public class Human extends ExplorerAgent {
 
     private int radio_range = DEFAULT_RADIO_RANGE;
 
+    protected Map<AID,Long> communicatedRobots;
+
+
     public Human(int vision_range, int radio_range) {
         super(vision_range);
         this.radio_range = radio_range;
+        communicatedRobots = new HashMap<>();
     }
 
     public int getRadio_range() {
@@ -33,9 +39,27 @@ public class Human extends ExplorerAgent {
         this.radio_range = radio_range;
     }
 
-    protected enum agent_state {FINDING_EXIT, AT_EXIT}
+    protected ArrayList<AID> checkRobotComms(ArrayList<AID> robotsOnRange) {
+        ArrayList<AID> robotsToRequest = new ArrayList<>();
 
-    void requestRobotForInfo(ArrayList<AID> robots) {
+        for(AID ag : robotsOnRange){
+
+            if(!communicatedRobots.containsKey(ag)){
+                communicatedRobots.put(ag,tick);
+                robotsToRequest.add(ag);
+            }else{
+                if(tick - communicatedRobots.get(ag) >= 200){
+                    robotsToRequest.add(ag);
+                    communicatedRobots.replace(ag,tick);
+                }
+            }
+        }
+        return robotsToRequest;
+    }
+
+    protected enum agent_state {WAITING_4_ORDERS, INITIAL_COMM_WITH_CAPTAINS, EXPLORING, AT_EXIT}
+
+    void requestAgentsForInfo(ArrayList<AID> agents) {
         ACLMessage msg = new ACLMessage(Message.REQUEST);
 
         Pair<Integer, Integer> pos = new Pair<>(getModel_link().getX(), getModel_link().getY());
@@ -45,13 +69,13 @@ public class Human extends ExplorerAgent {
             e.printStackTrace();
         }
 
-        for (AID robot : robots) {
-            msg.addReceiver(robot);
+        for (AID agent : agents) {
+            msg.addReceiver(agent);
         }
         send(msg);
     }
 
-    public boolean robotIsInCommRange(Pair<Integer,Integer> humanCoos, Pair<Integer,Integer> robotCoos){
+    boolean robotIsInCommRange(Pair<Integer, Integer> humanCoos, Pair<Integer, Integer> robotCoos){
         return distPos(humanCoos, robotCoos) <= 1;
     }
 

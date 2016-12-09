@@ -6,6 +6,7 @@ import utilities.Utilities;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * Created by sergi on 05/12/2016.
@@ -188,7 +189,10 @@ public class ViewMap implements Serializable {
     public ArrayList<Pair<Integer, Integer>> getPath(Pair<Integer, Integer> start, Pair<Integer, Integer> end) {
         ArrayList<Pair<Integer, Integer>> path = new ArrayList<>();
         recursiveSolve(start.getKey(), start.getValue(), end, path);
-        path.remove(0); //Removed current element
+        if (path.size() > 0) {
+            path.remove(path.size() - 1); //Removed current element
+            Collections.reverse(path);
+        }
         path.add(end);  // add end pos
         return path;
     }

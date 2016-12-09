@@ -8,11 +8,15 @@ import message.ExplorationResponse;
 import message.InformViewMap;
 import message.Message;
 import message.OrderToExplore;
+import model.Model;
+import model.map.AgentModel;
+import model.map.ViewMap;
 import sajas.core.Agent;
 import sajas.core.behaviours.CyclicBehaviour;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Stack;
 
 import static agent.Human.agent_state.*;
 
@@ -25,7 +29,8 @@ public class Captain extends Human {
 
     private agent_state state = INITIAL_COMM_WITH_CAPTAINS;
     private ArrayList<AID> teamSoldiers, wentExploringSoldiers;
-
+    private boolean captainMove = false;
+    private Stack<Pair<Integer, Integer>> coosToExplore;
 
     public Captain(int vision_range, int radio_range, int cellphone_range) {
         super(vision_range, radio_range);
@@ -102,14 +107,24 @@ public class Captain extends Human {
                             wentExploringSoldiers.remove(msg.getSender());
                             getMyViewMap().addViewMap(((ExplorationResponse) msg.getContentObject()).getViewMap());
 
-                            if (wentExploringSoldiers.size() == 0) {
-                                //state = GIVING_ORDERS;
+                            if (captainMove) {
+                                if (coosToExplore.size() > 0) {
+                                    Pair<Integer, Integer> newPos = coosToExplore.pop();
+                                    updatePosition(newPos);
+                                    getMyViewMap().addViewRange(newPos, Model.getForest(), getVision_range());
+                                }else{ //chegou ao novo destino
+                                    captainMove = false;
+                                }
+                            }
+
+                            if (wentExploringSoldiers.size() == 0 && !captainMove ) {
+                                state = GIVING_ORDERS;
                             }
                         }
 
-                        if (msg.getContentObject() instanceof InformViewMap) {
+                        /*if (msg.getContentObject() instanceof InformViewMap) {
                             getMyViewMap().addViewMap(((InformViewMap) msg.getContentObject()).getViewMap());
-                        }
+                        }*/
                     } catch (UnreadableException e) {
                         e.printStackTrace();
                     }
@@ -140,24 +155,25 @@ public class Captain extends Human {
                 ArrayList<Pair<Integer, Integer>> coosToExplore = myViewMap.coosToExplore(getModel_link().getMyCoos()
                         , getRadio_range());
 
-                for (int i = 0; i < coosToExplore.size(); i++) { //TODO!!
+                if (coosToExplore.size() == 0) {
+                    coosToExplore = new ArrayList<>();
+                    coosToExplore.add(myViewMap.coosToExplore(getModel_link().getMyCoos(), 99).get(0));
+                    captainMove = true;
+                    coosToExplore = myViewMap.getPath(getModel_link().getMyCoos(), coosToExplore.get(0));
+
+                    for (int i = 0; i < teamSoldiers.size(); i++) {
+                        sendOrderToExplore(coosToExplore, i);
+                    }
+
+                } else { //regroup on other area to explore
+               /* for (int i = 0; i < coosToExplore.size(); i++) { //TODO!!
                     System.out.println("Pos: " + coosToExplore.get(i).getKey() + " " + coosToExplore.get(i).getValue
                             ());
-                }
-
-                for (int i = 0; i < teamSoldiers.size() && i < coosToExplore.size(); i++) {
-                    try {
-                        OrderToExplore order = new OrderToExplore(coosToExplore.get(i));
-                        ACLMessage msg = new ACLMessage(Message.REQUEST);
-                        msg.setContentObject(order);
-                        msg.addReceiver(teamSoldiers.get(i));
-                        send(msg);
-                        wentExploringSoldiers.add(teamSoldiers.get(i));
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                }*/
+                    for (int i = 0; i < teamSoldiers.size() && i < coosToExplore.size(); i++) {
+                        sendOrderToExplore(coosToExplore, i);
                     }
                 }
-
                 state = WAITING_4_TEAM_RESPONSES;
                 break;
 
@@ -173,6 +189,19 @@ public class Captain extends Human {
                 break;
             /*case AT_EXIT:
                 break; */
+        }
+    }
+
+    private void sendOrderToExplore(ArrayList<Pair<Integer, Integer>> coosToExplore, int i) {
+        try {
+            OrderToExplore order = new OrderToExplore(coosToExplore.get(i));
+            ACLMessage msg = new ACLMessage(Message.REQUEST);
+            msg.setContentObject(order);
+            msg.addReceiver(teamSoldiers.get(i));
+            send(msg);
+            wentExploringSoldiers.add(teamSoldiers.get(i));
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

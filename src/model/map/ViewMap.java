@@ -155,7 +155,7 @@ public class ViewMap implements Serializable {
     public void addViewMap(ViewMap map) {
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
-                if (this.map[i][j].heat == 0 && map.getMap()[i][j].heat != 1 &&
+                if (this.map[i][j].heat == -1 &&
                         this.map[i][j].heat != map.getMap()[i][j].heat) {
                     this.map[i][j].heat = map.getMap()[i][j].heat;
                 }
@@ -219,9 +219,10 @@ public class ViewMap implements Serializable {
         recursiveSolve(start.getKey(), start.getValue(), end, path);
         if (path.size() > 0) {
             path.remove(path.size() - 1); //Removed current element
-            Collections.reverse(path);
+           // Collections.reverse(path);
+            path.add(end);
         }
-        path.add(end);  // add end pos
+       // path.add(end);  // add end pos
         return path;
     }
 

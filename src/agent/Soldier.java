@@ -9,10 +9,10 @@ import model.Model;
 import model.map.ViewMap;
 import sajas.core.Agent;
 import sajas.core.behaviours.CyclicBehaviour;
+import utilities.Utilities;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Stack;
+import java.util.*;
 
 import static agent.Human.agent_state.EXPLORATION_DONE;
 import static agent.Human.agent_state.EXPLORING;
@@ -105,7 +105,7 @@ public class Soldier extends Human {
             Pair<Integer, Integer> destiny = toParseMsg.getPosition();
             System.out.println(getAID() + "AT POS "+ getModel_link().getMyCoos()+" RECEIVED ORDER TO MOVE TO: " + destiny);
 
-            if (getModel_link().getMyCoos() != destiny) {
+            if (Utilities.distPos(getModel_link().getMyCoos(), destiny) != 0 ) {
                 ArrayList<Pair<Integer, Integer>> pathCoos = myViewMap.getPath(getModel_link().getMyCoos(), destiny);
                 pushToStack(pathCoos);
 
@@ -121,8 +121,10 @@ public class Soldier extends Human {
     }
 
     private void pushToStack(ArrayList<Pair<Integer, Integer>> pathCoos) {
-        for (int i = 0; i < pathCoos.size(); i++) {
-            coosToExplore.push(pathCoos.get(pathCoos.size() - (i + 1)));
+        Collections.reverse(pathCoos);
+
+        for (Pair<Integer, Integer> pathCoo : pathCoos) {
+            coosToExplore.push(pathCoo);
         }
     }
 

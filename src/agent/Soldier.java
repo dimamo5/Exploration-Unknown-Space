@@ -52,7 +52,7 @@ public class Soldier extends Human {
 
                 if (tick % 100 == 0) { //TODO destrolhar isto
                     update();
-                    System.out.println("SOLDIER state: "+state);
+                    System.out.println("SOLDIER state: " + state);
                 }
             }
 
@@ -99,21 +99,25 @@ public class Soldier extends Human {
         }
 
         if (toParseMsg instanceof OrderToExplore && state == WAITING_4_ORDERS) {
-            System.out.println(getAID() + " RECEIVED ORDER!!");
-
             state = EXPLORING;
             coosToExplore = new Stack<>();
 
             Pair<Integer, Integer> destiny = toParseMsg.getPosition();
-            ArrayList<Pair<Integer, Integer>> pathCoos = myViewMap.getPath(getModel_link().getMyCoos(), destiny);
-            pushToStack(pathCoos);
+            System.out.println(getAID() + "AT POS "+ getModel_link().getMyCoos()+" RECEIVED ORDER TO MOVE TO: " + destiny);
 
-            System.out.println("MY COOS TO EXPLORE: " + coosToExplore.toString());
+            if (getModel_link().getMyCoos() != destiny) {
+                ArrayList<Pair<Integer, Integer>> pathCoos = myViewMap.getPath(getModel_link().getMyCoos(), destiny);
+                pushToStack(pathCoos);
 
-        } else if (toParseMsg instanceof RequestViewMap) {
+                System.out.println("MY COOS TO EXPLORE: " + coosToExplore.toString());
+            }
+        } else if (toParseMsg instanceof RequestViewMap)
+
+        {
            /* System.out.println(getAID() + ">> SENDING MY INFO >>" + msg.getSender());
             sendMyInfoToAgent(msg); */
         }
+
     }
 
     private void pushToStack(ArrayList<Pair<Integer, Integer>> pathCoos) {
@@ -142,7 +146,7 @@ public class Soldier extends Human {
                     getMyViewMap().addViewRange(newPos, Model.getForest(), getVision_range());
 
                 } else {
-                    notifyTeamLeader(new ExplorationResponse(getModel_link().getMyCoos(), getMyViewMap(),foundExit), Message.INFORM);
+                    notifyTeamLeader(new ExplorationResponse(getModel_link().getMyCoos(), getMyViewMap(), foundExit), Message.INFORM);
                     state = EXPLORATION_DONE;
                 }
                 break;

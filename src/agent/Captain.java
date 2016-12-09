@@ -103,7 +103,7 @@ public class Captain extends Human {
                             getMyViewMap().addViewMap(((ExplorationResponse) msg.getContentObject()).getViewMap());
 
                             if (wentExploringSoldiers.size() == 0) {
-                                state = GIVING_ORDERS;
+                                //state = GIVING_ORDERS;
                             }
                         }
 

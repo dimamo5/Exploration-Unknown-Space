@@ -90,33 +90,33 @@ public class ViewMap implements Serializable {
         this.map[pos.getValue()][pos.getKey()].addMyHeat();
 
         //norte
-        if (map.getMap_in_array()[pos.getValue() - 1][pos.getKey()] == 2) {
+        if (pos.getValue() - 1 > 0 && map.getMap_in_array()[pos.getValue() - 1][pos.getKey()] == 2) {
             this.map[pos.getValue() - 1][pos.getKey()].addDoorHeat();
             foundExit = true;
-        } else if (map.getMap_in_array()[pos.getValue() - 1][pos.getKey()] == 1) {
+        } else if (pos.getValue() - 1 > 0 && map.getMap_in_array()[pos.getValue() - 1][pos.getKey()] == 1) {
             this.map[pos.getValue() - 1][pos.getKey()].addWallHeat();
         }
 
         //sul
-        if (map.getMap_in_array()[pos.getValue() + 1][pos.getKey()] == 2) {
+        if (pos.getValue() + 1 < this.size && map.getMap_in_array()[pos.getValue() + 1][pos.getKey()] == 2) {
             this.map[pos.getValue() + 1][pos.getKey()].addDoorHeat();
             foundExit = true;
-        } else if (map.getMap_in_array()[pos.getValue() + 1][pos.getKey()] == 1) {
+        } else if (pos.getValue() + 1 < this.size && map.getMap_in_array()[pos.getValue() + 1][pos.getKey()] == 1) {
             this.map[pos.getValue() + 1][pos.getKey()].addWallHeat();
         }
 
         //este
-        if (map.getMap_in_array()[pos.getValue()][pos.getKey() + 1] == 2) {
+        if (pos.getKey() + 1 < this.size && map.getMap_in_array()[pos.getValue()][pos.getKey() + 1] == 2) {
             this.map[pos.getValue()][pos.getKey() + 1].addDoorHeat();
             foundExit = true;
-        } else if (map.getMap_in_array()[pos.getValue()][pos.getKey() + 1] == 1) {
+        } else if (pos.getKey() + 1 < this.size && map.getMap_in_array()[pos.getValue()][pos.getKey() + 1] == 1) {
             this.map[pos.getValue()][pos.getKey() + 1].addWallHeat();
         }
 
-        if (map.getMap_in_array()[pos.getValue()][pos.getKey() - 1] == 2) {
+        if (pos.getKey() - 1 > 0 && map.getMap_in_array()[pos.getValue()][pos.getKey() - 1] == 2) {
             this.map[pos.getValue()][pos.getKey() - 1].addDoorHeat();
             foundExit = true;
-        } else if (map.getMap_in_array()[pos.getValue()][pos.getKey() - 1] == 1) {
+        } else if (pos.getKey() - 1 > 0 && map.getMap_in_array()[pos.getValue()][pos.getKey() - 1] == 1) {
             this.map[pos.getValue()][pos.getKey() - 1].addWallHeat();
         }
         return foundExit;
@@ -196,7 +196,7 @@ public class ViewMap implements Serializable {
 
     public boolean recursiveSolve(int x, int y, Pair<Integer, Integer> end, ArrayList<Pair<Integer, Integer>> path) {
         if (x == end.getKey() && y == end.getValue()) return true; // If you reached the end
-        if (this.map[y][x].heat == -2 || wasHere[x][y]) return false;
+        if (this.map[y][x].heat == -2 || this.map[y][x].heat == -1 || wasHere[x][y]) return false;
         // If you are on a wall or already were here
         wasHere[x][y] = true;
         if (x != 0) // Checks if not on left edge

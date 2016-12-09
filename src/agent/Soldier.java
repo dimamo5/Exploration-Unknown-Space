@@ -5,6 +5,7 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.UnreadableException;
 import javafx.util.Pair;
 import message.*;
+import model.Model;
 import model.map.ViewMap;
 import sajas.core.Agent;
 import sajas.core.behaviours.CyclicBehaviour;
@@ -23,7 +24,7 @@ import static agent.Human.agent_state.WAITING_4_ORDERS;
 public class Soldier extends Human {
 
     private agent_state state = WAITING_4_ORDERS;
-    private Stack<Pair<Integer,Integer>> coosToExplore;
+    private Stack<Pair<Integer, Integer>> coosToExplore;
 
     public AID getTeamLeader() {
         return teamLeader;
@@ -51,13 +52,10 @@ public class Soldier extends Human {
 
                 if (tick % 100 == 0) { //TODO destrolhar isto
                     update();
-                    //move_random();
                 }
             }
 
             private static final long serialVersionUID = 1L;
-
-
         });
     }
 
@@ -100,12 +98,12 @@ public class Soldier extends Human {
             e.printStackTrace();
         }
 
-        if (toParseMsg instanceof OrderToExplore && state != EXPLORING) {
+        if (toParseMsg instanceof OrderToExplore && state == WAITING_4_ORDERS) {
             state = EXPLORING;
             coosToExplore = new Stack<>();
 
-            Pair<Integer,Integer> destiny = toParseMsg.getPosition();
-            ArrayList<Pair<Integer,Integer>> pathCoos = myViewMap.getPath(getModel_link().getMyCoos(), destiny);
+            Pair<Integer, Integer> destiny = toParseMsg.getPosition();
+            ArrayList<Pair<Integer, Integer>> pathCoos = myViewMap.getPath(getModel_link().getMyCoos(), destiny);
             pushToStack(pathCoos);
 
         } else if (toParseMsg instanceof RequestViewMap) {
@@ -115,8 +113,8 @@ public class Soldier extends Human {
     }
 
     private void pushToStack(ArrayList<Pair<Integer, Integer>> pathCoos) {
-        for(int i = 0; i < pathCoos.size(); i++){
-            coosToExplore.push(pathCoos.get(pathCoos.size()-(i+1)));
+        for (int i = 0; i < pathCoos.size(); i++) {
+            coosToExplore.push(pathCoos.get(pathCoos.size() - (i + 1)));
         }
     }
 
@@ -124,7 +122,6 @@ public class Soldier extends Human {
 
         ArrayList<ExplorerAgent> onRangeAgents = getModel_link().getOnRadioRangeAgents(getRadio_range());
         ArrayList<AID> robotsOnRange = new ArrayList<>(), soldiersOnRange = new ArrayList<>();
-
 
         switch (state) {
             case WAITING_4_ORDERS:
@@ -134,13 +131,15 @@ public class Soldier extends Human {
                 break;
 
             case EXPLORING:
-
                 commWithAgents(onRangeAgents, robotsOnRange, soldiersOnRange);
 
-                if(coosToExplore.size() > 0)
-                    updatePosition(coosToExplore.pop());
-                else {
-                    notifyTeamLeader(new ExplorationResponse(getModel_link().getMyCoos()), Message.INFORM);
+                if (coosToExplore.size() > 0) {
+                    Pair<Integer, Integer> newPos = coosToExplore.pop();
+                    updatePosition(newPos);
+                    getMyViewMap().addViewRange(newPos, Model.getForest(), getVision_range());
+
+                } else {
+                    notifyTeamLeader(new ExplorationResponse(getModel_link().getMyCoos(), getMyViewMap(),foundExit), Message.INFORM);
                     state = EXPLORATION_DONE;
                 }
                 break;

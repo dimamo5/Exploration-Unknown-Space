@@ -4,10 +4,7 @@ import jade.core.AID;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.UnreadableException;
 import javafx.util.Pair;
-import message.InformViewMap;
-import message.Message;
-import message.OrderToExplore;
-import message.RequestViewMap;
+import message.*;
 import model.Model;
 import model.map.AgentModel;
 import model.map.ViewMap;
@@ -30,6 +27,14 @@ public class Captain extends Human {
     public int cellphone_range;
 
     private agent_state state = agent_state.INITIAL_COMM_WITH_CAPTAINS;
+    private ArrayList<AID> teamSoldiers, wentExploringSoldiers;
+
+
+    public Captain(int vision_range, int radio_range, int cellphone_range) {
+        super(vision_range, radio_range);
+        this.cellphone_range = cellphone_range;
+        teamSoldiers = new ArrayList<>();
+    }
 
     public ArrayList<AID> getTeamSoldiers() {
         return teamSoldiers;
@@ -37,14 +42,6 @@ public class Captain extends Human {
 
     public void setTeamSoldiers(ArrayList<AID> teamSoldiers) {
         this.teamSoldiers = teamSoldiers;
-    }
-
-    private ArrayList<AID> teamSoldiers;
-
-    public Captain(int vision_range, int radio_range, int cellphone_range) {
-        super(vision_range, radio_range);
-        this.cellphone_range = cellphone_range;
-        teamSoldiers = new ArrayList<>();
     }
 
     public int getCellphone_range() {
@@ -59,7 +56,7 @@ public class Captain extends Human {
 
     }
 
-    public void addSoldierToTeam(AID sol){
+    public void addSoldierToTeam(AID sol) {
         teamSoldiers.add(sol);
     }
 
@@ -69,17 +66,17 @@ public class Captain extends Human {
         beginMsgListener();
 
         addBehaviour(new CyclicBehaviour(this) {
+            private static final long serialVersionUID = 1L;
+
             @Override
             public void action() {
                 tick++;
 
                 if (tick % 100 == 0) { //TODO destrolhar isto
-                    update();
+                    //update();
                     //move_random();
                 }
             }
-
-            private static final long serialVersionUID = 1L;
 
 
         });
@@ -97,9 +94,19 @@ public class Captain extends Human {
                 if (msg != null) {
 
                     if (msg.getPerformative() == Message.REQUEST) {
-                            sendMyInfoToAgent(msg);
+                        sendMyInfoToAgent(msg);
                     } else if (msg.getPerformative() == Message.INFORM) {
                         try {
+                            if(state == WAITING_4_TEAM_RESPONSES && msg.getContentObject() instanceof ExplorationResponse){
+
+                                wentExploringSoldiers.remove(msg.getSender());
+                                getMyViewMap().addViewMap(((ExplorationResponse) msg.getContentObject()).getViewMap());
+
+                                if(wentExploringSoldiers.size() == 0){
+                                   state = GIVING_ORDERS;
+                                }
+                            }
+
                             if (msg.getContentObject() instanceof InformViewMap) {
                                 getMyViewMap().addViewMap(((InformViewMap) msg.getContentObject()).getViewMap());
                             }
@@ -130,7 +137,7 @@ public class Captain extends Human {
             case GIVING_ORDERS:
 
                 //TODO CALL method to obtain all possible coos to explore
-
+                wentExploringSoldiers = new ArrayList<>();
                 //todo
                 //DESCOMENTAR ESTAS CENAS
                 /*for(int i = 0; i < teamSoldiers.size() && i < coosToExplore.size() ; i++){
@@ -139,6 +146,7 @@ public class Captain extends Human {
                     msg.setContentObject(order);
                     msg.addReceiver(teamSoldiers.get(i));
                     send(msg);
+                    wentExploringSoldiers.add(teamSoldiers.get(i));
                 }*/
 
                 state = WAITING_4_TEAM_RESPONSES;
@@ -162,8 +170,8 @@ public class Captain extends Human {
     private ArrayList<AID> getAllCaptains() {
         ArrayList<AID> captains = new ArrayList<>();
 
-        for(Agent agent: getModel_link().getAgents_list()){
-            if(agent instanceof Captain){
+        for (Agent agent : getModel_link().getAgents_list()) {
+            if (agent instanceof Captain && agent.getAID() != getAID()) {
                 captains.add(agent.getAID());
             }
         }

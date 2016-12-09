@@ -142,7 +142,7 @@ public class ExplorerAgent extends Agent {
 
         //move on globalMap
 
-        AgentModel.setGlobalMap(AgentModel.getGlobalMap()); //extract these calls to 1 method
+        //AgentModel.setGlobalMap(AgentModel.getGlobalMap()); //extract these calls to 1 method
 
         //update pos
         updatePosition(newPos);

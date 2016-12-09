@@ -1,6 +1,7 @@
 package model.map;
 
 import javafx.util.Pair;
+import utilities.Utilities;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -45,12 +46,44 @@ public class ViewMap implements Serializable {
         return map;
     }
 
+    public ArrayList<Pair<Integer, Integer>> coosToExplore(Pair pos, int radioRange) {
+        ArrayList<Pair<Integer, Integer>> rip = new ArrayList<>();
+        for (int y = 0; y < this.size; y++) {
+            for (int x = 0; x < this.size; x++) {
+                Pair h = unexploredArea(this.map[y][x], pos, radioRange);
+                if (h != null) {
+                    rip.add(h);
+                }
+            }
+        }
+        return rip;
+    }
+
+    public Pair<Integer, Integer> unexploredArea(HeatElement h, Pair pos, int radioRange) {
+        if (Utilities.distPos(pos, new Pair<>(h.getX(), h.getY())) < radioRange) {
+            return null;
+        }
+        if (h.heat > 1 || h.heat == 0) {
+            return null;
+        }
+
+        if (h.getY() > 0 && this.map[h.getY() - 1][h.getX()].heat == -2 || this.map[h.getY() - 1][h.getX()].heat == 1) {
+            return new Pair<>(h.getX(), h.getY() - 1);
+        } else if (this.map[h.getY() + 1][h.getX()].heat == -2 || this.map[h.getY() + 1][h.getX()].heat == 1) {
+            return new Pair<>(h.getX(), h.getY() + 1);
+        } else if (this.map[h.getY()][h.getX() + 1].heat == -2 || this.map[h.getY()][h.getX() + 1].heat == 1) {
+            return new Pair<>(h.getX() + 1, h.getY());
+        } else if (this.map[h.getY()][h.getX() - 1].heat == -2 || this.map[h.getY()][h.getX() - 1].heat == 1) {
+            return new Pair<>(h.getX() - 1, h.getY());
+        } else return null;
+    }
+
     public void addViewRange(Pair<Integer, Integer> pos, Map map, int viewRange) {
         //Norte
         for (int i = 0; i < viewRange && pos.getValue() - i > 0; i++) {
             if (map.getMap_in_array()[pos.getValue() - i][pos.getKey()] == 0) {
                 if (i == 0) {
-                    this.map[pos.getValue() - i][pos.getKey()].addMyHeat();
+                    this.map[pos.getValue() - i][pos.getKey()].addMyHeat();   //current pos
                 } else {
                     this.map[pos.getValue() - i][pos.getKey()].addVisionHeat();
                 }

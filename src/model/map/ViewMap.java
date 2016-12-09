@@ -16,16 +16,8 @@ public class ViewMap implements Serializable {
     private int size;
 
     private boolean[][] wasHere;
-
-    public int getSize() {
-        return size;
-    }
-
-    public void setSize(int size) {
-        this.size = size;
-    }
-
     private HeatElement map[][];
+    private boolean exitFound = false;
 
     public ViewMap(HeatElement[][] map) {
     }
@@ -39,6 +31,14 @@ public class ViewMap implements Serializable {
             }
         }
         wasHere = new boolean[size][size];
+    }
+
+    public int getSize() {
+        return size;
+    }
+
+    public void setSize(int size) {
+        this.size = size;
     }
 
     public HeatElement getHeat(Pair<Integer, Integer> pos) {
@@ -95,6 +95,7 @@ public class ViewMap implements Serializable {
         } else if (Model.getForest().getMap_in_array()[pos.getValue()][pos.getKey()] == 2) {
             this.map[pos.getValue()][pos.getKey()].addDoorHeat();
             wall = true;
+            exitFound = true;
         } else if (Model.getForest().getMap_in_array()[pos.getValue()][pos.getKey()] == 0) {
             this.map[pos.getValue()][pos.getKey()].addMyHeat();
         }
@@ -103,18 +104,31 @@ public class ViewMap implements Serializable {
             if (pos.getKey() - 1 >= 0 && pos.getKey() + 1 < this.size) {
                 if (Model.getForest().getMap_in_array()[pos.getValue()][pos.getKey() - 1] == 1) {
                     this.map[pos.getValue()][pos.getKey() - 1].addWallHeat();
+                } else if (Model.getForest().getMap_in_array()[pos.getValue()][pos.getKey() - 1] == 2) {
+                    this.map[pos.getValue()][pos.getKey() - 1].addDoorHeat();
+                    this.exitFound = true;
                 }
                 if (Model.getForest().getMap_in_array()[pos.getValue()][pos.getKey() + 1] == 1) {
                     this.map[pos.getValue()][pos.getKey() + 1].addWallHeat();
+                } else if (Model.getForest().getMap_in_array()[pos.getValue()][pos.getKey() + 1] == 2) {
+                    this.map[pos.getValue()][pos.getKey() + 1].addDoorHeat();
+                    this.exitFound = true;
                 }
             }
         } else if (hor) {
             if (pos.getValue() - 1 >= 0 && pos.getValue() + 1 < this.size) {
                 if (Model.getForest().getMap_in_array()[pos.getValue() - 1][pos.getKey()] == 1) {
                     this.map[pos.getValue() - 1][pos.getKey()].addWallHeat();
+                } else if (Model.getForest().getMap_in_array()[pos.getValue() - 1][pos.getKey()] == 2) {
+                    this.map[pos.getValue() - 1][pos.getKey()].addDoorHeat();
+                    this.exitFound = true;
                 }
+
                 if (Model.getForest().getMap_in_array()[pos.getValue() + 1][pos.getKey()] == 1) {
                     this.map[pos.getValue() + 1][pos.getKey()].addWallHeat();
+                } else if (Model.getForest().getMap_in_array()[pos.getValue() + 1][pos.getKey()] == 2) {
+                    this.map[pos.getValue() + 1][pos.getKey()].addDoorHeat();
+                    this.exitFound = true;
                 }
             }
         }
@@ -158,6 +172,9 @@ public class ViewMap implements Serializable {
                 if (this.map[i][j].heat == 0 && map.getMap()[i][j].heat != 1 &&
                         this.map[i][j].heat != map.getMap()[i][j].heat) {
                     this.map[i][j].heat = map.getMap()[i][j].heat;
+                }
+                if (map.isExitFound()) {
+                    this.exitFound = true;
                 }
             }
         }
@@ -259,6 +276,10 @@ public class ViewMap implements Serializable {
                 return true;
             }
         return false;
+    }
+
+    public boolean isExitFound() {
+        return exitFound;
     }
 
 

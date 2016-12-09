@@ -82,7 +82,8 @@ public class ViewMap implements Serializable {
         return values;
     }
 
-    public void addViewRange(Pair<Integer, Integer> pos, Map map, int viewRange) {
+    public boolean addViewRange(Pair<Integer, Integer> pos, Map map, int viewRange) {
+        boolean foundExit = false;
         //Norte
         for (int i = 0; i < viewRange && pos.getValue() - i > 0; i++) {
             if (map.getMap_in_array()[pos.getValue() - i][pos.getKey()] == 0) {
@@ -93,6 +94,7 @@ public class ViewMap implements Serializable {
                 }
             } else if (map.getMap_in_array()[pos.getValue() - i][pos.getKey()] == 2) {
                 this.map[pos.getValue() - i][pos.getKey()].addDoorHeat();
+                foundExit = true;
             } else {
                 this.map[pos.getValue() - i][pos.getKey()].addWallHeat();
                 break;
@@ -106,6 +108,7 @@ public class ViewMap implements Serializable {
                 }
             } else if (map.getMap_in_array()[pos.getValue() - i][pos.getKey()] == 2) {
                 this.map[pos.getValue() - i][pos.getKey()].addDoorHeat();
+                foundExit = true;
             } else {
                 this.map[pos.getValue() + i][pos.getKey()].addWallHeat();
                 break;
@@ -119,6 +122,7 @@ public class ViewMap implements Serializable {
                 }
             } else if (map.getMap_in_array()[pos.getValue() - i][pos.getKey()] == 2) {
                 this.map[pos.getValue() - i][pos.getKey()].addDoorHeat();
+                foundExit = true;
             } else {
                 this.map[pos.getValue()][pos.getKey() + i].addWallHeat();
                 break;
@@ -132,11 +136,13 @@ public class ViewMap implements Serializable {
                 }
             } else if (map.getMap_in_array()[pos.getValue() - i][pos.getKey()] == 2) {
                 this.map[pos.getValue() - i][pos.getKey()].addDoorHeat();
+                foundExit = true;
             } else {
                 this.map[pos.getValue()][pos.getKey() - i].addWallHeat();
                 break;
             }
         }
+        return foundExit;
     }
 
     public void addViewMap(ViewMap map) {

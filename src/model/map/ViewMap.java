@@ -156,19 +156,19 @@ public class ViewMap implements Serializable {
     public ArrayList<DIR> getPossibleDir(Pair<Integer, Integer> pos) {
         ArrayList<DIR> posDir = new ArrayList<>();
         //north
-        if (map[pos.getValue() - 1][pos.getKey()].heat != -2) {
+        if (pos.getValue() - 1 > 0 && map[pos.getValue() - 1][pos.getKey()].heat != -2) {
             posDir.add(DIR.N);
         }
         //south
-        if (map[pos.getValue() + 1][pos.getKey()].heat != -2) {
+        if (pos.getValue() + 1 < this.size && map[pos.getValue() + 1][pos.getKey()].heat != -2) {
             posDir.add(DIR.S);
         }
         //este
-        if (map[pos.getValue()][pos.getKey() + 1].heat != -2) {
+        if (pos.getKey() + 1 > this.size && map[pos.getValue()][pos.getKey() + 1].heat != -2) {
             posDir.add(DIR.E);
         }
         //oeste
-        if (map[pos.getValue()][pos.getKey() - 1].heat != -2) {
+        if (pos.getKey() - 1 > 0 && map[pos.getValue()][pos.getKey() - 1].heat != -2) {
             posDir.add(DIR.W);
         }
         return posDir;

@@ -35,9 +35,9 @@ import java.util.ArrayList;
 public class Model extends Repast3Launcher {
 
     private static final boolean BATCH_MODE = true;
-    private static int NUM_CAP = 2;
+    private static int NUM_CAP = 1;
     private static int NUM_SOL = 2;
-    private static int NUM_ROBOT = 3;
+    private static int NUM_ROBOT = 5;
 
     public DisplaySurface dsurf;
     public DisplaySurface dsurf2;
@@ -260,7 +260,6 @@ public class Model extends Repast3Launcher {
 
             //Gerar Soldados
             for (int j = 1; j < soldiers.size(); j++) {
-                System.out.println("Soldados: " + soldiers.get(j)[0] + " " + soldiers.get(j)[1]);
                 Soldier sol = new Soldier(5, 5);
 
                 agModel = new AgentModel(soldiers.get(j)[0],

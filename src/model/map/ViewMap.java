@@ -67,16 +67,16 @@ public class ViewMap implements Serializable {
         if (h.heat > 1 || h.heat == 0) {
             return null;
         }
-        if (h.getY() > 0 && this.map[h.getY() - 1][h.getX()].heat == -2 || this.map[h.getY() - 1][h.getX()].heat == 1) {
+        if (h.getY() - 1 > 0 && (this.map[h.getY() - 1][h.getX()].heat == -2 || this.map[h.getY() - 1][h.getX()].heat == 1)) {
             values.add(new Pair<>(h.getX(), h.getY() - 1));
         }
-        if (this.map[h.getY() + 1][h.getX()].heat == -2 || this.map[h.getY() + 1][h.getX()].heat == 1) {
+        if (h.getY() + 1 < this.size && (this.map[h.getY() + 1][h.getX()].heat == -2 || this.map[h.getY() + 1][h.getX()].heat == 1)) {
             values.add(new Pair<>(h.getX(), h.getY() + 1));
         }
-        if (this.map[h.getY()][h.getX() + 1].heat == -2 || this.map[h.getY()][h.getX() + 1].heat == 1) {
+        if (h.getX() + 1 < this.size && (this.map[h.getY()][h.getX() + 1].heat == -2 || this.map[h.getY()][h.getX() + 1].heat == 1)) {
             values.add(new Pair<>(h.getX() + 1, h.getY()));
         }
-        if (this.map[h.getY()][h.getX() - 1].heat == -2 || this.map[h.getY()][h.getX() - 1].heat == 1) {
+        if (h.getX() - 1 > 0 && (this.map[h.getY()][h.getX() - 1].heat == -2 || this.map[h.getY()][h.getX() - 1].heat == 1)) {
             values.add(new Pair<>(h.getX() - 1, h.getY()));
         }
         return values;
@@ -101,13 +101,13 @@ public class ViewMap implements Serializable {
             }
         }
         //Sul
-        for (int i = 0; i < viewRange && pos.getValue() + i > 0; i++) {
+        for (int i = 0; i < viewRange && pos.getValue() + i < this.size; i++) {
             if (map.getMap_in_array()[pos.getValue() + i][pos.getKey()] == 0) {
                 if (i != 0) {
                     this.map[pos.getValue() + i][pos.getKey()].addVisionHeat();
                 }
-            } else if (map.getMap_in_array()[pos.getValue() - i][pos.getKey()] == 2) {
-                this.map[pos.getValue() - i][pos.getKey()].addDoorHeat();
+            } else if (map.getMap_in_array()[pos.getValue() + i][pos.getKey()] == 2) {
+                this.map[pos.getValue() + i][pos.getKey()].addDoorHeat();
                 foundExit = true;
             } else {
                 this.map[pos.getValue() + i][pos.getKey()].addWallHeat();
@@ -115,13 +115,13 @@ public class ViewMap implements Serializable {
             }
         }
         //Este
-        for (int i = 0; i < viewRange && pos.getKey() + i > 0; i++) {
+        for (int i = 0; i < viewRange && pos.getKey() + i < this.size; i++) {
             if (map.getMap_in_array()[pos.getValue()][pos.getKey() + i] == 0) {
                 if (i != 0) {
                     this.map[pos.getValue()][pos.getKey() + i].addVisionHeat();
                 }
-            } else if (map.getMap_in_array()[pos.getValue() - i][pos.getKey()] == 2) {
-                this.map[pos.getValue() - i][pos.getKey()].addDoorHeat();
+            } else if (map.getMap_in_array()[pos.getValue()][pos.getKey() + i] == 2) {
+                this.map[pos.getValue()][pos.getKey() + i].addDoorHeat();
                 foundExit = true;
             } else {
                 this.map[pos.getValue()][pos.getKey() + i].addWallHeat();
@@ -134,8 +134,8 @@ public class ViewMap implements Serializable {
                 if (i != 0) {
                     this.map[pos.getValue()][pos.getKey() - i].addVisionHeat();
                 }
-            } else if (map.getMap_in_array()[pos.getValue() - i][pos.getKey()] == 2) {
-                this.map[pos.getValue() - i][pos.getKey()].addDoorHeat();
+            } else if (map.getMap_in_array()[pos.getValue()][pos.getKey() - i] == 2) {
+                this.map[pos.getValue()][pos.getKey() - i].addDoorHeat();
                 foundExit = true;
             } else {
                 this.map[pos.getValue()][pos.getKey() - i].addWallHeat();

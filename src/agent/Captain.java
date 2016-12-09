@@ -26,7 +26,7 @@ public class Captain extends Human {
 
     public int cellphone_range;
 
-    private agent_state state = agent_state.INITIAL_COMM_WITH_CAPTAINS;
+    private agent_state state = INITIAL_COMM_WITH_CAPTAINS;
     private ArrayList<AID> teamSoldiers, wentExploringSoldiers;
 
 
@@ -73,7 +73,7 @@ public class Captain extends Human {
                 tick++;
 
                 if (tick % 100 == 0) { //TODO destrolhar isto
-                    //update();
+                    update();
                     //move_random();
                 }
             }
@@ -97,13 +97,13 @@ public class Captain extends Human {
                         sendMyInfoToAgent(msg);
                     } else if (msg.getPerformative() == Message.INFORM) {
                         try {
-                            if(state == WAITING_4_TEAM_RESPONSES && msg.getContentObject() instanceof ExplorationResponse){
+                            if (state == WAITING_4_TEAM_RESPONSES && msg.getContentObject() instanceof ExplorationResponse) {
 
                                 wentExploringSoldiers.remove(msg.getSender());
                                 getMyViewMap().addViewMap(((ExplorationResponse) msg.getContentObject()).getViewMap());
 
-                                if(wentExploringSoldiers.size() == 0){
-                                   state = GIVING_ORDERS;
+                                if (wentExploringSoldiers.size() == 0) {
+                                    state = GIVING_ORDERS;
                                 }
                             }
 
@@ -128,7 +128,7 @@ public class Captain extends Human {
         switch (state) {
 
             case INITIAL_COMM_WITH_CAPTAINS:
-                ArrayList<AID> allCaptains = getAllCaptains();
+               // ArrayList<AID> allCaptains = getAllCaptains();
 
                 //todo desenvolver isto
                 state = GIVING_ORDERS;
@@ -136,18 +136,22 @@ public class Captain extends Human {
 
             case GIVING_ORDERS:
 
-                //TODO CALL method to obtain all possible coos to explore
                 wentExploringSoldiers = new ArrayList<>();
-                //todo
-                //DESCOMENTAR ESTAS CENAS
-                /*for(int i = 0; i < teamSoldiers.size() && i < coosToExplore.size() ; i++){
-                    OrderToExplore order = new OrderToExplore(pos);
-                    ACLMessage msg = new ACLMessage(Message.REQUEST);
-                    msg.setContentObject(order);
-                    msg.addReceiver(teamSoldiers.get(i));
-                    send(msg);
-                    wentExploringSoldiers.add(teamSoldiers.get(i));
-                }*/
+
+                ArrayList<Pair<Integer, Integer>> coosToExplore = myViewMap.coosToExplore(getModel_link().getMyCoos(), getRadio_range());
+
+                for (int i = 0; i < teamSoldiers.size() && i < coosToExplore.size(); i++) {
+                    try {
+                        OrderToExplore order = new OrderToExplore(coosToExplore.get(i));
+                        ACLMessage msg = new ACLMessage(Message.REQUEST);
+                        msg.setContentObject(order);
+                        msg.addReceiver(teamSoldiers.get(i));
+                        send(msg);
+                        wentExploringSoldiers.add(teamSoldiers.get(i));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
 
                 state = WAITING_4_TEAM_RESPONSES;
                 break;

@@ -72,7 +72,6 @@ public class Soldier extends Human {
                 if (msg != null) {
 
                     if (msg.getPerformative() == Message.REQUEST) {
-
                         handleRequest(msg);
 
                     } else if (msg.getPerformative() == Message.INFORM) {
@@ -126,12 +125,12 @@ public class Soldier extends Human {
         switch (state) {
             case WAITING_4_ORDERS:
                 //communicates with agents(soldiers+robots) on range
-                commWithAgents(onRangeAgents, robotsOnRange, soldiersOnRange);
+                //commWithAgents(onRangeAgents, robotsOnRange, soldiersOnRange);
 
                 break;
 
             case EXPLORING:
-                commWithAgents(onRangeAgents, robotsOnRange, soldiersOnRange);
+                //commWithAgents(onRangeAgents, robotsOnRange, soldiersOnRange);
 
                 if (coosToExplore.size() > 0) {
                     Pair<Integer, Integer> newPos = coosToExplore.pop();

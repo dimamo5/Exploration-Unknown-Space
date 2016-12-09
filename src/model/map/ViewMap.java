@@ -216,6 +216,7 @@ public class ViewMap implements Serializable {
     //Returns null
     public ArrayList<Pair<Integer, Integer>> getPath(Pair<Integer, Integer> start, Pair<Integer, Integer> end) {
         ArrayList<Pair<Integer, Integer>> path = new ArrayList<>();
+        this.wasHere = new boolean[this.size][this.size];
         recursiveSolve(start.getKey(), start.getValue(), end, path);
         if (path.size() > 0) {
             if (Utilities.distPos(path.get(path.size() - 1), start) >= 1) {

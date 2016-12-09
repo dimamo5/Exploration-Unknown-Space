@@ -1,6 +1,7 @@
 package model.map;
 
 import javafx.util.Pair;
+import utilities.Utilities;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -45,17 +46,55 @@ public class ViewMap implements Serializable {
         return map;
     }
 
-    public void addViewRange(Pair<Integer, Integer> pos, Map map, int viewRange) {
+    public ArrayList<Pair<Integer, Integer>> coosToExplore(Pair pos, int radioRange) {
+        ArrayList<Pair<Integer, Integer>> rip = new ArrayList<>();
+        for (int y = 0; y < this.size; y++) {
+            for (int x = 0; x < this.size; x++) {
+                ArrayList<Pair<Integer, Integer>> h = unexploredArea(this.map[y][x], pos, radioRange);
+                if (h != null) {
+                    rip.addAll(h);
+                }
+            }
+        }
+        return rip;
+    }
+
+    public ArrayList<Pair<Integer, Integer>> unexploredArea(HeatElement h, Pair pos, int radioRange) {
+        ArrayList<Pair<Integer, Integer>> values = new ArrayList<>();
+        if (Utilities.distPos(pos, new Pair<>(h.getX(), h.getY())) < radioRange) {
+            return null;
+        }
+        if (h.heat > 1 || h.heat == 0) {
+            return null;
+        }
+        if (h.getY() > 0 && this.map[h.getY() - 1][h.getX()].heat == -2 || this.map[h.getY() - 1][h.getX()].heat == 1) {
+            values.add(new Pair<>(h.getX(), h.getY() - 1));
+        }
+        if (this.map[h.getY() + 1][h.getX()].heat == -2 || this.map[h.getY() + 1][h.getX()].heat == 1) {
+            values.add(new Pair<>(h.getX(), h.getY() + 1));
+        }
+        if (this.map[h.getY()][h.getX() + 1].heat == -2 || this.map[h.getY()][h.getX() + 1].heat == 1) {
+            values.add(new Pair<>(h.getX() + 1, h.getY()));
+        }
+        if (this.map[h.getY()][h.getX() - 1].heat == -2 || this.map[h.getY()][h.getX() - 1].heat == 1) {
+            values.add(new Pair<>(h.getX() - 1, h.getY()));
+        }
+        return values;
+    }
+
+    public boolean addViewRange(Pair<Integer, Integer> pos, Map map, int viewRange) {
+        boolean foundExit = false;
         //Norte
         for (int i = 0; i < viewRange && pos.getValue() - i > 0; i++) {
             if (map.getMap_in_array()[pos.getValue() - i][pos.getKey()] == 0) {
                 if (i == 0) {
-                    this.map[pos.getValue() - i][pos.getKey()].addMyHeat();
+                    this.map[pos.getValue() - i][pos.getKey()].addMyHeat();   //current pos
                 } else {
                     this.map[pos.getValue() - i][pos.getKey()].addVisionHeat();
                 }
             } else if (map.getMap_in_array()[pos.getValue() - i][pos.getKey()] == 2) {
                 this.map[pos.getValue() - i][pos.getKey()].addDoorHeat();
+                foundExit = true;
             } else {
                 this.map[pos.getValue() - i][pos.getKey()].addWallHeat();
                 break;
@@ -69,6 +108,7 @@ public class ViewMap implements Serializable {
                 }
             } else if (map.getMap_in_array()[pos.getValue() - i][pos.getKey()] == 2) {
                 this.map[pos.getValue() - i][pos.getKey()].addDoorHeat();
+                foundExit = true;
             } else {
                 this.map[pos.getValue() + i][pos.getKey()].addWallHeat();
                 break;
@@ -82,6 +122,7 @@ public class ViewMap implements Serializable {
                 }
             } else if (map.getMap_in_array()[pos.getValue() - i][pos.getKey()] == 2) {
                 this.map[pos.getValue() - i][pos.getKey()].addDoorHeat();
+                foundExit = true;
             } else {
                 this.map[pos.getValue()][pos.getKey() + i].addWallHeat();
                 break;
@@ -95,17 +136,20 @@ public class ViewMap implements Serializable {
                 }
             } else if (map.getMap_in_array()[pos.getValue() - i][pos.getKey()] == 2) {
                 this.map[pos.getValue() - i][pos.getKey()].addDoorHeat();
+                foundExit = true;
             } else {
                 this.map[pos.getValue()][pos.getKey() - i].addWallHeat();
                 break;
             }
         }
+        return foundExit;
     }
 
     public void addViewMap(ViewMap map) {
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
-                if (this.map[i][j].heat == 0 && this.map[i][j].heat != map.getMap()[i][j].heat) {
+                if (this.map[i][j].heat == 0 && map.getMap()[i][j].heat != 1 &&
+                        this.map[i][j].heat != map.getMap()[i][j].heat) {
                     this.map[i][j].heat = map.getMap()[i][j].heat;
                 }
             }

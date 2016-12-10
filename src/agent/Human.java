@@ -58,7 +58,9 @@ public class Human extends ExplorerAgent {
         return robotsToRequest;
     }
 
-    protected void commWithAgents(ArrayList<ExplorerAgent> onRangeAgents, ArrayList<AID> robotsOnRange, ArrayList<AID> soldiersOnRange) {
+    protected void commWithAgents(ArrayList<ExplorerAgent> onRangeAgents) {
+
+        ArrayList<AID> robotsOnRange = new ArrayList<>(), soldiersOnRange = new ArrayList<>();
         for (Agent agent : onRangeAgents) {
             if (agent instanceof Robot) {
                 Pair<Integer, Integer> robotCoos = ((Robot) agent).getModel_link().getMyCoos(),
@@ -73,8 +75,6 @@ public class Human extends ExplorerAgent {
             }
         }
 
-        //TODO adaptar para os restantes agentes tb
-
         ArrayList<AID> robotsToRequest = checkRobotComms(robotsOnRange);
 
         //robots + soldiers
@@ -85,8 +85,6 @@ public class Human extends ExplorerAgent {
             System.out.println(getAID() + "  requested info from agent(s)");
             requestAgentsForInfo(robotsToRequest);
         }
-
-        //comms with captains  - ALL MAP RANGE VIA TELEFONE
     }
 
     protected enum agent_state {WAITING_4_ORDERS, INITIAL_COMM_WITH_CAPTAINS, WAITING_4_TEAM_RESPONSES, GIVING_ORDERS, EXPLORING, EXPLORATION_DONE, AT_EXIT}

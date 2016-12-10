@@ -14,10 +14,7 @@ import sajas.core.behaviours.CyclicBehaviour;
 import utilities.Utilities;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Stack;
+import java.util.*;
 
 import static agent.Human.agent_state.*;
 
@@ -30,6 +27,15 @@ public class Captain extends Human {
 
     private agent_state state = INITIAL_COMM_WITH_CAPTAINS;
     private ArrayList<AID> teamSoldiers, wentExploringSoldiers;
+
+    public ArrayList<Soldier> getTeamSoldiersObject() {
+        return teamSoldiersObject;
+    }
+
+    public void setTeamSoldiersObject(ArrayList<Soldier> teamSoldiersObject) {
+        this.teamSoldiersObject = teamSoldiersObject;
+    }
+
     private ArrayList<Soldier> teamSoldiersObject;
     private boolean captainMove = false;
     private Stack<Pair<Integer, Integer>> coosToExplore;
@@ -78,8 +84,8 @@ public class Captain extends Human {
             public void action() {
                 tick++;
 
-                if (tick % 10 == 0) { //TODO destrolhar isto
-                    System.out.println("CAPTAIN state: " + state);
+                if (tick % 5 == 0) { //TODO destrolhar isto
+                    System.out.println(getAID() +" state: " + state);
                     update();
                     //move_random();
                 }
@@ -116,7 +122,12 @@ public class Captain extends Human {
                                 notifyTeam(new InformTeam(getModel_link().getMyCoos(), getMyViewMap()));
                                 state = GIVING_ORDERS;
                             }
+                            //response from commWithOnRangeAgents
+                        } else if (msg.getContentObject() instanceof InformViewMap) {
+                            myViewMap.addViewMap(((InformViewMap) msg.getContentObject()).getViewMap());
                         }
+
+
                     } catch (UnreadableException e) {
                         e.printStackTrace();
                     }
@@ -143,8 +154,12 @@ public class Captain extends Human {
     private void update() {
 
         ArrayList<ExplorerAgent> onRangeAgents = getModel_link().getOnRadioRangeAgents(getRadio_range());
-        ArrayList<AID> robotsOnRange = new ArrayList<>();
-        ArrayList<AID> soldiersOnRange = new ArrayList<>();
+
+        onRangeAgents.removeIf(ag -> teamSoldiers.indexOf(ag.getAID()) != -1 || ag.getAID() == this.getAID());
+
+        for (Soldier sol : teamSoldiersObject) {
+            onRangeAgents.remove(sol);
+        }
 
         switch (state) {
 
@@ -164,11 +179,17 @@ public class Captain extends Human {
 
                 if (coosToExplore.size() == 0) { //regroup on other area to explore
                     coosToExplore = new ArrayList<>();
-                    coosToExplore.add(myViewMap.coosToExplore(getModel_link().getMyCoos(), 999).get(0));
-                    captainMove = true;
+                    System.out.println("---------->>>>>>>>>>>>>>>>>>>>>>>>>>REGROUP");
+                    //coosToExplore.add(myViewMap.coosToExplore(getModel_link().getMyCoos(), 999).get(0));  //to remove after this being stable
+
+                    ArrayList<Pair<Integer, Integer>> tempCoos = myViewMap.coosToExplore(getModel_link().getMyCoos(), 999);
+
+                    //get best option
+                    coosToExplore.add(myViewMap.getRegroupSite(tempCoos, getModel_link().getMyCoos()));
                     coosToExplore = myViewMap.getPath(getModel_link().getMyCoos(), coosToExplore.get(0));
 
                     pushToStack(coosToExplore);
+                    captainMove = true;
 
                     for (int i = 0; i < teamSoldiers.size(); i++) {
                         sendOrderToExplore(coosToExplore, i, 0);
@@ -177,18 +198,10 @@ public class Captain extends Human {
                 } else {
 
                     for (int i = 0; i < teamSoldiers.size() && i < coosToExplore.size(); i++) {
-                        try {
-                            OrderToExplore order = new OrderToExplore(coosToExplore.get(i));
-                            ACLMessage msg = new ACLMessage(Message.REQUEST);
-                            msg.setContentObject(order);
-                            msg.addReceiver(teamSoldiers.get(i));
-                            send(msg);
-                            wentExploringSoldiers.add(teamSoldiers.get(i));
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
+                        sendOrderToExplore(coosToExplore, i, i);
                     }
                 }
+
                 state = WAITING_4_TEAM_RESPONSES;
                 break;
 
@@ -203,16 +216,12 @@ public class Captain extends Human {
                         captainMove = false;
                     }
                 }
-                //commWithAgents(onRangeAgents, robotsOnRange, soldiersOnRange);
 
+                commWithAgents(onRangeAgents);
                 break;
 
-            case EXPLORING:
-
-
+            case AT_EXIT:
                 break;
-            /*case AT_EXIT:
-                break; */
         }
     }
 
@@ -238,7 +247,7 @@ public class Captain extends Human {
         }
     }
 
-    private ArrayList<AID> getAllCaptains() {
+    public ArrayList<AID> getAllCaptains() {
         ArrayList<AID> captains = new ArrayList<>();
 
         for (Agent agent : getModel_link().getAgents_list()) {

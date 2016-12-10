@@ -6,8 +6,6 @@ import jade.lang.acl.UnreadableException;
 import javafx.util.Pair;
 import message.*;
 import model.Model;
-import model.map.ViewMap;
-import sajas.core.Agent;
 import sajas.core.behaviours.CyclicBehaviour;
 import utilities.Utilities;
 
@@ -50,7 +48,7 @@ public class Soldier extends Human {
             public void action() {
                 tick++;
 
-                if (tick % 100 == 0) { //TODO destrolhar isto
+                if (tick % 10 == 0) { //TODO destrolhar isto
                     update();
                     System.out.println("SOLDIER state: " + state);
                 }
@@ -72,24 +70,16 @@ public class Soldier extends Human {
 
                 if (msg != null) {
 
-                    if (msg.getPerformative() == Message.REQUEST) {
-                        handleRequest(msg);
-
-                    } else if (msg.getPerformative() == Message.INFORM) {
-                        try {
-                            if (msg.getContentObject() instanceof InformViewMap) {
-                                getMyViewMap().addViewMap(((InformViewMap) msg.getContentObject()).getViewMap());
-                            }
-                        } catch (UnreadableException e) {
-                            e.printStackTrace();
-                        }
+                    if (msg.getPerformative() == Message.REQUEST || msg.getPerformative() == Message.INFORM) {
+                        handleMsg(msg);
                     }
                 }
             }
         });
     }
 
-    private void handleRequest(ACLMessage msg) {
+
+    private void handleMsg(ACLMessage msg) {
 
         Message toParseMsg = null;
         try {
@@ -98,22 +88,25 @@ public class Soldier extends Human {
             e.printStackTrace();
         }
 
-        if (toParseMsg instanceof OrderToExplore && state == WAITING_4_ORDERS) {
+        if (toParseMsg instanceof InformTeam && state == EXPLORATION_DONE) {
+            System.out.println("RECEIVED INFORM TEAM");
+            myViewMap.addViewMap(((InformTeam) toParseMsg).getViewMap());
+            state = WAITING_4_ORDERS;
+
+        } else if (toParseMsg instanceof OrderToExplore && state == WAITING_4_ORDERS) {
             state = EXPLORING;
             coosToExplore = new Stack<>();
 
             Pair<Integer, Integer> destiny = toParseMsg.getPosition();
-            System.out.println(getAID() + "AT POS "+ getModel_link().getMyCoos()+" RECEIVED ORDER TO MOVE TO: " + destiny);
+            System.out.println(getAID() + "AT POS " + getModel_link().getMyCoos() + " RECEIVED ORDER TO MOVE TO: " + destiny);
 
-            if (Utilities.distPos(getModel_link().getMyCoos(), destiny) != 0 ) {
+            if (Utilities.distPos(getModel_link().getMyCoos(), destiny) != 0) {
                 ArrayList<Pair<Integer, Integer>> pathCoos = myViewMap.getPath(getModel_link().getMyCoos(), destiny);
                 pushToStack(pathCoos);
 
                 System.out.println("MY COOS TO EXPLORE: " + coosToExplore.toString());
             }
-        } else if (toParseMsg instanceof RequestViewMap)
-
-        {
+        } else if (toParseMsg instanceof RequestViewMap)        {
            /* System.out.println(getAID() + ">> SENDING MY INFO >>" + msg.getSender());
             sendMyInfoToAgent(msg); */
         }
@@ -121,8 +114,7 @@ public class Soldier extends Human {
     }
 
     private void pushToStack(ArrayList<Pair<Integer, Integer>> pathCoos) {
-        Collections.reverse(pathCoos);
-
+        //Collections.reverse(pathCoos);
         for (Pair<Integer, Integer> pathCoo : pathCoos) {
             coosToExplore.push(pathCoo);
         }
@@ -148,13 +140,13 @@ public class Soldier extends Human {
                     getMyViewMap().addViewRange(newPos, Model.getForest(), getVision_range());
 
                 } else {
-                    notifyTeamLeader(new ExplorationResponse(getModel_link().getMyCoos(), getMyViewMap(), foundExit), Message.INFORM);
                     state = EXPLORATION_DONE;
+                    notifyTeamLeader(new ExplorationResponse(getModel_link().getMyCoos(), getMyViewMap(), foundExit), Message.INFORM);
                 }
                 break;
 
             case EXPLORATION_DONE:
-                commWithAgents(onRangeAgents, robotsOnRange, soldiersOnRange);
+                //commWithAgents(onRangeAgents, robotsOnRange, soldiersOnRange);
                 break;
 
             case AT_EXIT:

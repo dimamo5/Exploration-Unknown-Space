@@ -1,21 +1,22 @@
 package agent;
 
+import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.UnreadableException;
 import javafx.util.Pair;
-import message.ExplorationResponse;
-import message.InformViewMap;
-import message.Message;
-import message.OrderToExplore;
+import message.*;
 import model.Model;
 import model.map.AgentModel;
 import model.map.ViewMap;
 import sajas.core.Agent;
 import sajas.core.behaviours.CyclicBehaviour;
+import utilities.Utilities;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Stack;
 
 import static agent.Human.agent_state.*;
@@ -29,6 +30,7 @@ public class Captain extends Human {
 
     private agent_state state = INITIAL_COMM_WITH_CAPTAINS;
     private ArrayList<AID> teamSoldiers, wentExploringSoldiers;
+    private ArrayList<Soldier> teamSoldiersObject;
     private boolean captainMove = false;
     private Stack<Pair<Integer, Integer>> coosToExplore;
 
@@ -36,6 +38,7 @@ public class Captain extends Human {
         super(vision_range, radio_range);
         this.cellphone_range = cellphone_range;
         teamSoldiers = new ArrayList<>();
+        teamSoldiersObject = new ArrayList<>();
     }
 
     public ArrayList<AID> getTeamSoldiers() {
@@ -58,8 +61,9 @@ public class Captain extends Human {
 
     }
 
-    public void addSoldierToTeam(AID sol) {
-        teamSoldiers.add(sol);
+    public void addSoldierToTeam(Soldier sol) {
+        teamSoldiers.add(sol.getAID());
+        teamSoldiersObject.add(sol);
     }
 
     @Override
@@ -74,7 +78,7 @@ public class Captain extends Human {
             public void action() {
                 tick++;
 
-                if (tick % 100 == 0) { //TODO destrolhar isto
+                if (tick % 10 == 0) { //TODO destrolhar isto
                     System.out.println("CAPTAIN state: " + state);
                     update();
                     //move_random();
@@ -107,30 +111,33 @@ public class Captain extends Human {
                             wentExploringSoldiers.remove(msg.getSender());
                             getMyViewMap().addViewMap(((ExplorationResponse) msg.getContentObject()).getViewMap());
 
-                            if (captainMove) {
-                                if (coosToExplore.size() > 0) {
-                                    Pair<Integer, Integer> newPos = coosToExplore.pop();
-                                    updatePosition(newPos);
-                                    getMyViewMap().addViewRange(newPos, Model.getForest(), getVision_range());
-                                }else{ //chegou ao novo destino
-                                    captainMove = false;
-                                }
-                            }
-
-                            if (wentExploringSoldiers.size() == 0 && !captainMove ) {
+                            if (wentExploringSoldiers.size() == 0 && !captainMove) {
+                                System.out.println("CAPTAIN NOTIFY TEAM");
+                                notifyTeam(new InformTeam(getModel_link().getMyCoos(), getMyViewMap()));
                                 state = GIVING_ORDERS;
                             }
                         }
-
-                        /*if (msg.getContentObject() instanceof InformViewMap) {
-                            getMyViewMap().addViewMap(((InformViewMap) msg.getContentObject()).getViewMap());
-                        }*/
                     } catch (UnreadableException e) {
                         e.printStackTrace();
                     }
                 }
             }
         });
+    }
+
+    private void notifyTeam(Message message) {
+        ACLMessage msg = new ACLMessage(Message.INFORM);
+
+        try {
+            msg.setContentObject(message);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        for (AID id : teamSoldiers) {
+            msg.addReceiver(id);
+        }
+        send(msg);
     }
 
     private void update() {
@@ -155,23 +162,31 @@ public class Captain extends Human {
                 ArrayList<Pair<Integer, Integer>> coosToExplore = myViewMap.coosToExplore(getModel_link().getMyCoos()
                         , getRadio_range());
 
-                if (coosToExplore.size() == 0) {
+                if (coosToExplore.size() == 0) { //regroup on other area to explore
                     coosToExplore = new ArrayList<>();
-                    coosToExplore.add(myViewMap.coosToExplore(getModel_link().getMyCoos(), 99).get(0));
+                    coosToExplore.add(myViewMap.coosToExplore(getModel_link().getMyCoos(), 999).get(0));
                     captainMove = true;
                     coosToExplore = myViewMap.getPath(getModel_link().getMyCoos(), coosToExplore.get(0));
 
+                    pushToStack(coosToExplore);
+
                     for (int i = 0; i < teamSoldiers.size(); i++) {
-                        sendOrderToExplore(coosToExplore, i);
+                        sendOrderToExplore(coosToExplore, i, 0);
                     }
 
-                } else { //regroup on other area to explore
-               /* for (int i = 0; i < coosToExplore.size(); i++) { //TODO!!
-                    System.out.println("Pos: " + coosToExplore.get(i).getKey() + " " + coosToExplore.get(i).getValue
-                            ());
-                }*/
+                } else {
+
                     for (int i = 0; i < teamSoldiers.size() && i < coosToExplore.size(); i++) {
-                        sendOrderToExplore(coosToExplore, i);
+                        try {
+                            OrderToExplore order = new OrderToExplore(coosToExplore.get(i));
+                            ACLMessage msg = new ACLMessage(Message.REQUEST);
+                            msg.setContentObject(order);
+                            msg.addReceiver(teamSoldiers.get(i));
+                            send(msg);
+                            wentExploringSoldiers.add(teamSoldiers.get(i));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
                 state = WAITING_4_TEAM_RESPONSES;
@@ -179,6 +194,15 @@ public class Captain extends Human {
 
             case WAITING_4_TEAM_RESPONSES:
 
+                if (captainMove) {
+                    if (this.coosToExplore.size() > 0) {
+                        Pair<Integer, Integer> newPos = this.coosToExplore.pop();
+                        updatePosition(newPos);
+                        getMyViewMap().addViewRange(newPos, Model.getForest(), getVision_range());
+                    } else { //chegou ao novo destino
+                        captainMove = false;
+                    }
+                }
                 //commWithAgents(onRangeAgents, robotsOnRange, soldiersOnRange);
 
                 break;
@@ -192,14 +216,23 @@ public class Captain extends Human {
         }
     }
 
-    private void sendOrderToExplore(ArrayList<Pair<Integer, Integer>> coosToExplore, int i) {
+    private void pushToStack(ArrayList<Pair<Integer, Integer>> pathCoos) {
+        //Collections.reverse(pathCoos);
+        coosToExplore = new Stack<>();
+        for (Pair<Integer, Integer> pathCoo : pathCoos) {
+            coosToExplore.push(pathCoo);
+        }
+    }
+
+
+    private void sendOrderToExplore(ArrayList<Pair<Integer, Integer>> coosToExplore, int soldierIndex, int cooIndex) {
         try {
-            OrderToExplore order = new OrderToExplore(coosToExplore.get(i));
+            OrderToExplore order = new OrderToExplore(coosToExplore.get(cooIndex));
             ACLMessage msg = new ACLMessage(Message.REQUEST);
             msg.setContentObject(order);
-            msg.addReceiver(teamSoldiers.get(i));
+            msg.addReceiver(teamSoldiers.get(soldierIndex));
             send(msg);
-            wentExploringSoldiers.add(teamSoldiers.get(i));
+            wentExploringSoldiers.add(teamSoldiers.get(soldierIndex));
         } catch (IOException e) {
             e.printStackTrace();
         }

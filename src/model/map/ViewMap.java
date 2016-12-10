@@ -69,20 +69,18 @@ public class ViewMap implements Serializable {
         }
         if (h.heat < 0) {
             return null;
-        } else {
-            System.out.println("Tem de pintar1");
         }
         if (h.getY() - 1 > 0 && this.map[h.getY() - 1][h.getX()].heat == -1) {
-            values.add(new Pair<>(h.getX(), h.getY() - 1));
+            values.add(new Pair<>(h.getX(), h.getY()));
         }
         if (h.getY() + 1 < this.size && this.map[h.getY() + 1][h.getX()].heat == -1) {
-            values.add(new Pair<>(h.getX(), h.getY() + 1));
+            values.add(new Pair<>(h.getX(), h.getY()));
         }
         if (h.getX() + 1 < this.size && this.map[h.getY()][h.getX() + 1].heat == -1) {
-            values.add(new Pair<>(h.getX() + 1, h.getY()));
+            values.add(new Pair<>(h.getX(), h.getY()));
         }
         if (h.getX() - 1 > 0 && this.map[h.getY()][h.getX() - 1].heat == -1) {
-            values.add(new Pair<>(h.getX() - 1, h.getY()));
+            values.add(new Pair<>(h.getX(), h.getY()));
         }
         return values;
     }

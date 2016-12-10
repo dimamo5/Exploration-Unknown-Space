@@ -11,6 +11,7 @@ import model.map.AgentModel;
 import model.map.ViewMap;
 import sajas.core.Agent;
 import sajas.core.behaviours.CyclicBehaviour;
+import sun.awt.windows.WEmbeddedFrame;
 import utilities.Utilities;
 
 import java.io.IOException;
@@ -84,8 +85,8 @@ public class Captain extends Human {
             public void action() {
                 tick++;
 
-                if (tick % 5 == 0) { //TODO destrolhar isto
-                    System.out.println(getAID() +" state: " + state);
+                if (tick % 2 == 0) { //TODO destrolhar isto
+                    System.out.println(getAID() + " state: " + state);
                     update();
                     //move_random();
                 }
@@ -114,16 +115,24 @@ public class Captain extends Human {
                     try {
                         if (state == WAITING_4_TEAM_RESPONSES && msg.getContentObject() instanceof ExplorationResponse) {
 
-                            wentExploringSoldiers.remove(msg.getSender());
+                            if (!wentExploringSoldiers.remove(msg.getSender()))
+                                System.out.println("------------DEU          PEIDO----------------");
+
                             getMyViewMap().addViewMap(((ExplorationResponse) msg.getContentObject()).getViewMap());
 
                             if (wentExploringSoldiers.size() == 0 && !captainMove) {
                                 System.out.println("CAPTAIN NOTIFY TEAM");
                                 notifyTeam(new InformTeam(getModel_link().getMyCoos(), getMyViewMap()));
                                 state = GIVING_ORDERS;
+                            } else {
+                                System.out.println("WENT_EXPLORING_NOT_EMPTY - SIZE " + wentExploringSoldiers.size() + " MOVING " + captainMove);
                             }
-                            //response from commWithOnRangeAgents
-                        } else if (msg.getContentObject() instanceof InformViewMap) {
+                        } else if (state == WAITING_4_TEAM_RESPONSES && !captainMove && wentExploringSoldiers.size() == 0) {
+                            notifyTeam(new InformTeam(getModel_link().getMyCoos(), getMyViewMap()));
+                            state = GIVING_ORDERS;
+                        }
+                        //response from commWithOnRangeAgents
+                        else if (msg.getContentObject() instanceof InformViewMap) {
                             myViewMap.addViewMap(((InformViewMap) msg.getContentObject()).getViewMap());
                         }
 
@@ -196,7 +205,6 @@ public class Captain extends Human {
                     }
 
                 } else {
-
                     for (int i = 0; i < teamSoldiers.size() && i < coosToExplore.size(); i++) {
                         sendOrderToExplore(coosToExplore, i, i);
                     }
@@ -212,8 +220,20 @@ public class Captain extends Human {
                         Pair<Integer, Integer> newPos = this.coosToExplore.pop();
                         updatePosition(newPos);
                         getMyViewMap().addViewRange(newPos, Model.getForest(), getVision_range());
+
+                        if (this.coosToExplore.size() == 0) {
+                            captainMove = false;
+                            if (wentExploringSoldiers.size() == 0) {
+                                notifyTeam(new InformTeam(getModel_link().getMyCoos(), getMyViewMap()));
+                                state = GIVING_ORDERS;
+                            }
+                        }
                     } else { //chegou ao novo destino
                         captainMove = false;
+                        if (wentExploringSoldiers.size() == 0) {
+                            notifyTeam(new InformTeam(getModel_link().getMyCoos(), getMyViewMap()));
+                            state = GIVING_ORDERS;
+                        }
                     }
                 }
 

@@ -59,9 +59,9 @@ public class Soldier extends Human {
             public void action() {
                 tick++;
 
-                if (tick % 5 == 0) { //TODO destrolhar isto
-                    update();
+                if (tick % 2 == 0) { //TODO destrolhar isto
                     System.out.println(getAID() +" state: " + state);
+                    update();
                 }
             }
 
@@ -152,7 +152,9 @@ public class Soldier extends Human {
             case EXPLORING:
                 commWithAgents(onRangeAgents);
 
+
                 if (coosToExplore.size() > 0) {
+                    System.out.println("-----------   COOS--     ");
                     Pair<Integer, Integer> newPos = coosToExplore.pop();
                     updatePosition(newPos);
                     getMyViewMap().addViewRange(newPos, Model.getForest(), getVision_range());

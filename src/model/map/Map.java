@@ -398,7 +398,7 @@ public class Map {
                 double dst = Math.sqrt((capitains.get(i - 1)[0] - capitain[0]) * (capitains.get(i - 1)[0] -
                         capitain[0]) + (capitains
                         .get(i - 1)[1] - capitain[1]) * (capitains.get(i - 1)[1] - capitain[1]));
-                if (dst < distance && distance > 0 && !capitains.contains(capitain) && capitain != capitains.get(i -
+                if (dst >= distance && distance > 0 && distance < this.getWidth() && !capitains.contains(capitain) && capitain != capitains.get(i -
                         1)) {
                     capitains.add(capitain);
                 }

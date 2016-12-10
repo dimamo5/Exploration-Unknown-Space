@@ -116,6 +116,7 @@ public class Captain extends Human {
                 } else if (msg.getPerformative() == Message.INFORM) {
                     try {
                         if (state == WAITING_4_TEAM_RESPONSES && msg.getContentObject() instanceof ExplorationResponse) {
+                            System.out.println("RECEIVED EXPLO_RESPONSE FROM > " + msg.getSender());
 
                             wentExploringSoldiers.remove(msg.getSender());
                             getMyViewMap().addViewMap(((ExplorationResponse) msg.getContentObject()).getViewMap());
@@ -123,13 +124,19 @@ public class Captain extends Human {
                             if (wentExploringSoldiers.size() == 0 && !captainMove) {
                                 System.out.println("CAPTAIN NOTIFY TEAM");
                                 notifyTeam(new InformTeam(getModel_link().getMyCoos(), getMyViewMap()));
-                                state = GIVING_ORDERS;
+                                if (at_map_exit)
+                                    state = AT_EXIT;
+                                else
+                                    state = GIVING_ORDERS;
                             } else {
                                 System.out.println("WENT_EXPLORING_NOT_EMPTY - SIZE " + wentExploringSoldiers.size() + " MOVING " + captainMove);
                             }
                         } else if (state == WAITING_4_TEAM_RESPONSES && !captainMove && wentExploringSoldiers.size() == 0) {
                             notifyTeam(new InformTeam(getModel_link().getMyCoos(), getMyViewMap()));
-                            state = GIVING_ORDERS;
+                            if (at_map_exit)
+                                state = AT_EXIT;
+                            else
+                                state = GIVING_ORDERS;
                         }
                         //response from commWithOnRangeAgents
                         else if (msg.getContentObject() instanceof InformViewMap) {
@@ -165,6 +172,10 @@ public class Captain extends Human {
                 break;
 
             case GIVING_ORDERS:
+                if (at_map_exit && wentExploringSoldiers.size() == 0) {
+                    state = AT_EXIT;
+                }
+
                 ArrayList<Pair<Integer, Integer>> coosToExplore;
 
                 if (found_map_exit) {
@@ -234,6 +245,7 @@ public class Captain extends Human {
                 break;
 
             case WAITING_4_TEAM_RESPONSES:
+                System.out.println("AT MAP EXIT >>> " + at_map_exit);
 
                 if (captainMove) {
                     if (this.coosToExplore.size() > 0) {
@@ -243,6 +255,9 @@ public class Captain extends Human {
 
                         if (this.coosToExplore.size() == 0) {
                             captainMove = false;
+
+                            if (found_map_exit)
+                                at_map_exit = true;
 
                             if (wentExploringSoldiers.size() == 0) {
                                 if (found_map_exit) {
@@ -256,6 +271,8 @@ public class Captain extends Human {
                         }
                     } else { //chegou ao novo destino
                         captainMove = false;
+                        if (found_map_exit)
+                            at_map_exit = true;
 
                         if (wentExploringSoldiers.size() == 0) {
                             if (found_map_exit) {

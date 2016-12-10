@@ -30,7 +30,7 @@ public class Utilities {
         return pos1.getKey().equals(pos2.getKey()) && pos1.getValue().equals(pos2.getValue());
     }
 
-    public static void main(String[] args) {
-        System.out.println(posEqual(new Pair<>(1, 1), new Pair<>(1, 1)));
+    public static void printArrayPair(ArrayList<Pair<Integer, Integer>> array) {
+        System.out.println(Arrays.toString(array.toArray()));
     }
 }

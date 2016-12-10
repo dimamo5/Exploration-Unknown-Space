@@ -10,7 +10,6 @@ import jade.wrapper.StaleProxyException;
 import javafx.util.Pair;
 import model.map.*;
 import sajas.core.Runtime;
-import sajas.sim.AgentScheduler;
 import sajas.sim.repast3.Repast3Launcher;
 import sajas.wrapper.ContainerController;
 import uchicago.src.sim.engine.Schedule;
@@ -136,11 +135,9 @@ public class Model extends Repast3Launcher {
         heat_map_display = new Object2DDisplay(heat_map_space);
 
         dsurf2.addDisplayableProbeable(heat_map_display, "ExplorerAgent View");
-        //addSimEventListener(dsurf2);
         dsurf2.setBackground(Color.LIGHT_GRAY);
-        dsurf2.setLocation(500, 70);
+        dsurf2.setLocation(800, 10);
         dsurf2.display();
-        //dsurf2.print();*/
 
         dsurf.addDisplayableProbeable(display, "ExplorerAgent Space");
         dsurf.setBackground(Color.LIGHT_GRAY);
@@ -287,11 +284,11 @@ public class Model extends Repast3Launcher {
             }
         }
 
-        for(ExplorerAgent ag : agents_list){
-            if(ag instanceof Captain){
+        for (ExplorerAgent ag : agents_list) {
+            if (ag instanceof Captain) {
                 ArrayList<Soldier> solds = ((Captain) ag).getTeamSoldiersObject();
 
-                for(Soldier sol : solds){
+                for (Soldier sol : solds) {
                     ArrayList<Soldier> team = new ArrayList<>(solds);
                     team.remove(sol);
                     sol.setTeamMembers(team);
@@ -341,7 +338,7 @@ public class Model extends Repast3Launcher {
         JScrollPane scroll = new JScrollPane(agentList);
         agentFrame.add(scroll);
         agentFrame.setSize(300, 350);
-        agentFrame.setLocation(500, 70);
+        agentFrame.setLocation(600, 10);
         agentFrame.setVisible(true);
         MouseListener mouseListener = new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {

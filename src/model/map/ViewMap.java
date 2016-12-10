@@ -280,6 +280,48 @@ public class ViewMap implements Serializable {
         return exitFound;
     }
 
+    public Pair<Integer, Integer> getRegroupSite(ArrayList<Pair<Integer, Integer>> possiblePos, Pair<Integer, Integer>
+            capPos) {
+        ArrayList<Double> prob = new ArrayList<Double>();
+        ArrayList<Integer> dist = new ArrayList<>();
+        for (Pair pos : possiblePos) {
+            prob.add(calcProbExit(pos));
+            dist.add(getPath(capPos, pos).size());
+        }
+
+        int closest = dist.indexOf(Collections.min(dist));
+        return possiblePos.get(closest);
+    }
+
+    private Double calcProbExit(Pair<Integer, Integer> pos) {
+        final int RADIO = 5;
+        int countWhite = 0, countBlack = 0;
+        for (int y = 0; y < RADIO && pos.getValue() - y > 0 && pos.getValue() + y < this.size; y++) {
+            for (int x = 0; x < RADIO && pos.getKey() - x > 0 && pos.getKey() + x < this.size; x++) {
+                if (this.map[pos.getValue() - y][pos.getKey() - x].heat == -1) {
+                    countWhite++;
+                } else {
+                    countBlack++;
+                }
+                if (this.map[pos.getValue() + y][pos.getKey() - x].heat == -1) {
+                    countWhite++;
+                } else {
+                    countBlack++;
+                }
+                if (this.map[pos.getValue() - y][pos.getKey() + x].heat == -1) {
+                    countWhite++;
+                } else {
+                    countBlack++;
+                }
+                if (this.map[pos.getValue() + y][pos.getKey() + x].heat == -1) {
+                    countWhite++;
+                } else {
+                    countBlack++;
+                }
+            }
+        }
+        return countWhite / (double) countBlack;
+    }
 
     public enum DIR {N, S, E, W}
 }

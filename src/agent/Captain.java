@@ -1,18 +1,13 @@
 package agent;
 
-import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.UnreadableException;
 import javafx.util.Pair;
 import message.*;
 import model.Model;
-import model.map.AgentModel;
-import model.map.ViewMap;
 import sajas.core.Agent;
 import sajas.core.behaviours.CyclicBehaviour;
-import sun.awt.windows.WEmbeddedFrame;
-import utilities.Utilities;
 
 import java.io.IOException;
 import java.util.*;
@@ -85,7 +80,7 @@ public class Captain extends Human {
             public void action() {
                 tick++;
 
-                if (tick % 2 == 0) { //TODO destrolhar isto
+                if (tick % 1 == 0) { //TODO destrolhar isto
                     System.out.println(getAID() + " state: " + state);
                     update();
                     //move_random();
@@ -111,13 +106,18 @@ public class Captain extends Human {
 
                 if (msg.getPerformative() == Message.REQUEST) {
                     sendMyInfoToAgent(msg);
+                } else if (msg.getPerformative() == Message.PROPAGATE) {
+                    try {
+                        exitCoords = ((PropagateExit) msg.getContentObject()).getPosition();
+                        found_map_exit = true;
+                    } catch (UnreadableException e) {
+                        e.printStackTrace();
+                    }
                 } else if (msg.getPerformative() == Message.INFORM) {
                     try {
                         if (state == WAITING_4_TEAM_RESPONSES && msg.getContentObject() instanceof ExplorationResponse) {
 
-                            if (!wentExploringSoldiers.remove(msg.getSender()))
-                                System.out.println("------------DEU          PEIDO----------------");
-
+                            wentExploringSoldiers.remove(msg.getSender());
                             getMyViewMap().addViewMap(((ExplorationResponse) msg.getContentObject()).getViewMap());
 
                             if (wentExploringSoldiers.size() == 0 && !captainMove) {
@@ -136,7 +136,6 @@ public class Captain extends Human {
                             myViewMap.addViewMap(((InformViewMap) msg.getContentObject()).getViewMap());
                         }
 
-
                     } catch (UnreadableException e) {
                         e.printStackTrace();
                     }
@@ -145,20 +144,6 @@ public class Captain extends Human {
         });
     }
 
-    private void notifyTeam(Message message) {
-        ACLMessage msg = new ACLMessage(Message.INFORM);
-
-        try {
-            msg.setContentObject(message);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        for (AID id : teamSoldiers) {
-            msg.addReceiver(id);
-        }
-        send(msg);
-    }
 
     private void update() {
 
@@ -180,17 +165,52 @@ public class Captain extends Human {
                 break;
 
             case GIVING_ORDERS:
+                ArrayList<Pair<Integer, Integer>> coosToExplore;
+
+                if (found_map_exit) {
+                    coosToExplore = myViewMap.getPath(getModel_link().getMyCoos(), exitCoords);
+                    pushToStack(coosToExplore);
+
+                    //notifica team members
+                    coosToExplore = new ArrayList<>();
+                    coosToExplore.add(exitCoords);
+                    for (int i = 0; i < teamSoldiers.size(); i++) {
+                        sendOrderToExplore(coosToExplore, i, 0, true);
+                    }
+
+                    captainMove = true;
+                    state = WAITING_4_TEAM_RESPONSES;
+                    break;
+                } else if (getMyViewMap().isExitFound()) {
+
+                    exitCoords = myViewMap.getExitCoords();
+                    coosToExplore = myViewMap.getPath(getModel_link().getMyCoos(), exitCoords);
+                    pushToStack(coosToExplore);
+
+                    //notifica outros capitaes
+                    notifyCaptains(new PropagateExit(exitCoords));
+
+                    //notifica team members
+                    coosToExplore = new ArrayList<>();
+                    coosToExplore.add(exitCoords);
+                    for (int i = 0; i < teamSoldiers.size(); i++) {
+                        sendOrderToExplore(coosToExplore, i, 0, true);
+                    }
+
+                    found_map_exit = true;
+                    captainMove = true;
+                    state = WAITING_4_TEAM_RESPONSES;
+                    break;
+                }
+
 
                 wentExploringSoldiers = new ArrayList<>();
 
-                ArrayList<Pair<Integer, Integer>> coosToExplore = myViewMap.coosToExplore(getModel_link().getMyCoos()
+                coosToExplore = myViewMap.coosToExplore(getModel_link().getMyCoos()
                         , getRadio_range());
 
                 if (coosToExplore.size() == 0) { //regroup on other area to explore
                     coosToExplore = new ArrayList<>();
-                    System.out.println("---------->>>>>>>>>>>>>>>>>>>>>>>>>>REGROUP");
-                    //coosToExplore.add(myViewMap.coosToExplore(getModel_link().getMyCoos(), 999).get(0));  //to remove after this being stable
-
                     ArrayList<Pair<Integer, Integer>> tempCoos = myViewMap.coosToExplore(getModel_link().getMyCoos(), 999);
 
                     //get best option
@@ -201,12 +221,12 @@ public class Captain extends Human {
                     captainMove = true;
 
                     for (int i = 0; i < teamSoldiers.size(); i++) {
-                        sendOrderToExplore(coosToExplore, i, 0);
+                        sendOrderToExplore(coosToExplore, i, 0, false);
                     }
 
                 } else {
                     for (int i = 0; i < teamSoldiers.size() && i < coosToExplore.size(); i++) {
-                        sendOrderToExplore(coosToExplore, i, i);
+                        sendOrderToExplore(coosToExplore, i, i, false);
                     }
                 }
 
@@ -223,17 +243,35 @@ public class Captain extends Human {
 
                         if (this.coosToExplore.size() == 0) {
                             captainMove = false;
+
                             if (wentExploringSoldiers.size() == 0) {
-                                notifyTeam(new InformTeam(getModel_link().getMyCoos(), getMyViewMap()));
-                                state = GIVING_ORDERS;
+                                if (found_map_exit) {
+                                    at_map_exit = true;
+                                    state = AT_EXIT;
+                                } else {
+                                    notifyTeam(new InformTeam(getModel_link().getMyCoos(), getMyViewMap()));
+                                    state = GIVING_ORDERS;
+                                }
                             }
                         }
                     } else { //chegou ao novo destino
                         captainMove = false;
+
                         if (wentExploringSoldiers.size() == 0) {
-                            notifyTeam(new InformTeam(getModel_link().getMyCoos(), getMyViewMap()));
-                            state = GIVING_ORDERS;
+                            if (found_map_exit) {
+                                at_map_exit = true;
+                                state = AT_EXIT;
+                                break;
+                            } else {
+                                notifyTeam(new InformTeam(getModel_link().getMyCoos(), getMyViewMap()));
+                                state = GIVING_ORDERS;
+                            }
                         }
+                    }
+                } else {
+                    if (wentExploringSoldiers.size() == 0) {
+                        notifyTeam(new InformTeam(getModel_link().getMyCoos(), getMyViewMap()));
+                        state = GIVING_ORDERS;
                     }
                 }
 
@@ -253,10 +291,9 @@ public class Captain extends Human {
         }
     }
 
-
-    private void sendOrderToExplore(ArrayList<Pair<Integer, Integer>> coosToExplore, int soldierIndex, int cooIndex) {
+    private void sendOrderToExplore(ArrayList<Pair<Integer, Integer>> coosToExplore, int soldierIndex, int cooIndex, boolean goToExit) {
         try {
-            OrderToExplore order = new OrderToExplore(coosToExplore.get(cooIndex));
+            OrderToExplore order = new OrderToExplore(coosToExplore.get(cooIndex), goToExit);
             ACLMessage msg = new ACLMessage(Message.REQUEST);
             msg.setContentObject(order);
             msg.addReceiver(teamSoldiers.get(soldierIndex));
@@ -265,6 +302,37 @@ public class Captain extends Human {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void notifyCaptains(Message message) {
+        ACLMessage msg = new ACLMessage(Message.PROPAGATE);
+
+        try {
+            msg.setContentObject(message);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        ArrayList<AID> captains = getAllCaptains();
+
+        for (AID id : captains) {
+            msg.addReceiver(id);
+        }
+        send(msg);
+    }
+
+    private void notifyTeam(Message message) {
+        ACLMessage msg = new ACLMessage(Message.INFORM);
+
+        try {
+            msg.setContentObject(message);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        for (AID id : teamSoldiers) {
+            msg.addReceiver(id);
+        }
+        send(msg);
     }
 
     public ArrayList<AID> getAllCaptains() {

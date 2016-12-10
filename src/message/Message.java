@@ -10,7 +10,7 @@ import java.io.Serializable;
  */
 public class Message implements Serializable{
 
-    public static final int INFORM = 7, REQUEST = 16;
+    public static final int INFORM = 7, REQUEST = 16, PROPAGATE = 21;
 
     private Pair<Integer,Integer> position ;
 

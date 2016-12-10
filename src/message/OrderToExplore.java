@@ -7,7 +7,18 @@ import javafx.util.Pair;
  */
 public class OrderToExplore extends Message {
 
-    public OrderToExplore(Pair<Integer, Integer> position) {
+    public boolean isGoToExit() {
+        return goToExit;
+    }
+
+    public void setGoToExit(boolean goToExit) {
+        this.goToExit = goToExit;
+    }
+
+    private boolean goToExit = false;
+
+    public OrderToExplore(Pair<Integer, Integer> position, boolean goToExit) {
         super(position);
+        this.goToExit = goToExit;
     }
 }

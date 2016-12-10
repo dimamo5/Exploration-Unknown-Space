@@ -39,6 +39,7 @@ public class Model extends Repast3Launcher {
     private static int NUM_CAP = 1;
     private static int NUM_SOL = 2;
     private static int NUM_ROBOT = 5;
+    private static int ROBOT_ENERGY = 20;
 
     public DisplaySurface dsurf;
     public DisplaySurface dsurf2;
@@ -52,9 +53,10 @@ public class Model extends Repast3Launcher {
 
     private ArrayList<Object> display_list;
     public static long tick = 0;
-    private int numCap = NUM_CAP;
-    private int numSol = NUM_SOL;
-    private int numRobot = NUM_ROBOT;
+    private int numCap = NUM_CAP,
+            numSol = NUM_SOL,
+            numRobot = NUM_ROBOT,
+            energyRobot = ROBOT_ENERGY;
 
     private ArrayList<ExplorerAgent> agents_list;
     private static Map forest;
@@ -73,7 +75,7 @@ public class Model extends Repast3Launcher {
 
     @Override
     public String[] getInitParam() {
-        return new String[]{"numCap", "numRobot", "numSol"};
+        return new String[]{"numCap", "numRobot", "numSol","energyRobot"};
     }
 
     @Override
@@ -232,7 +234,7 @@ public class Model extends Repast3Launcher {
         agents_list = new ArrayList<>();
 
         //Gerar Capitães
-        ArrayList<int[]> capitains = forest.createCapitainsPosition(numCap, 15);
+        ArrayList<int[]> capitains = forest.createCapitainsPosition(numCap, 25);
 
         for (int i = 0; i < capitains.size(); i++) {
             ArrayList<int[]> soldiers = forest.createSoldiersPosition(capitains.get(i), numSol, 5);
@@ -287,11 +289,11 @@ public class Model extends Repast3Launcher {
             }
         }
 
-        for(ExplorerAgent ag : agents_list){
-            if(ag instanceof Captain){
+        for (ExplorerAgent ag : agents_list) {
+            if (ag instanceof Captain) {
                 ArrayList<Soldier> solds = ((Captain) ag).getTeamSoldiersObject();
 
-                for(Soldier sol : solds){
+                for (Soldier sol : solds) {
                     ArrayList<Soldier> team = new ArrayList<>(solds);
                     team.remove(sol);
                     sol.setTeamMembers(team);
@@ -303,7 +305,7 @@ public class Model extends Repast3Launcher {
 
         //Gerar Robot
         for (int i = 0; i < robots.size(); i++) {
-            Robot robot = new Robot(5, 5);
+            Robot robot = new Robot(5, energyRobot);
 
             AgentModel agModel = new AgentModel(robots.get(i)[0],
                     robots.get(i)[1],

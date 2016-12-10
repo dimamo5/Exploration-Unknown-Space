@@ -24,7 +24,7 @@ public class Human extends ExplorerAgent {
     private int radio_range = DEFAULT_RADIO_RANGE;
 
     protected Map<AID,Long> communicatedRobots;
-    protected boolean foundExit = false;
+    protected Pair<Integer,Integer> exitCoords;
 
     public Human(int vision_range, int radio_range) {
         super(vision_range);

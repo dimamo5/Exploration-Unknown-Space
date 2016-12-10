@@ -1,5 +1,6 @@
 package agent;
 
+import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.UnreadableException;
@@ -12,9 +13,7 @@ import utilities.Utilities;
 import java.io.IOException;
 import java.util.*;
 
-import static agent.Human.agent_state.EXPLORATION_DONE;
-import static agent.Human.agent_state.EXPLORING;
-import static agent.Human.agent_state.WAITING_4_ORDERS;
+import static agent.Human.agent_state.*;
 
 /**
  * Created by sergi on 16/10/2016.
@@ -59,8 +58,8 @@ public class Soldier extends Human {
             public void action() {
                 tick++;
 
-                if (tick % 2 == 0) { //TODO destrolhar isto
-                    System.out.println(getAID() +" state: " + state);
+                if (tick % 1 == 0) { //TODO destrolhar isto
+                    System.out.println(getAID() + " state: " + state);
                     update();
                 }
             }
@@ -80,6 +79,9 @@ public class Soldier extends Human {
                 ACLMessage msg = myAgent.receive();
 
                 if (msg != null) {
+
+                    if(state == AT_EXIT)
+                        return;
 
                     if (msg.getPerformative() == Message.REQUEST || msg.getPerformative() == Message.INFORM) {
                         handleMsg(msg);
@@ -108,6 +110,12 @@ public class Soldier extends Human {
             state = EXPLORING;
             coosToExplore = new Stack<>();
 
+            if (((OrderToExplore) toParseMsg).isGoToExit()) {
+                System.out.println(">>>>>>>>>>>GO TO EXIT");
+                found_map_exit = true;
+                exitCoords = toParseMsg.getPosition();
+            }
+
             Pair<Integer, Integer> destiny = toParseMsg.getPosition();
             System.out.println(getAID() + "AT POS " + getModel_link().getMyCoos() + " RECEIVED ORDER TO MOVE TO: " + destiny);
 
@@ -135,38 +143,53 @@ public class Soldier extends Human {
 
         ArrayList<ExplorerAgent> onRangeAgents = getModel_link().getOnRadioRangeAgents(getRadio_range());
 
-        for(Soldier sol : teamMembers){
+        for (Soldier sol : teamMembers) {
             onRangeAgents.remove(sol);
         }
-
-        //
 
         onRangeAgents.removeIf(ag -> ag.getAID() == teamLeader || teamMembers.indexOf(ag) != -1 || ag.getAID() == this.getAID());
 
         switch (state) {
             case WAITING_4_ORDERS:
                 commWithAgents(onRangeAgents);
-
                 break;
 
             case EXPLORING:
                 commWithAgents(onRangeAgents);
 
-
                 if (coosToExplore.size() > 0) {
-                    System.out.println("-----------   COOS--     ");
                     Pair<Integer, Integer> newPos = coosToExplore.pop();
                     updatePosition(newPos);
                     getMyViewMap().addViewRange(newPos, Model.getForest(), getVision_range());
+                    if (coosToExplore.size() == 0) {
+                        state = EXPLORATION_DONE;
+                        if (found_map_exit) {
+                            state = AT_EXIT;
+                            at_map_exit = true;
+                            System.out.println("FOUND EXIT NOW NOTIFYING CAPTAIN");
+                        }
+                        notifyTeamLeader(new ExplorationResponse(getModel_link().getMyCoos(), getMyViewMap(), found_map_exit), Message.INFORM);
+                    }
 
                 } else {
                     state = EXPLORATION_DONE;
-                    notifyTeamLeader(new ExplorationResponse(getModel_link().getMyCoos(), getMyViewMap(), foundExit), Message.INFORM);
+                    if (found_map_exit) {
+                        state = AT_EXIT;
+                        at_map_exit = true;
+                        System.out.println("FOUND EXIT NOW NOTIFYING CAPTAIN");
+                    }
+                    notifyTeamLeader(new ExplorationResponse(getModel_link().getMyCoos(), getMyViewMap(), found_map_exit), Message.INFORM);
                 }
                 break;
 
             case EXPLORATION_DONE:
                 commWithAgents(onRangeAgents);
+                if(found_map_exit){
+                    System.out.println("SOLDIER>>>>>>>>>>>>>FOUND EXIT");
+                }
+                if (at_map_exit || (exitCoords != null && exitCoords.equals(getModel_link().getMyCoos()))) {
+                    state = AT_EXIT;
+                }
                 break;
 
             case AT_EXIT:

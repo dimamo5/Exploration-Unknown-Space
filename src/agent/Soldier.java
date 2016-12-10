@@ -24,6 +24,16 @@ public class Soldier extends Human {
     private agent_state state = WAITING_4_ORDERS;
     private Stack<Pair<Integer, Integer>> coosToExplore;
 
+    public ArrayList<Soldier> getTeamMembers() {
+        return teamMembers;
+    }
+
+    public void setTeamMembers(ArrayList<Soldier> teamMembers) {
+        this.teamMembers = teamMembers;
+    }
+
+    private ArrayList<Soldier> teamMembers;
+
     public AID getTeamLeader() {
         return teamLeader;
     }
@@ -36,6 +46,7 @@ public class Soldier extends Human {
 
     public Soldier(int vision_range, int radio_range) {
         super(vision_range, radio_range);
+        teamMembers = new ArrayList<>();
     }
 
 
@@ -48,9 +59,9 @@ public class Soldier extends Human {
             public void action() {
                 tick++;
 
-                if (tick % 10 == 0) { //TODO destrolhar isto
+                if (tick % 2 == 0) { //TODO destrolhar isto
+                    System.out.println(getAID() +" state: " + state);
                     update();
-                    System.out.println("SOLDIER state: " + state);
                 }
             }
 
@@ -106,9 +117,9 @@ public class Soldier extends Human {
 
                 System.out.println("MY COOS TO EXPLORE: " + coosToExplore.toString());
             }
-        } else if (toParseMsg instanceof RequestViewMap)        {
-           /* System.out.println(getAID() + ">> SENDING MY INFO >>" + msg.getSender());
-            sendMyInfoToAgent(msg); */
+        } else if (toParseMsg instanceof RequestViewMap) {
+            System.out.println(getAID() + ">> SENDING MY INFO >>" + msg.getSender());
+            sendMyInfoToAgent(msg);
         }
 
     }
@@ -123,18 +134,27 @@ public class Soldier extends Human {
     private void update() {
 
         ArrayList<ExplorerAgent> onRangeAgents = getModel_link().getOnRadioRangeAgents(getRadio_range());
-        ArrayList<AID> robotsOnRange = new ArrayList<>(), soldiersOnRange = new ArrayList<>();
+
+        for(Soldier sol : teamMembers){
+            onRangeAgents.remove(sol);
+        }
+
+        //
+
+        onRangeAgents.removeIf(ag -> ag.getAID() == teamLeader || teamMembers.indexOf(ag) != -1 || ag.getAID() == this.getAID());
 
         switch (state) {
             case WAITING_4_ORDERS:
-                //commWithAgents(onRangeAgents, robotsOnRange, soldiersOnRange);
+                commWithAgents(onRangeAgents);
 
                 break;
 
             case EXPLORING:
-                //commWithAgents(onRangeAgents, robotsOnRange, soldiersOnRange);
+                commWithAgents(onRangeAgents);
+
 
                 if (coosToExplore.size() > 0) {
+                    System.out.println("-----------   COOS--     ");
                     Pair<Integer, Integer> newPos = coosToExplore.pop();
                     updatePosition(newPos);
                     getMyViewMap().addViewRange(newPos, Model.getForest(), getVision_range());
@@ -146,7 +166,7 @@ public class Soldier extends Human {
                 break;
 
             case EXPLORATION_DONE:
-                //commWithAgents(onRangeAgents, robotsOnRange, soldiersOnRange);
+                commWithAgents(onRangeAgents);
                 break;
 
             case AT_EXIT:

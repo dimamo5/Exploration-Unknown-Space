@@ -10,6 +10,7 @@ import jade.wrapper.StaleProxyException;
 import javafx.util.Pair;
 import model.map.*;
 import sajas.core.Runtime;
+import sajas.sim.AgentScheduler;
 import sajas.sim.repast3.Repast3Launcher;
 import sajas.wrapper.ContainerController;
 import uchicago.src.sim.engine.Schedule;
@@ -286,6 +287,17 @@ public class Model extends Repast3Launcher {
             }
         }
 
+        for(ExplorerAgent ag : agents_list){
+            if(ag instanceof Captain){
+                ArrayList<Soldier> solds = ((Captain) ag).getTeamSoldiersObject();
+
+                for(Soldier sol : solds){
+                    ArrayList<Soldier> team = new ArrayList<>(solds);
+                    team.remove(sol);
+                    sol.setTeamMembers(team);
+                }
+            }
+        }
 
         ArrayList<int[]> robots = forest.createRobotsPosition(numRobot);
 

@@ -172,7 +172,7 @@ public class ViewMap implements Serializable {
                     //this.map[i][j].heat = map.getMap()[i][j].heat;
                     if (map.getMap()[i][j].heat == -2) {
                         this.map[i][j].addWallHeat();
-                    } else if (map.getMap()[i][j].heat > 0) {
+                    } else if (map.getMap()[i][j].heat > 0 || map.getMap()[i][j].heat == 0) {
                         this.map[i][j].addOtherHeat();
                     }
 

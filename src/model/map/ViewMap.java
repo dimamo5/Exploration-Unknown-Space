@@ -340,5 +340,26 @@ public class ViewMap implements Serializable {
         return countWhite / (double) countBlack;
     }
 
+    public ArrayList<Pair<Integer, Integer>> closestPoints(ArrayList<Pair<Integer, Integer>> agentsCoords,
+                                                           ArrayList<Pair<Integer, Integer>> possibleCoords) {
+        ArrayList<Pair<Integer, Integer>> pointsToAgent = new ArrayList<>();
+        for (int i = 0; i < agentsCoords.size() || possibleCoords.size() > 0; i++) {
+            Pair<Integer, Integer> agentCoord = possibleCoords.get(i);
+            Collections.sort(possibleCoords, (o1, o2) -> {
+                int dist1 = Utilities.distPos(agentCoord, o1);
+                int dist2 = Utilities.distPos(agentCoord, o2);
+                if (dist1 > dist2) {
+                    return 1;
+                } else if (dist1 == dist2) {
+                    return 0;
+                } else return -1;
+            });
+            pointsToAgent.add(possibleCoords.get(0));
+            possibleCoords.remove(0);
+        }
+        return pointsToAgent;
+    }
+
+
     public enum DIR {N, S, E, W}
 }

@@ -81,7 +81,7 @@ public class Captain extends Human {
                 tick++;
 
                 if (tick % 1 == 0) { //TODO destrolhar isto
-                    System.out.println(getAID() + " state: " + state);
+                    //System.out.println(getAID() + " state: " + state);
                     update();
                     //move_random();
                 }
@@ -116,20 +116,20 @@ public class Captain extends Human {
                 } else if (msg.getPerformative() == Message.INFORM) {
                     try {
                         if (state == WAITING_4_TEAM_RESPONSES && msg.getContentObject() instanceof ExplorationResponse) {
-                            System.out.println("RECEIVED EXPLO_RESPONSE FROM > " + msg.getSender());
+                            //System.out.println("RECEIVED EXPLO_RESPONSE FROM > " + msg.getSender());
 
                             wentExploringSoldiers.remove(msg.getSender());
                             getMyViewMap().addViewMap(((ExplorationResponse) msg.getContentObject()).getViewMap());
 
                             if (wentExploringSoldiers.size() == 0 && !captainMove) {
-                                System.out.println("CAPTAIN NOTIFY TEAM");
+                                //System.out.println("CAPTAIN NOTIFY TEAM");
                                 notifyTeam(new InformTeam(getModel_link().getMyCoos(), getMyViewMap()));
                                 if (at_map_exit)
                                     state = AT_EXIT;
                                 else
                                     state = GIVING_ORDERS;
                             } else {
-                                System.out.println("WENT_EXPLORING_NOT_EMPTY - SIZE " + wentExploringSoldiers.size() + " MOVING " + captainMove);
+                                //System.out.println("WENT_EXPLORING_NOT_EMPTY - SIZE " + wentExploringSoldiers.size() + " MOVING " + captainMove);
                             }
                         } else if (state == WAITING_4_TEAM_RESPONSES && !captainMove && wentExploringSoldiers.size() == 0) {
                             notifyTeam(new InformTeam(getModel_link().getMyCoos(), getMyViewMap()));
@@ -151,16 +151,7 @@ public class Captain extends Human {
         });
     }
 
-
     private void update() {
-
-        ArrayList<ExplorerAgent> onRangeAgents = getModel_link().getOnRadioRangeAgents(getRadio_range());
-
-        onRangeAgents.removeIf(ag -> teamSoldiers.indexOf(ag.getAID()) != -1 || ag.getAID() == this.getAID());
-
-        for (Soldier sol : teamSoldiersObject) {
-            onRangeAgents.remove(sol);
-        }
 
         switch (state) {
 
@@ -245,7 +236,7 @@ public class Captain extends Human {
                 break;
 
             case WAITING_4_TEAM_RESPONSES:
-                System.out.println("AT MAP EXIT >>> " + at_map_exit);
+                //System.out.println("AT MAP EXIT >>> " + at_map_exit);
 
                 if (captainMove) {
                     if (this.coosToExplore.size() > 0) {
@@ -291,13 +282,24 @@ public class Captain extends Human {
                         state = GIVING_ORDERS;
                     }
                 }
-
-                commWithAgents(onRangeAgents);
+                requestInfoFromAgents();
                 break;
 
             case AT_EXIT:
                 break;
         }
+    }
+
+    private void requestInfoFromAgents() {
+        ArrayList<ExplorerAgent> onRangeAgents = getModel_link().getOnRadioRangeAgents(getRadio_range());
+
+        onRangeAgents.removeIf(ag -> teamSoldiers.indexOf(ag.getAID()) != -1 || ag.getAID() == this.getAID());
+
+        for (Soldier sol : teamSoldiersObject) {
+            onRangeAgents.remove(sol);
+        }
+
+        commWithAgents(onRangeAgents);
     }
 
     private void pushToStack(ArrayList<Pair<Integer, Integer>> pathCoos) {
@@ -363,58 +365,4 @@ public class Captain extends Human {
 
         return captains;
     }
-
-
-    private void requestForInfo(AID aid) {
-        /*try {
-            ACLMessage msg = new ACLMessage(Message.REQUEST);
-
-            System.out.println("#" + getId()+ "  sending request");
-
-            msg.setContentObject(m);
-            msg.addReceiver(aid);
-
-            send(msg);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
-    }
-
-
-    private void sendMyInfoToAgent(ACLMessage msg) {
-
-        ACLMessage reply = msg.createReply();
-        reply.setPerformative(Message.INFORM);
-
-        try {
-            Pair<Integer, Integer> pos = new Pair<>(getModel_link().getX(), getModel_link().getY());
-            reply.setContentObject(new InformViewMap(pos, getMyViewMap()));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        send(reply);
-    }
-
-    //used on behaviour that informs every captain
-    //todo needs rework to only send the msg to captains  (simulating cellphone communication)
-    private void sendMyInfo() {
-
-        try {
-            ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-
-            msg.setContentObject("MyInfo");
-
-            for (ExplorerAgent agent : getModel_link().getAgents_list()) {
-                if (agent.getAID() != this.getAID()) {
-                    msg.addReceiver(agent.getAID());
-                }
-            }
-            send(msg);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-
 }

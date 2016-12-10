@@ -35,8 +35,8 @@ import java.util.ArrayList;
 public class Model extends Repast3Launcher {
 
     private static final boolean BATCH_MODE = true;
-    private static int NUM_CAP = 1;
-    private static int NUM_SOL = 2;
+    private static int NUM_CAP = 2;
+    private static int NUM_SOL = 4;
     private static int NUM_ROBOT = 5;
     private static int ROBOT_ENERGY = 20;
 

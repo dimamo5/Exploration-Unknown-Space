@@ -50,7 +50,7 @@ public class AgentModel extends MapElement {
             Pair<Integer, Integer> pos = new Pair<>(agent.getModel_link().getX(), agent.getModel_link().getY());
             Pair<Integer, Integer> currentpos = new Pair<>(this.getX(), this.getY());
             int range = Utilities.distPos(pos, currentpos);
-            if (this.type != agent_type.ROBOT && radio_range >= range) {
+            if (this.type != agent_type.ROBOT && radio_range >= range) { //robots cant request info
                 agentsInRange.add(agent);
             }
         }

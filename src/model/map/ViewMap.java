@@ -69,20 +69,18 @@ public class ViewMap implements Serializable {
         }
         if (h.heat < 0) {
             return null;
-        } else {
-            System.out.println("Tem de pintar1");
         }
         if (h.getY() - 1 > 0 && this.map[h.getY() - 1][h.getX()].heat == -1) {
-            values.add(new Pair<>(h.getX(), h.getY() - 1));
+            values.add(new Pair<>(h.getX(), h.getY()));
         }
         if (h.getY() + 1 < this.size && this.map[h.getY() + 1][h.getX()].heat == -1) {
-            values.add(new Pair<>(h.getX(), h.getY() + 1));
+            values.add(new Pair<>(h.getX(), h.getY()));
         }
         if (h.getX() + 1 < this.size && this.map[h.getY()][h.getX() + 1].heat == -1) {
-            values.add(new Pair<>(h.getX() + 1, h.getY()));
+            values.add(new Pair<>(h.getX(), h.getY()));
         }
         if (h.getX() - 1 > 0 && this.map[h.getY()][h.getX() - 1].heat == -1) {
-            values.add(new Pair<>(h.getX() - 1, h.getY()));
+            values.add(new Pair<>(h.getX(), h.getY()));
         }
         return values;
     }
@@ -169,7 +167,7 @@ public class ViewMap implements Serializable {
     public void addViewMap(ViewMap map) {
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
-                if (this.map[i][j].heat == 0 && map.getMap()[i][j].heat != 1 &&
+                if (this.map[i][j].heat == -1 &&
                         this.map[i][j].heat != map.getMap()[i][j].heat) {
                     this.map[i][j].heat = map.getMap()[i][j].heat;
                 }

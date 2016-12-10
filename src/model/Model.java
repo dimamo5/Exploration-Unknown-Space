@@ -236,7 +236,7 @@ public class Model extends Repast3Launcher {
         for (int i = 0; i < capitains.size(); i++) {
             ArrayList<int[]> soldiers = forest.createSoldiersPosition(capitains.get(i), numSol, 5);
 
-            Captain cap = new Captain(5, 5, 5);
+            Captain cap = new Captain(5, 5, 10);
 
             AgentModel agModel = new AgentModel(soldiers.get(0)[0],
                     soldiers.get(0)[1],
@@ -276,7 +276,7 @@ public class Model extends Repast3Launcher {
                 try {
                     agentContainer.acceptNewAgent("Soldier #" + (i * soldiers.size() + j), sol).start();
                     sol.setTeamLeader(cap.getAID());
-                    cap.addSoldierToTeam(sol.getAID());
+                    cap.addSoldierToTeam(sol);
                 } catch (StaleProxyException e) {
                     e.printStackTrace();
                 }

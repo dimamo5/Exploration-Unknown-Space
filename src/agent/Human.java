@@ -3,13 +3,16 @@ package agent;
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;
 import javafx.util.Pair;
+import message.InformViewMap;
 import message.Message;
 import message.RequestViewMap;
+import org.apache.velocity.runtime.parser.node.ASTElseIfStatement;
 import sajas.core.Agent;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import static utilities.Utilities.distPos;
@@ -23,13 +26,15 @@ public class Human extends ExplorerAgent {
 
     private int radio_range = DEFAULT_RADIO_RANGE;
 
-    protected Map<AID,Long> communicatedRobots;
-    protected Pair<Integer,Integer> exitCoords;
+    protected Map<AID, Long> communicatedRobots;
+    protected Pair<Integer, Integer> exitCoords;
+    protected HashMap<AID, Long> commsAgentsList;
 
     public Human(int vision_range, int radio_range) {
         super(vision_range);
         this.radio_range = radio_range;
         communicatedRobots = new HashMap<>();
+        commsAgentsList = new HashMap<>();
     }
 
     public int getRadio_range() {
@@ -43,15 +48,15 @@ public class Human extends ExplorerAgent {
     protected ArrayList<AID> checkRobotComms(ArrayList<AID> robotsOnRange) {
         ArrayList<AID> robotsToRequest = new ArrayList<>();
 
-        for(AID ag : robotsOnRange){
+        for (AID ag : robotsOnRange) {
 
-            if(!communicatedRobots.containsKey(ag)){
-                communicatedRobots.put(ag,tick);
+            if (!communicatedRobots.containsKey(ag)) {
+                communicatedRobots.put(ag, tick);
                 robotsToRequest.add(ag);
-            }else{
-                if(tick - communicatedRobots.get(ag) >= 200){
+            } else {
+                if (tick - communicatedRobots.get(ag) >= 200) {
                     robotsToRequest.add(ag);
-                    communicatedRobots.replace(ag,tick);
+                    communicatedRobots.replace(ag, tick);
                 }
             }
         }
@@ -60,8 +65,9 @@ public class Human extends ExplorerAgent {
 
     protected void commWithAgents(ArrayList<ExplorerAgent> onRangeAgents) {
 
-        ArrayList<AID> robotsOnRange = new ArrayList<>(), soldiersOnRange = new ArrayList<>();
+        ArrayList<AID> robotsOnRange = new ArrayList<>(), humansOnRange = new ArrayList<>();
         for (Agent agent : onRangeAgents) {
+
             if (agent instanceof Robot) {
                 Pair<Integer, Integer> robotCoos = ((Robot) agent).getModel_link().getMyCoos(),
                         humanCoos = getModel_link().getMyCoos();
@@ -70,21 +76,51 @@ public class Human extends ExplorerAgent {
                     robotsOnRange.add(agent.getAID());
                 }
 
-            } else if (agent instanceof Soldier) {
-                soldiersOnRange.add(agent.getAID());
+            } else {
+                humansOnRange.add(agent.getAID());
             }
         }
 
+
         ArrayList<AID> robotsToRequest = checkRobotComms(robotsOnRange);
 
-        //robots + soldiers
-        robotsToRequest.addAll(soldiersOnRange); //quitos trolha mas pronts
+        //robots + humans
+        robotsToRequest.addAll(humansOnRange); //quitos trolha mas pronts
 
-        //comms with robots+soldiers
+        Iterator<AID> iter = robotsToRequest.iterator();
+
+        while (iter.hasNext()) {
+            AID id = iter.next();
+
+            if (commsAgentsList.containsKey(id)) {
+                if ((tick - commsAgentsList.get(id)) > 20)
+                    commsAgentsList.replace(id, tick);
+                else
+                    iter.remove();
+            } else {
+                commsAgentsList.put(id, tick);
+            }
+        }
+
+        //comms with robots + humans
         if (robotsToRequest.size() > 0) {
-            System.out.println(getAID() + "  requested info from agent(s)");
+            //System.out.println(getAID() + "  requested info from agent(s)");
             requestAgentsForInfo(robotsToRequest);
         }
+    }
+
+    protected void sendMyInfoToAgent(ACLMessage msg) {
+
+        ACLMessage reply = msg.createReply();
+        reply.setPerformative(Message.INFORM);
+
+        try {
+            Pair<Integer, Integer> pos = new Pair<>(getModel_link().getX(), getModel_link().getY());
+            reply.setContentObject(new InformViewMap(pos, getMyViewMap()));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        send(reply);
     }
 
     protected enum agent_state {WAITING_4_ORDERS, INITIAL_COMM_WITH_CAPTAINS, WAITING_4_TEAM_RESPONSES, GIVING_ORDERS, EXPLORING, EXPLORATION_DONE, AT_EXIT}
@@ -105,7 +141,7 @@ public class Human extends ExplorerAgent {
         send(msg);
     }
 
-    boolean robotIsInCommRange(Pair<Integer, Integer> humanCoos, Pair<Integer, Integer> robotCoos){
+    boolean robotIsInCommRange(Pair<Integer, Integer> humanCoos, Pair<Integer, Integer> robotCoos) {
         return distPos(humanCoos, robotCoos) <= 1;
     }
 

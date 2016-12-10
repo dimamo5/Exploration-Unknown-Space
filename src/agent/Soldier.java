@@ -59,7 +59,7 @@ public class Soldier extends Human {
                 tick++;
 
                 if (tick % 1 == 0) { //TODO destrolhar isto
-                    System.out.println(getAID() + " state: " + state);
+                    //System.out.println(getAID() + " state: " + state);
                     update();
                 }
             }
@@ -102,7 +102,7 @@ public class Soldier extends Human {
         }
 
         if (toParseMsg instanceof InformTeam && state == EXPLORATION_DONE) {
-            System.out.println("RECEIVED INFORM TEAM");
+            //System.out.println("RECEIVED INFORM TEAM");
             myViewMap.addViewMap(((InformTeam) toParseMsg).getViewMap());
             state = WAITING_4_ORDERS;
 
@@ -111,22 +111,22 @@ public class Soldier extends Human {
             coosToExplore = new Stack<>();
 
             if (((OrderToExplore) toParseMsg).isGoToExit()) {
-                System.out.println(">>>>>>>>>>>GO TO EXIT");
+                //System.out.println(">>>>>>>>>>>GO TO EXIT");
                 found_map_exit = true;
                 exitCoords = toParseMsg.getPosition();
             }
 
             Pair<Integer, Integer> destiny = toParseMsg.getPosition();
-            System.out.println(getAID() + "AT POS " + getModel_link().getMyCoos() + " RECEIVED ORDER TO MOVE TO: " + destiny);
+            //System.out.println(getAID() + "AT POS " + getModel_link().getMyCoos() + " RECEIVED ORDER TO MOVE TO: " + destiny);
 
             if (Utilities.distPos(getModel_link().getMyCoos(), destiny) != 0) {
                 ArrayList<Pair<Integer, Integer>> pathCoos = myViewMap.getPath(getModel_link().getMyCoos(), destiny);
                 pushToStack(pathCoos);
 
-                System.out.println("MY COOS TO EXPLORE: " + coosToExplore.toString());
+               // System.out.println("MY COOS TO EXPLORE: " + coosToExplore.toString());
             }
         } else if (toParseMsg instanceof RequestViewMap) {
-            System.out.println(getAID() + ">> SENDING MY INFO >>" + msg.getSender());
+            //System.out.println(getAID() + ">> SENDING MY INFO >>" + msg.getSender());
             sendMyInfoToAgent(msg);
         }
 
@@ -166,7 +166,7 @@ public class Soldier extends Human {
                         if (found_map_exit) {
                             state = AT_EXIT;
                             at_map_exit = true;
-                            System.out.println("FOUND EXIT NOW NOTIFYING CAPTAIN");
+                            //System.out.println("FOUND EXIT NOW NOTIFYING CAPTAIN");
                         }
                         notifyTeamLeader(new ExplorationResponse(getModel_link().getMyCoos(), getMyViewMap(), found_map_exit), Message.INFORM);
                     }
@@ -176,7 +176,7 @@ public class Soldier extends Human {
                     if (found_map_exit) {
                         state = AT_EXIT;
                         at_map_exit = true;
-                        System.out.println("FOUND EXIT NOW NOTIFYING CAPTAIN");
+                        //System.out.println("FOUND EXIT NOW NOTIFYING CAPTAIN");
                     }
                     notifyTeamLeader(new ExplorationResponse(getModel_link().getMyCoos(), getMyViewMap(), found_map_exit), Message.INFORM);
                 }
@@ -185,7 +185,7 @@ public class Soldier extends Human {
             case EXPLORATION_DONE:
                 commWithAgents(onRangeAgents);
                 if(found_map_exit){
-                    System.out.println("SOLDIER>>>>>>>>>>>>>FOUND EXIT");
+                    //System.out.println("SOLDIER>>>>>>>>>>>>>FOUND EXIT");
                 }
                 if (at_map_exit || (exitCoords != null && exitCoords.equals(getModel_link().getMyCoos()))) {
                     state = AT_EXIT;
@@ -208,20 +208,4 @@ public class Soldier extends Human {
         send(msg);
     }
 
-
-    private void sendMyInfoToAgent(ACLMessage msg) {
-
-        ACLMessage reply = msg.createReply();
-        reply.setPerformative(Message.INFORM);
-
-        try {
-            Pair<Integer, Integer> pos = new Pair<>(getModel_link().getX(), getModel_link().getY());
-            InformViewMap inform = new InformViewMap(pos, getMyViewMap());
-            reply.setContentObject(inform);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        send(reply);
-    }
 }

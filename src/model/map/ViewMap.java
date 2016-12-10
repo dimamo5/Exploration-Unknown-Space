@@ -5,8 +5,7 @@ import model.Model;
 import utilities.Utilities;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.*;
 
 /**
  * Created by sergi on 05/12/2016.
@@ -54,7 +53,7 @@ public class ViewMap implements Serializable {
         ArrayList<Pair<Integer, Integer>> rip = new ArrayList<>();
         for (int y = 0; y < this.size; y++) {
             for (int x = 0; x < this.size; x++) {
-                ArrayList<Pair<Integer, Integer>> h = unexploredArea(this.map[y][x], pos, radioRange);
+                Set<Pair<Integer, Integer>> h = unexploredArea(this.map[y][x], pos, radioRange);
                 if (h != null) {
                     rip.addAll(h);
                 }
@@ -63,8 +62,8 @@ public class ViewMap implements Serializable {
         return rip;
     }
 
-    public ArrayList<Pair<Integer, Integer>> unexploredArea(HeatElement h, Pair pos, int radioRange) {
-        ArrayList<Pair<Integer, Integer>> values = new ArrayList<>();
+    public Set<Pair<Integer, Integer>> unexploredArea(HeatElement h, Pair pos, int radioRange) {
+        Set<Pair<Integer, Integer>> values = new HashSet<>();
         if (Utilities.distPos(pos, new Pair<>(h.getX(), h.getY())) > radioRange) {
             return null;
         }

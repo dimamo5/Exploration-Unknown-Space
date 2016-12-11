@@ -33,6 +33,16 @@ public class Robot extends ExplorerAgent {
 
     private ArrayList<AID> outOfEnergyCommAgents;
 
+    public int getRobotUpdTickPeriod() {
+        return robotUpdTickPeriod;
+    }
+
+    public void setRobotUpdTickPeriod(int robotUpdTickPeriod) {
+        this.robotUpdTickPeriod = robotUpdTickPeriod;
+    }
+
+    private int robotUpdTickPeriod = Model.ROBOT_UPD_TICK_PERIOD;
+
     public Robot(int vision_range, int energy) {
         super(vision_range);
         this.energy = energy;
@@ -59,7 +69,7 @@ public class Robot extends ExplorerAgent {
             public void action() {
                 tick++;
 
-                if (tick % Model.robotUpdTickPeriod == 0) { //TODO period nao estar hardcoded
+                if (tick % robotUpdTickPeriod == 0) { //TODO period nao estar hardcoded
                     update();
                 }
             }

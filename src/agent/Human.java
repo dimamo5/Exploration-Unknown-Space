@@ -6,6 +6,7 @@ import javafx.util.Pair;
 import message.InformViewMap;
 import message.Message;
 import message.RequestViewMap;
+import model.Model;
 import org.apache.velocity.runtime.parser.node.ASTElseIfStatement;
 import sajas.core.Agent;
 
@@ -29,6 +30,16 @@ public class Human extends ExplorerAgent {
     protected Map<AID, Long> communicatedRobots;
     protected Pair<Integer, Integer> exitCoords;
     protected HashMap<AID, Long> commsAgentsList;
+
+    public int getHumanUpdTickPeriod() {
+        return humanUpdTickPeriod;
+    }
+
+    public void setHumanUpdTickPeriod(int humanUpdTickPeriod) {
+        this.humanUpdTickPeriod = humanUpdTickPeriod;
+    }
+
+    protected int humanUpdTickPeriod = Model.HUMAN_UPD_TICK_PERIOD;
 
     public Human(int vision_range, int radio_range) {
         super(vision_range);

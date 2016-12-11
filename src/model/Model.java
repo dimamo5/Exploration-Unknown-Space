@@ -44,8 +44,8 @@ public class Model extends Repast3Launcher {
     private static final int VISION_RANGE_ROBOT = 10;
     private static final int VISION_RANGE = 5;
     private static final int MAP_SIZE = 15;
-    private static final int HUMAN_UPD_TICK_PERIOD = 1;
-    private static final int ROBOT_UPD_TICK_PERIOD = 5;
+    public static final int HUMAN_UPD_TICK_PERIOD = 1;
+    public static final int ROBOT_UPD_TICK_PERIOD = 5;
 
 
     public DisplaySurface dsurf;
@@ -70,25 +70,25 @@ public class Model extends Repast3Launcher {
     private int visionRange = VISION_RANGE;
     private int mapSize = MAP_SIZE;
     private boolean displayStatistics = false;
-    public static int humanUpdTickPeriod = HUMAN_UPD_TICK_PERIOD;
+    public int humanUpdTickPeriod = HUMAN_UPD_TICK_PERIOD;
 
-    public static int getHumanUpdTickPeriod() {
+    public  int getHumanUpdTickPeriod() {
         return humanUpdTickPeriod;
     }
 
-    public static void setHumanUpdTickPeriod(int humanUpdTickPeriod) {
-        Model.humanUpdTickPeriod = humanUpdTickPeriod;
+    public  void setHumanUpdTickPeriod(int humanUpdTickPeriod) {
+        this.humanUpdTickPeriod = humanUpdTickPeriod;
     }
 
-    public static int getRobotUpdTickPeriod() {
+    public int getRobotUpdTickPeriod() {
         return robotUpdTickPeriod;
     }
 
-    public static void setRobotUpdTickPeriod(int robotUpdTickPeriod) {
-        Model.robotUpdTickPeriod = robotUpdTickPeriod;
+    public void setRobotUpdTickPeriod(int robotUpdTickPeriod) {
+        this.robotUpdTickPeriod = robotUpdTickPeriod;
     }
 
-    public static int robotUpdTickPeriod = ROBOT_UPD_TICK_PERIOD;
+    public int robotUpdTickPeriod = ROBOT_UPD_TICK_PERIOD;
 
     private ArrayList<ExplorerAgent> agents_list;
     private static Map forest;
@@ -331,6 +331,7 @@ public class Model extends Repast3Launcher {
             cap.setMyViewMap(new ViewMap(Model.forest.getWidth()));
             cap.getMyViewMap().addViewRange(new Pair<>(agModel.getX(), agModel.getY()), Model.getForest(), cap
                     .getVision_range());
+            cap.setHumanUpdTickPeriod(this.humanUpdTickPeriod);
 
             try {
                 agentContainer.acceptNewAgent("Captain #" + i, cap).start();
@@ -354,6 +355,7 @@ public class Model extends Repast3Launcher {
                 sol.setMyViewMap(new ViewMap(Model.forest.getWidth()));
                 sol.getMyViewMap().addViewRange(new Pair<>(agModel.getX(), agModel.getY()), Model.getForest(), sol
                         .getVision_range());
+                sol.setHumanUpdTickPeriod(this.humanUpdTickPeriod);
 
                 try {
                     agentContainer.acceptNewAgent("Soldier #" + (i * soldiers.size() + j), sol).start();
@@ -396,6 +398,8 @@ public class Model extends Repast3Launcher {
             robot.setMyViewMap(new ViewMap(Model.forest.getWidth()));
             robot.getMyViewMap().addViewRange(new Pair<>(agModel.getX(), agModel.getY()), Model.getForest(), robot
                     .getVision_range());
+
+            robot.setRobotUpdTickPeriod(this.robotUpdTickPeriod);
 
             try {
                 agentContainer.acceptNewAgent("Robot #" + i, robot).start();

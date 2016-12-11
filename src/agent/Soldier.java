@@ -58,7 +58,7 @@ public class Soldier extends Human {
             public void action() {
                 tick++;
 
-                if (tick % Model.humanUpdTickPeriod == 0) { //TODO destrolhar isto
+                if (tick % humanUpdTickPeriod == 0) { //TODO destrolhar isto
                     //System.out.println(getAID() + " state: " + state);
                     update();
                 }

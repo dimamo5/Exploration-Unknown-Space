@@ -71,7 +71,7 @@ public class Map implements Serializable {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-
+        return null;
     }
 
     private static boolean between(int v, int upper) {
@@ -385,7 +385,8 @@ public class Map implements Serializable {
     }
 
 
-    public ArrayList<int[]> createSoldiersPosition(ArrayList<int[]> capitains, int[] capitainPosition, int numSoldiers, int viewRange, int distance) {
+    public ArrayList<int[]> createSoldiersPosition(ArrayList<int[]> capitains, int[] capitainPosition, int
+            numSoldiers, int viewRange, int distance) {
         ArrayList<int[]> soldiers = new ArrayList<>();
         int[] count = countSpaces(capitainPosition, this, numSoldiers);
         int sum = IntStream.of(count).sum();
@@ -393,7 +394,8 @@ public class Map implements Serializable {
 
         for (int i = 0; i < capitains.size(); i++) {
             double dst = Math.sqrt((capitains.get(i)[0] - capitainPosition[0]) * (capitains.get(i)[0] -
-                    capitainPosition[0]) + (capitains.get(i)[1] - capitainPosition[1]) * (capitains.get(i)[1] - capitainPosition[1]));
+                    capitainPosition[0]) + (capitains.get(i)[1] - capitainPosition[1]) * (capitains.get(i)[1] -
+                    capitainPosition[1]));
             if (!(dst >= distance && distance > 0 && dst < this.getWidth() && !capitains.contains(capitainPosition)
                     && capitainPosition != capitains.get(i))) {
                 valid = false;
@@ -451,9 +453,10 @@ public class Map implements Serializable {
                 double dst = Math.sqrt((capitains.get(i - 1)[0] - capitain[0]) * (capitains.get(i - 1)[0] -
                         capitain[0]) + (capitains
                         .get(i - 1)[1] - capitain[1]) * (capitains.get(i - 1)[1] - capitain[1]));
-                if (dst >= distance && distance > 0 && dst < this.getWidth() && !capitains.contains(capitain) && capitain != capitains
-                        .get(i -
-                                1)) {
+                if (dst >= distance && distance > 0 && dst < this.getWidth() && !capitains.contains(capitain) &&
+                        capitain != capitains
+                                .get(i -
+                                        1)) {
                     capitains.add(capitain);
                 }
             }

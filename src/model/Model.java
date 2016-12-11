@@ -74,7 +74,7 @@ public class Model extends Repast3Launcher {
 
     @Override
     public String[] getInitParam() {
-        return new String[]{"numCap", "numRobot", "numSol","energyRobot"};
+        return new String[]{"numCap", "numRobot", "numSol", "energyRobot"};
     }
 
     @Override

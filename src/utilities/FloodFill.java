@@ -14,7 +14,7 @@ import static java.lang.Thread.sleep;
 public class FloodFill {
     private ArrayList<Pair<Integer, Integer>> coords = new ArrayList<Pair<Integer, Integer>>();
 
-    private ArrayList<Pair<Integer, Integer>> flood(Map map, boolean[][] mark,
+    ArrayList<Pair<Integer, Integer>> flood(Map map, boolean[][] mark,
                                                            int row, int col, int empty) {
 
         // make sure row and col are inside the image

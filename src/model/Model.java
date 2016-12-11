@@ -39,7 +39,13 @@ public class Model extends Repast3Launcher {
     private static int NUM_CAP = 2;
     private static int NUM_SOL = 4;
     private static int NUM_ROBOT = 5;
-    private static int ROBOT_ENERGY = 20;
+    private static int ROBOT_ENERGY = 10;
+
+    private static int RADIO_RANGE = 5;
+    private static int VISION_RANGE_ROBOT = 10;
+    private static int VISION_RANGE = 5;
+    private static int MAP_SIZE = 20;
+
 
     public DisplaySurface dsurf;
     public DisplaySurface dsurf2;
@@ -58,11 +64,10 @@ public class Model extends Repast3Launcher {
     private int numRobot = NUM_ROBOT;
     private int energyRobot = ROBOT_ENERGY;
 
-    private int radioRange = 5;
-    private int cellPhoneRange = 10;
-    private int visionRangeRobot = 10;
-    private int visionRange = 5;
-    private int mapSize = 20;
+    private int radioRange = RADIO_RANGE;
+    private int visionRangeRobot = VISION_RANGE_ROBOT;
+    private int visionRange = VISION_RANGE;
+    private int mapSize = MAP_SIZE;
     private boolean displayStatistics = false;
 
     private ArrayList<ExplorerAgent> agents_list;
@@ -74,7 +79,7 @@ public class Model extends Repast3Launcher {
 
     @Override
     public String[] getInitParam() {
-        return new String[]{"numCap", "numRobot", "numSol","energyRobot", "radioRange", "visionRange", "visionRangeRobot", "cellPhoneRange", "mapSize", "displayStatistics"};
+        return new String[]{"numCap", "numRobot", "numSol","energyRobot", "radioRange", "visionRange", "visionRangeRobot", "mapSize", "displayStatistics"};
     }
 
     @Override
@@ -240,14 +245,6 @@ public class Model extends Repast3Launcher {
         this.radioRange = radioRange;
     }
 
-    public int getCellPhoneRange() {
-        return cellPhoneRange;
-    }
-
-    public void setCellPhoneRange(int cellPhoneRange) {
-        this.cellPhoneRange = cellPhoneRange;
-    }
-
     public int getVisionRangeRobot() {
         return visionRangeRobot;
     }
@@ -300,7 +297,7 @@ public class Model extends Repast3Launcher {
         for (int i = 0; i < capitains.size(); i++) {
             ArrayList<int[]> soldiers = forest.createSoldiersPosition(capitains, capitains.get(i), numSol, visionRange, mapSize/numCap);
 
-            Captain cap = new Captain(visionRange, radioRange, cellPhoneRange);
+            Captain cap = new Captain(visionRange, radioRange, 10);
 
             AgentModel agModel = new AgentModel(soldiers.get(0)[0],
                     soldiers.get(0)[1],

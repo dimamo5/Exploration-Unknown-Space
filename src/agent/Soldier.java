@@ -58,7 +58,7 @@ public class Soldier extends Human {
             public void action() {
                 tick++;
 
-                if (tick % 1 == 0) { //TODO destrolhar isto
+                if (tick % 10 == 0) { //TODO destrolhar isto
                     //System.out.println(getAID() + " state: " + state);
                     update();
                 }
@@ -80,7 +80,7 @@ public class Soldier extends Human {
 
                 if (msg != null) {
 
-                    if(state == AT_EXIT)
+                    if (state == AT_EXIT)
                         return;
 
                     if (msg.getPerformative() == Message.REQUEST || msg.getPerformative() == Message.INFORM) {
@@ -101,17 +101,42 @@ public class Soldier extends Human {
             e.printStackTrace();
         }
 
+        if(toParseMsg instanceof OrderToExplore && (((OrderToExplore) toParseMsg).isGoToExit())){
+            System.out.println(getAID() + "state: " + state + "  RECEIVED ORDER WHILE EXPLORING");
+        }
+
         if (toParseMsg instanceof InformTeam && state == EXPLORATION_DONE) {
             //System.out.println("RECEIVED INFORM TEAM");
             myViewMap.addViewMap(((InformTeam) toParseMsg).getViewMap());
             state = WAITING_4_ORDERS;
+
+        } else if (toParseMsg instanceof OrderToExplore && (state == EXPLORING || state == EXPLORATION_DONE)) {
+            state = EXPLORING;
+            System.out.println(getAID() + "  RECEIVED ORDER WHILE EXPLORING");
+
+            coosToExplore = new Stack<>();
+
+            if (((OrderToExplore) toParseMsg).isGoToExit()) {
+                System.out.println(msg.getSender() + "  >>>>>>>>>>>GO TO EXIT  >>" + getAID());
+                found_map_exit = true;
+                exitCoords = toParseMsg.getPosition();
+            }
+
+            Pair<Integer, Integer> destiny = toParseMsg.getPosition();
+            //System.out.println(getAID() + "AT POS " + getModel_link().getMyCoos() + " RECEIVED ORDER TO MOVE TO: " + destiny);
+
+            if (Utilities.distPos(getModel_link().getMyCoos(), destiny) != 0) {
+                ArrayList<Pair<Integer, Integer>> pathCoos = myViewMap.getPath(getModel_link().getMyCoos(), destiny);
+                pushToStack(pathCoos);
+            }
+            System.out.println("MY COOS TO EXPLORE: " + coosToExplore.toString());
 
         } else if (toParseMsg instanceof OrderToExplore && state == WAITING_4_ORDERS) {
             state = EXPLORING;
             coosToExplore = new Stack<>();
 
             if (((OrderToExplore) toParseMsg).isGoToExit()) {
-                //System.out.println(">>>>>>>>>>>GO TO EXIT");
+                System.out.println(msg.getSender() + "  >>>>>>>>>>>GO TO EXIT  >>" + getAID());
                 found_map_exit = true;
                 exitCoords = toParseMsg.getPosition();
             }
@@ -123,14 +148,14 @@ public class Soldier extends Human {
                 ArrayList<Pair<Integer, Integer>> pathCoos = myViewMap.getPath(getModel_link().getMyCoos(), destiny);
                 pushToStack(pathCoos);
 
-               // System.out.println("MY COOS TO EXPLORE: " + coosToExplore.toString());
+                // System.out.println("MY COOS TO EXPLORE: " + coosToExplore.toString());
             }
         } else if (toParseMsg instanceof RequestViewMap) {
             //System.out.println(getAID() + ">> SENDING MY INFO >>" + msg.getSender());
             sendMyInfoToAgent(msg);
         }
-
     }
+
 
     private void pushToStack(ArrayList<Pair<Integer, Integer>> pathCoos) {
         //Collections.reverse(pathCoos);
@@ -157,12 +182,16 @@ public class Soldier extends Human {
             case EXPLORING:
                 commWithAgents(onRangeAgents);
 
+                if (exitCoords != null & !found_map_exit)
+                    found_map_exit = true;
+
                 if (coosToExplore.size() > 0) {
                     Pair<Integer, Integer> newPos = coosToExplore.pop();
                     updatePosition(newPos);
                     getMyViewMap().addViewRange(newPos, Model.getForest(), getVision_range());
-                    if (coosToExplore.size() == 0) {
+                    if (coosToExplore.size() == 0 || (exitCoords != null && newPos == exitCoords)) {
                         state = EXPLORATION_DONE;
+
                         if (found_map_exit) {
                             state = AT_EXIT;
                             at_map_exit = true;
@@ -170,7 +199,6 @@ public class Soldier extends Human {
                         }
                         notifyTeamLeader(new ExplorationResponse(getModel_link().getMyCoos(), getMyViewMap(), found_map_exit), Message.INFORM);
                     }
-
                 } else {
                     state = EXPLORATION_DONE;
                     if (found_map_exit) {
@@ -184,7 +212,7 @@ public class Soldier extends Human {
 
             case EXPLORATION_DONE:
                 commWithAgents(onRangeAgents);
-                if(found_map_exit){
+                if (found_map_exit) {
                     //System.out.println("SOLDIER>>>>>>>>>>>>>FOUND EXIT");
                 }
                 if (at_map_exit || (exitCoords != null && exitCoords.equals(getModel_link().getMyCoos()))) {

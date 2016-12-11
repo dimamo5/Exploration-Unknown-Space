@@ -12,7 +12,6 @@ import model.map.*;
 import sajas.core.Runtime;
 import sajas.sim.repast3.Repast3Launcher;
 import sajas.wrapper.ContainerController;
-import uchicago.src.reflector.BooleanPropertyDescriptor;
 import uchicago.src.sim.engine.Schedule;
 import uchicago.src.sim.engine.SimInit;
 import uchicago.src.sim.gui.DisplaySurface;
@@ -36,8 +35,8 @@ import java.util.ArrayList;
 public class Model extends Repast3Launcher {
 
     private static final boolean BATCH_MODE = true;
-    private static int NUM_CAP = 2;
-    private static int NUM_SOL = 4;
+    private static int NUM_CAP = 3;
+    private static int NUM_SOL = 1;
     private static int NUM_ROBOT = 5;
     private static int ROBOT_ENERGY = 10;
 
@@ -95,7 +94,7 @@ public class Model extends Repast3Launcher {
         display_list = new ArrayList<>();
 
         forest = new Map(mapSize, mapSize);
-
+        //forest = Map.loadMap();
         forest.print(); //prints globalMap on console
 
         //Map model
@@ -245,6 +244,14 @@ public class Model extends Repast3Launcher {
         this.radioRange = radioRange;
     }
 
+    public int getCellPhoneRange() {
+        return cellPhoneRange;
+    }
+
+    public void setCellPhoneRange(int cellPhoneRange) {
+        this.cellPhoneRange = cellPhoneRange;
+    }
+
     public int getVisionRangeRobot() {
         return visionRangeRobot;
     }
@@ -292,10 +299,11 @@ public class Model extends Repast3Launcher {
         agents_list = new ArrayList<>();
 
         //Gerar Capitães
-        ArrayList<int[]> capitains = forest.createCapitainsPosition(numCap, mapSize/numCap);
+        ArrayList<int[]> capitains = forest.createCapitainsPosition(numCap, mapSize / numCap);
 
         for (int i = 0; i < capitains.size(); i++) {
-            ArrayList<int[]> soldiers = forest.createSoldiersPosition(capitains, capitains.get(i), numSol, visionRange, mapSize/numCap);
+            ArrayList<int[]> soldiers = forest.createSoldiersPosition(capitains, capitains.get(i), numSol,
+                    visionRange, mapSize / numCap);
 
             Captain cap = new Captain(visionRange, radioRange, 10);
 

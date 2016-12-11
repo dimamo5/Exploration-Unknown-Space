@@ -23,6 +23,8 @@ public class Captain extends Human {
 
     private agent_state state = INITIAL_COMM_WITH_CAPTAINS;
     private ArrayList<AID> teamSoldiers, wentExploringSoldiers;
+    protected boolean exitNotified = false;
+    protected boolean notifiedExitTeamMembers = false;
 
     public ArrayList<Soldier> getTeamSoldiersObject() {
         return teamSoldiersObject;
@@ -80,8 +82,8 @@ public class Captain extends Human {
             public void action() {
                 tick++;
 
-                if (tick % 1 == 0) { //TODO destrolhar isto
-                    //System.out.println(getAID() + " state: " + state);
+                if (tick % 10 == 0) { //TODO destrolhar isto
+                   // System.out.println(getAID() + " state: " + state);
                     update();
                     //move_random();
                 }
@@ -108,8 +110,18 @@ public class Captain extends Human {
                     sendMyInfoToAgent(msg);
                 } else if (msg.getPerformative() == Message.PROPAGATE) {
                     try {
+                        System.out.println(getAID() +"STATE :>" +state +"  RECEIVED EXIT INFORMATION");
                         exitCoords = ((PropagateExit) msg.getContentObject()).getPosition();
+                        myViewMap.addViewMap(((PropagateExit) msg.getContentObject()).getvMap());
+
+                        notifiedExitTeamMembers = false;
                         found_map_exit = true;
+                        exitNotified = true;
+
+                        //todo foi isto que adicionei
+                        /*wentExploringSoldiers.clear();
+                        state = GIVING_ORDERS;*/
+
                     } catch (UnreadableException e) {
                         e.printStackTrace();
                     }
@@ -169,6 +181,9 @@ public class Captain extends Human {
 
                 ArrayList<Pair<Integer, Integer>> coosToExplore;
 
+                if(found_map_exit && !notifiedExitTeamMembers)
+                    System.out.println(getAID() + "need to notify team members");
+
                 if (found_map_exit) {
                     coosToExplore = myViewMap.getPath(getModel_link().getMyCoos(), exitCoords);
                     pushToStack(coosToExplore);
@@ -180,6 +195,10 @@ public class Captain extends Human {
                         sendOrderToExplore(coosToExplore, i, 0, true);
                     }
 
+                    if(!exitNotified) {
+                        notifyCaptains(new PropagateExit(exitCoords, myViewMap));
+                    }
+                    notifiedExitTeamMembers = true;
                     captainMove = true;
                     state = WAITING_4_TEAM_RESPONSES;
                     break;
@@ -190,7 +209,7 @@ public class Captain extends Human {
                     pushToStack(coosToExplore);
 
                     //notifica outros capitaes
-                    notifyCaptains(new PropagateExit(exitCoords));
+                    notifyCaptains(new PropagateExit(exitCoords, myViewMap));
 
                     //notifica team members
                     coosToExplore = new ArrayList<>();
@@ -199,6 +218,7 @@ public class Captain extends Human {
                         sendOrderToExplore(coosToExplore, i, 0, true);
                     }
 
+                    notifiedExitTeamMembers = true;
                     found_map_exit = true;
                     captainMove = true;
                     state = WAITING_4_TEAM_RESPONSES;
@@ -210,6 +230,7 @@ public class Captain extends Human {
 
                 coosToExplore = myViewMap.coosToExplore(getModel_link().getMyCoos()
                         , getRadio_range());
+
 
                 if (coosToExplore.size() == 0) { //regroup on other area to explore
                     coosToExplore = new ArrayList<>();
@@ -227,6 +248,18 @@ public class Captain extends Human {
                     }
 
                 } else {
+                    /*ArrayList<Pair<Integer,Integer>> soldCoos = new ArrayList<>();
+
+                    for(Soldier sold : teamSoldiersObject){
+                        soldCoos.add(sold.getModel_link().getMyCoos());
+                    }
+
+                    ArrayList<Pair<Integer,Integer>> assignCoos = myViewMap.closestPoints(soldCoos,coosToExplore);
+
+                    for (int i = 0; i < assignCoos.size() ; i++) {
+                        sendOrderToExplore(assignCoos, i, i, false);
+                    }*/
+
                     for (int i = 0; i < teamSoldiers.size() && i < coosToExplore.size(); i++) {
                         sendOrderToExplore(coosToExplore, i, i, false);
                     }
@@ -237,6 +270,11 @@ public class Captain extends Human {
 
             case WAITING_4_TEAM_RESPONSES:
                 //System.out.println("AT MAP EXIT >>> " + at_map_exit);
+
+                if(found_map_exit && !notifiedExitTeamMembers){
+                    state = GIVING_ORDERS;
+                    break;
+                }
 
                 if (captainMove) {
                     if (this.coosToExplore.size() > 0) {
@@ -317,6 +355,11 @@ public class Captain extends Human {
             msg.setContentObject(order);
             msg.addReceiver(teamSoldiers.get(soldierIndex));
             send(msg);
+
+            if(found_map_exit){
+                System.out.println(getAID() + "  SENT ORDER TO GO EXIT TO >> " + teamSoldiers.get(soldierIndex));
+            }
+
             wentExploringSoldiers.add(teamSoldiers.get(soldierIndex));
         } catch (IOException e) {
             e.printStackTrace();
@@ -334,7 +377,10 @@ public class Captain extends Human {
         ArrayList<AID> captains = getAllCaptains();
 
         for (AID id : captains) {
-            msg.addReceiver(id);
+            if (id != this.getAID()) {
+                msg.addReceiver(id);
+                System.out.println(getAID() + " SENDING EXIT INFORM TO " + id);
+            }
         }
         send(msg);
     }

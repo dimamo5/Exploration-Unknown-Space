@@ -59,7 +59,7 @@ public class Robot extends ExplorerAgent {
             public void action() {
                 tick++;
 
-                if (tick % 10 == 0) { //TODO period nao estar hardcoded
+                if (tick % Model.robotUpdTickPeriod == 0) { //TODO period nao estar hardcoded
                     update();
                 }
             }

@@ -35,15 +35,17 @@ import java.util.ArrayList;
 public class Model extends Repast3Launcher {
 
     private static final boolean BATCH_MODE = true;
-    private static int NUM_CAP = 3;
-    private static int NUM_SOL = 1;
-    private static int NUM_ROBOT = 5;
-    private static int ROBOT_ENERGY = 10;
+    private static final int NUM_CAP = 5;
+    private static final int NUM_SOL = 2;
+    private static final int NUM_ROBOT = 5;
+    private static final int ROBOT_ENERGY = 20;
 
-    private static int RADIO_RANGE = 5;
-    private static int VISION_RANGE_ROBOT = 10;
-    private static int VISION_RANGE = 5;
-    private static int MAP_SIZE = 20;
+    private static final int RADIO_RANGE = 5;
+    private static final int VISION_RANGE_ROBOT = 10;
+    private static final int VISION_RANGE = 5;
+    private static final int MAP_SIZE = 15;
+    private static final int HUMAN_UPD_TICK_PERIOD = 1;
+    private static final int ROBOT_UPD_TICK_PERIOD = 5;
 
 
     public DisplaySurface dsurf;
@@ -68,6 +70,25 @@ public class Model extends Repast3Launcher {
     private int visionRange = VISION_RANGE;
     private int mapSize = MAP_SIZE;
     private boolean displayStatistics = false;
+    public static int humanUpdTickPeriod = HUMAN_UPD_TICK_PERIOD;
+
+    public static int getHumanUpdTickPeriod() {
+        return humanUpdTickPeriod;
+    }
+
+    public static void setHumanUpdTickPeriod(int humanUpdTickPeriod) {
+        Model.humanUpdTickPeriod = humanUpdTickPeriod;
+    }
+
+    public static int getRobotUpdTickPeriod() {
+        return robotUpdTickPeriod;
+    }
+
+    public static void setRobotUpdTickPeriod(int robotUpdTickPeriod) {
+        Model.robotUpdTickPeriod = robotUpdTickPeriod;
+    }
+
+    public static int robotUpdTickPeriod = ROBOT_UPD_TICK_PERIOD;
 
     private ArrayList<ExplorerAgent> agents_list;
     private static Map forest;
@@ -78,7 +99,7 @@ public class Model extends Repast3Launcher {
 
     @Override
     public String[] getInitParam() {
-        return new String[]{"numCap", "numRobot", "numSol","energyRobot", "radioRange", "visionRange", "visionRangeRobot", "mapSize", "displayStatistics"};
+        return new String[]{"numCap", "numRobot", "numSol","energyRobot", "radioRange", "visionRange", "visionRangeRobot", "mapSize", "displayStatistics", "humanUpdTickPeriod", "robotUpdTickPeriod"};
     }
 
     @Override

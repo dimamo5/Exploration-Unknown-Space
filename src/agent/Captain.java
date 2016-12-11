@@ -82,7 +82,7 @@ public class Captain extends Human {
             public void action() {
                 tick++;
 
-                if (tick % 10 == 0) { //TODO destrolhar isto
+                if (tick % Model.humanUpdTickPeriod == 0) { //TODO destrolhar isto
                    // System.out.println(getAID() + " state: " + state);
                     update();
                     //move_random();
@@ -110,7 +110,7 @@ public class Captain extends Human {
                     sendMyInfoToAgent(msg);
                 } else if (msg.getPerformative() == Message.PROPAGATE) {
                     try {
-                        System.out.println(getAID() +"STATE :>" +state +"  RECEIVED EXIT INFORMATION");
+                        //System.out.println(getAID() +"STATE :>" +state +"  RECEIVED EXIT INFORMATION");
                         exitCoords = ((PropagateExit) msg.getContentObject()).getPosition();
                         myViewMap.addViewMap(((PropagateExit) msg.getContentObject()).getvMap());
 
@@ -181,8 +181,9 @@ public class Captain extends Human {
 
                 ArrayList<Pair<Integer, Integer>> coosToExplore;
 
-                if(found_map_exit && !notifiedExitTeamMembers)
-                    System.out.println(getAID() + "need to notify team members");
+                //if(found_map_exit && !notifiedExitTeamMembers)
+                    //System.out.println(getAID() + "need to notify team members");
+
 
                 if (found_map_exit) {
                     coosToExplore = myViewMap.getPath(getModel_link().getMyCoos(), exitCoords);
@@ -357,7 +358,7 @@ public class Captain extends Human {
             send(msg);
 
             if(found_map_exit){
-                System.out.println(getAID() + "  SENT ORDER TO GO EXIT TO >> " + teamSoldiers.get(soldierIndex));
+                //System.out.println(getAID() + "  SENT ORDER TO GO EXIT TO >> " + teamSoldiers.get(soldierIndex));
             }
 
             wentExploringSoldiers.add(teamSoldiers.get(soldierIndex));
@@ -379,7 +380,7 @@ public class Captain extends Human {
         for (AID id : captains) {
             if (id != this.getAID()) {
                 msg.addReceiver(id);
-                System.out.println(getAID() + " SENDING EXIT INFORM TO " + id);
+                //System.out.println(getAID() + " SENDING EXIT INFORM TO " + id);
             }
         }
         send(msg);

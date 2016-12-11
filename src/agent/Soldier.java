@@ -58,7 +58,7 @@ public class Soldier extends Human {
             public void action() {
                 tick++;
 
-                if (tick % 10 == 0) { //TODO destrolhar isto
+                if (tick % Model.humanUpdTickPeriod == 0) { //TODO destrolhar isto
                     //System.out.println(getAID() + " state: " + state);
                     update();
                 }
@@ -102,7 +102,7 @@ public class Soldier extends Human {
         }
 
         if(toParseMsg instanceof OrderToExplore && (((OrderToExplore) toParseMsg).isGoToExit())){
-            System.out.println(getAID() + "state: " + state + "  RECEIVED ORDER WHILE EXPLORING");
+            //System.out.println(getAID() + "state: " + state + "  RECEIVED ORDER WHILE EXPLORING");
         }
 
         if (toParseMsg instanceof InformTeam && state == EXPLORATION_DONE) {
@@ -112,12 +112,12 @@ public class Soldier extends Human {
 
         } else if (toParseMsg instanceof OrderToExplore && (state == EXPLORING || state == EXPLORATION_DONE)) {
             state = EXPLORING;
-            System.out.println(getAID() + "  RECEIVED ORDER WHILE EXPLORING");
+            //System.out.println(getAID() + "  RECEIVED ORDER WHILE EXPLORING");
 
             coosToExplore = new Stack<>();
 
             if (((OrderToExplore) toParseMsg).isGoToExit()) {
-                System.out.println(msg.getSender() + "  >>>>>>>>>>>GO TO EXIT  >>" + getAID());
+                //System.out.println(msg.getSender() + "  >>>>>>>>>>>GO TO EXIT  >>" + getAID());
                 found_map_exit = true;
                 exitCoords = toParseMsg.getPosition();
             }
@@ -129,14 +129,14 @@ public class Soldier extends Human {
                 ArrayList<Pair<Integer, Integer>> pathCoos = myViewMap.getPath(getModel_link().getMyCoos(), destiny);
                 pushToStack(pathCoos);
             }
-            System.out.println("MY COOS TO EXPLORE: " + coosToExplore.toString());
+            //System.out.println("MY COOS TO EXPLORE: " + coosToExplore.toString());
 
         } else if (toParseMsg instanceof OrderToExplore && state == WAITING_4_ORDERS) {
             state = EXPLORING;
             coosToExplore = new Stack<>();
 
             if (((OrderToExplore) toParseMsg).isGoToExit()) {
-                System.out.println(msg.getSender() + "  >>>>>>>>>>>GO TO EXIT  >>" + getAID());
+                //System.out.println(msg.getSender() + "  >>>>>>>>>>>GO TO EXIT  >>" + getAID());
                 found_map_exit = true;
                 exitCoords = toParseMsg.getPosition();
             }

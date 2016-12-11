@@ -10,7 +10,6 @@ import jade.wrapper.StaleProxyException;
 import javafx.util.Pair;
 import model.map.*;
 import sajas.core.Runtime;
-import sajas.sim.AgentScheduler;
 import sajas.sim.repast3.Repast3Launcher;
 import sajas.wrapper.ContainerController;
 import uchicago.src.sim.engine.Schedule;
@@ -36,9 +35,18 @@ import java.util.ArrayList;
 public class Model extends Repast3Launcher {
 
     private static final boolean BATCH_MODE = true;
-    private static int NUM_CAP = 1;
-    private static int NUM_SOL = 2;
-    private static int NUM_ROBOT = 5;
+    private static final int NUM_CAP = 5;
+    private static final int NUM_SOL = 2;
+    private static final int NUM_ROBOT = 5;
+    private static final int ROBOT_ENERGY = 20;
+
+    private static final int RADIO_RANGE = 5;
+    private static final int VISION_RANGE_ROBOT = 10;
+    private static final int VISION_RANGE = 5;
+    private static final int MAP_SIZE = 15;
+    public static final int HUMAN_UPD_TICK_PERIOD = 1;
+    public static final int ROBOT_UPD_TICK_PERIOD = 5;
+
 
     public DisplaySurface dsurf;
     public DisplaySurface dsurf2;
@@ -55,17 +63,35 @@ public class Model extends Repast3Launcher {
     private int numCap = NUM_CAP;
     private int numSol = NUM_SOL;
     private int numRobot = NUM_ROBOT;
+    private int energyRobot = ROBOT_ENERGY;
+
+    private int radioRange = RADIO_RANGE;
+    private int visionRangeRobot = VISION_RANGE_ROBOT;
+    private int visionRange = VISION_RANGE;
+    private int mapSize = MAP_SIZE;
+    private boolean displayStatistics = false;
+    public int humanUpdTickPeriod = HUMAN_UPD_TICK_PERIOD;
+
+    public  int getHumanUpdTickPeriod() {
+        return humanUpdTickPeriod;
+    }
+
+    public  void setHumanUpdTickPeriod(int humanUpdTickPeriod) {
+        this.humanUpdTickPeriod = humanUpdTickPeriod;
+    }
+
+    public int getRobotUpdTickPeriod() {
+        return robotUpdTickPeriod;
+    }
+
+    public void setRobotUpdTickPeriod(int robotUpdTickPeriod) {
+        this.robotUpdTickPeriod = robotUpdTickPeriod;
+    }
+
+    public int robotUpdTickPeriod = ROBOT_UPD_TICK_PERIOD;
 
     private ArrayList<ExplorerAgent> agents_list;
     private static Map forest;
-
-    public static Map getForest() {
-        return forest;
-    }
-
-    public static void setForest(Map forest) {
-        Model.forest = forest;
-    }
 
     public Model() {
         super();
@@ -73,7 +99,7 @@ public class Model extends Repast3Launcher {
 
     @Override
     public String[] getInitParam() {
-        return new String[]{"numCap", "numRobot", "numSol"};
+        return new String[]{"numCap", "numRobot", "numSol","energyRobot", "radioRange", "visionRange", "visionRangeRobot", "mapSize", "displayStatistics", "humanUpdTickPeriod", "robotUpdTickPeriod"};
     }
 
     @Override
@@ -88,8 +114,8 @@ public class Model extends Repast3Launcher {
 
         display_list = new ArrayList<>();
 
-        forest = new Map(15, 15);
-
+        forest = new Map(mapSize, mapSize);
+        //forest = Map.loadMap();
         forest.print(); //prints globalMap on console
 
         //Map model
@@ -136,11 +162,9 @@ public class Model extends Repast3Launcher {
         heat_map_display = new Object2DDisplay(heat_map_space);
 
         dsurf2.addDisplayableProbeable(heat_map_display, "ExplorerAgent View");
-        //addSimEventListener(dsurf2);
         dsurf2.setBackground(Color.LIGHT_GRAY);
-        dsurf2.setLocation(500, 70);
+        dsurf2.setLocation(800, 10);
         dsurf2.display();
-        //dsurf2.print();*/
 
         dsurf.addDisplayableProbeable(display, "ExplorerAgent Space");
         dsurf.setBackground(Color.LIGHT_GRAY);
@@ -171,6 +195,15 @@ public class Model extends Repast3Launcher {
         if (dsurf2 != null) dsurf2.dispose();
         dsurf2 = new DisplaySurface(this, "Heat Display");
         registerDisplaySurface("Heat Display", dsurf2);
+    }
+
+
+    public static Map getForest() {
+        return forest;
+    }
+
+    public static void setForest(Map forest) {
+        Model.forest = forest;
     }
 
 
@@ -216,6 +249,53 @@ public class Model extends Repast3Launcher {
         //panel graphics + listeners
     }
 
+    public int getEnergyRobot() {
+        return energyRobot;
+    }
+
+    public void setEnergyRobot(int energyRobot) {
+        this.energyRobot = energyRobot;
+    }
+
+    public int getRadioRange() {
+        return radioRange;
+    }
+
+    public void setRadioRange(int radioRange) {
+        this.radioRange = radioRange;
+    }
+
+    public int getVisionRangeRobot() {
+        return visionRangeRobot;
+    }
+
+    public void setVisionRangeRobot(int visionRangeRobot) {
+        this.visionRangeRobot = visionRangeRobot;
+    }
+
+    public int getVisionRange() {
+        return visionRange;
+    }
+
+    public void setVisionRange(int visionRange) {
+        this.visionRange = visionRange;
+    }
+
+    public int getMapSize() {
+        return mapSize;
+    }
+
+    public boolean isDisplayStatistics() {
+        return displayStatistics;
+    }
+
+    public void setMapSize(int mapSize) {
+        this.mapSize = mapSize;
+    }
+
+    public void setDisplayStatistics(boolean displayStatistics) {
+        this.displayStatistics = displayStatistics;
+    }
 
     @Override
     protected void launchJADE() {
@@ -232,12 +312,13 @@ public class Model extends Repast3Launcher {
         agents_list = new ArrayList<>();
 
         //Gerar Capitães
-        ArrayList<int[]> capitains = forest.createCapitainsPosition(numCap, 15);
+        ArrayList<int[]> capitains = forest.createCapitainsPosition(numCap, mapSize / numCap);
 
         for (int i = 0; i < capitains.size(); i++) {
-            ArrayList<int[]> soldiers = forest.createSoldiersPosition(capitains.get(i), numSol, 5);
+            ArrayList<int[]> soldiers = forest.createSoldiersPosition(capitains, capitains.get(i), numSol,
+                    visionRange, mapSize / numCap);
 
-            Captain cap = new Captain(5, 5, 10);
+            Captain cap = new Captain(visionRange, radioRange);
 
             AgentModel agModel = new AgentModel(soldiers.get(0)[0],
                     soldiers.get(0)[1],
@@ -250,6 +331,7 @@ public class Model extends Repast3Launcher {
             cap.setMyViewMap(new ViewMap(Model.forest.getWidth()));
             cap.getMyViewMap().addViewRange(new Pair<>(agModel.getX(), agModel.getY()), Model.getForest(), cap
                     .getVision_range());
+            cap.setHumanUpdTickPeriod(this.humanUpdTickPeriod);
 
             try {
                 agentContainer.acceptNewAgent("Captain #" + i, cap).start();
@@ -261,7 +343,7 @@ public class Model extends Repast3Launcher {
 
             //Gerar Soldados
             for (int j = 1; j < soldiers.size(); j++) {
-                Soldier sol = new Soldier(5, 5);
+                Soldier sol = new Soldier(visionRange, radioRange);
 
                 agModel = new AgentModel(soldiers.get(j)[0],
                         soldiers.get(j)[1],
@@ -273,6 +355,7 @@ public class Model extends Repast3Launcher {
                 sol.setMyViewMap(new ViewMap(Model.forest.getWidth()));
                 sol.getMyViewMap().addViewRange(new Pair<>(agModel.getX(), agModel.getY()), Model.getForest(), sol
                         .getVision_range());
+                sol.setHumanUpdTickPeriod(this.humanUpdTickPeriod);
 
                 try {
                     agentContainer.acceptNewAgent("Soldier #" + (i * soldiers.size() + j), sol).start();
@@ -287,11 +370,11 @@ public class Model extends Repast3Launcher {
             }
         }
 
-        for(ExplorerAgent ag : agents_list){
-            if(ag instanceof Captain){
+        for (ExplorerAgent ag : agents_list) {
+            if (ag instanceof Captain) {
                 ArrayList<Soldier> solds = ((Captain) ag).getTeamSoldiersObject();
 
-                for(Soldier sol : solds){
+                for (Soldier sol : solds) {
                     ArrayList<Soldier> team = new ArrayList<>(solds);
                     team.remove(sol);
                     sol.setTeamMembers(team);
@@ -303,7 +386,7 @@ public class Model extends Repast3Launcher {
 
         //Gerar Robot
         for (int i = 0; i < robots.size(); i++) {
-            Robot robot = new Robot(5, 5);
+            Robot robot = new Robot(visionRangeRobot, energyRobot);
 
             AgentModel agModel = new AgentModel(robots.get(i)[0],
                     robots.get(i)[1],
@@ -315,6 +398,8 @@ public class Model extends Repast3Launcher {
             robot.setMyViewMap(new ViewMap(Model.forest.getWidth()));
             robot.getMyViewMap().addViewRange(new Pair<>(agModel.getX(), agModel.getY()), Model.getForest(), robot
                     .getVision_range());
+
+            robot.setRobotUpdTickPeriod(this.robotUpdTickPeriod);
 
             try {
                 agentContainer.acceptNewAgent("Robot #" + i, robot).start();
@@ -341,7 +426,7 @@ public class Model extends Repast3Launcher {
         JScrollPane scroll = new JScrollPane(agentList);
         agentFrame.add(scroll);
         agentFrame.setSize(300, 350);
-        agentFrame.setLocation(500, 70);
+        agentFrame.setLocation(600, 10);
         agentFrame.setVisible(true);
         MouseListener mouseListener = new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {

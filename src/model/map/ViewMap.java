@@ -1,5 +1,6 @@
 package model.map;
 
+import com.bbn.openmap.omGraphics.grid.GridData;
 import javafx.util.Pair;
 import model.Model;
 import utilities.Utilities;
@@ -7,6 +8,8 @@ import utilities.Utilities;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by sergi on 05/12/2016.
@@ -18,6 +21,7 @@ public class ViewMap implements Serializable {
     private boolean[][] wasHere;
     private HeatElement map[][];
     private boolean exitFound = false;
+    private Pair<Integer, Integer> exit;
 
     public ViewMap(HeatElement[][] map) {
     }
@@ -53,7 +57,7 @@ public class ViewMap implements Serializable {
         ArrayList<Pair<Integer, Integer>> rip = new ArrayList<>();
         for (int y = 0; y < this.size; y++) {
             for (int x = 0; x < this.size; x++) {
-                ArrayList<Pair<Integer, Integer>> h = unexploredArea(this.map[y][x], pos, radioRange);
+                Set<Pair<Integer, Integer>> h = unexploredArea(this.map[y][x], pos, radioRange);
                 if (h != null) {
                     rip.addAll(h);
                 }
@@ -62,8 +66,37 @@ public class ViewMap implements Serializable {
         return rip;
     }
 
-    public ArrayList<Pair<Integer, Integer>> unexploredArea(HeatElement h, Pair pos, int radioRange) {
-        ArrayList<Pair<Integer, Integer>> values = new ArrayList<>();
+    public ArrayList<Integer> calculateProb() {
+        ArrayList<Integer> probs = new ArrayList<>();
+        int count1 = 0;
+        int count2 = 0;
+        int count3 = 0;
+        int count4 = 0;
+
+        for (int y = 0; y < map.length; y++) {
+            for (int x = 0; x < map.length; x++) {
+                if (map[y][x].heat == -1 && (y == 1 && x < (map.length / 2)) || (x == 1 && y < (map.length / 2))) {
+                    count1++;
+                } else if (map[y][x].heat == -1 && (y == 1 && y < (map.length / 2)) || (x == 1 && x >= (map.length / 2))) {
+                    count2++;
+                } else if (map[y][x].heat == -1 && (y == 1 &&  y >= (map.length / 2)) || (x == 1 && x < (map.length / 2))) {
+                    count3++;
+                } else if (map[y][x].heat == -1 && (x == map.length - 1 && y >= (map.length / 2)) || (y == map.length - 1 && x >= (map.length / 2))) {
+                    count4++;
+                }
+            }
+        }
+
+        probs.add(count1 / map.length);
+        probs.add(count2 / map.length);
+        probs.add(count3 / map.length);
+        probs.add(count4 / map.length);
+
+        return probs;
+    }
+
+    public Set<Pair<Integer, Integer>> unexploredArea(HeatElement h, Pair pos, int radioRange) {
+        Set<Pair<Integer, Integer>> values = new HashSet<>();
         if (Utilities.distPos(pos, new Pair<>(h.getX(), h.getY())) > radioRange) {
             return null;
         }
@@ -94,6 +127,7 @@ public class ViewMap implements Serializable {
             this.map[pos.getValue()][pos.getKey()].addDoorHeat();
             wall = true;
             exitFound = true;
+            this.exit = new Pair<>(pos.getKey(), pos.getValue());
         } else if (Model.getForest().getMap_in_array()[pos.getValue()][pos.getKey()] == 0) {
             this.map[pos.getValue()][pos.getKey()].addMyHeat();
         }
@@ -105,12 +139,14 @@ public class ViewMap implements Serializable {
                 } else if (Model.getForest().getMap_in_array()[pos.getValue()][pos.getKey() - 1] == 2) {
                     this.map[pos.getValue()][pos.getKey() - 1].addDoorHeat();
                     this.exitFound = true;
+                    this.exit = new Pair<>(pos.getKey() - 1, pos.getValue());
                 }
                 if (Model.getForest().getMap_in_array()[pos.getValue()][pos.getKey() + 1] == 1) {
                     this.map[pos.getValue()][pos.getKey() + 1].addWallHeat();
                 } else if (Model.getForest().getMap_in_array()[pos.getValue()][pos.getKey() + 1] == 2) {
                     this.map[pos.getValue()][pos.getKey() + 1].addDoorHeat();
                     this.exitFound = true;
+                    this.exit = new Pair<>(pos.getKey() + 1, pos.getValue());
                 }
             }
         } else if (hor) {
@@ -120,6 +156,7 @@ public class ViewMap implements Serializable {
                 } else if (Model.getForest().getMap_in_array()[pos.getValue() - 1][pos.getKey()] == 2) {
                     this.map[pos.getValue() - 1][pos.getKey()].addDoorHeat();
                     this.exitFound = true;
+                    this.exit = new Pair<>(pos.getKey(), pos.getValue() - 1);
                 }
 
                 if (Model.getForest().getMap_in_array()[pos.getValue() + 1][pos.getKey()] == 1) {
@@ -127,6 +164,8 @@ public class ViewMap implements Serializable {
                 } else if (Model.getForest().getMap_in_array()[pos.getValue() + 1][pos.getKey()] == 2) {
                     this.map[pos.getValue() + 1][pos.getKey()].addDoorHeat();
                     this.exitFound = true;
+                    this.exit = new Pair<>(pos.getKey(), pos.getValue() + 1);
+
                 }
             }
         }
@@ -175,13 +214,17 @@ public class ViewMap implements Serializable {
                     } else if (map.getMap()[i][j].heat > 0 || map.getMap()[i][j].heat == 0) {
                         this.map[i][j].addOtherHeat();
                     }
-
                 }
                 if (map.isExitFound()) {
                     this.exitFound = true;
+                    this.exit = new Pair<>(map.getExitCoords().getKey(), map.getExitCoords().getValue());
                 }
             }
         }
+    }
+
+    public Pair<Integer, Integer> getExitCoords() {
+        return this.exit;
     }
 
     public boolean canMoveDir(DIR dir, Pair<Integer, Integer> pos) {
@@ -328,6 +371,27 @@ public class ViewMap implements Serializable {
         }
         return countWhite / (double) countBlack;
     }
+
+    public ArrayList<Pair<Integer, Integer>> closestPoints(ArrayList<Pair<Integer, Integer>> agentsCoords,
+                                                           ArrayList<Pair<Integer, Integer>> possibleCoords) {
+        ArrayList<Pair<Integer, Integer>> pointsToAgent = new ArrayList<>();
+        for (int i = 0; i < agentsCoords.size() && possibleCoords.size() > 0; i++) {
+            Pair<Integer, Integer> agentCoord = agentsCoords.get(i);
+            Collections.sort(possibleCoords, (o1, o2) -> {
+                int dist1 = Utilities.distPos(agentCoord, o1);
+                int dist2 = Utilities.distPos(agentCoord, o2);
+                if (dist1 > dist2) {
+                    return 1;
+                } else if (dist1 == dist2) {
+                    return 0;
+                } else return -1;
+            });
+            pointsToAgent.add(possibleCoords.get(0));
+            possibleCoords.remove(0);
+        }
+        return pointsToAgent;
+    }
+
 
     public enum DIR {N, S, E, W}
 }

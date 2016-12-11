@@ -1,5 +1,6 @@
 package model.map;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -9,7 +10,7 @@ import java.util.stream.IntStream;
 /**
  * Created by sergi on 16/10/2016.
  */
-public class Map {
+public class Map implements Serializable {
 
     private int input_width, input_height, width, height;
     private int[][] map;
@@ -31,6 +32,47 @@ public class Map {
         getMapInArray();
         createExit();
         map_in_array[this.exit[1]][this.exit[0]] = 2;
+    }
+
+    public static void saveMap(Map m) {
+        try {
+
+            // Write to disk with FileOutputStream
+            FileOutputStream f_out = new
+                    FileOutputStream("./res/map.data");
+
+            ObjectOutputStream obj_out = new
+                    ObjectOutputStream(f_out);
+
+            obj_out.writeObject(m);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static Map loadMap() {
+        // Read from disk using FileInputStream
+        FileInputStream f_in = null;
+        try {
+            f_in = new
+                    FileInputStream("./res/map.data");
+            // Read object using ObjectInputStream
+            ObjectInputStream obj_in =
+                    new ObjectInputStream(f_in);
+            // Read an object
+            Object obj = obj_in.readObject();
+            if (obj instanceof Map) {
+                // Cast object to a Vector
+                return (Map) obj;
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     private static boolean between(int v, int upper) {
@@ -265,28 +307,28 @@ public class Map {
 
             switch (exitSide) {
                 case N:
-                    posY = posY / 4;
+                    posY = posY / 3;
                     if (map_in_array[this.height - posY - 1][posX] == 0) {
                         a = new int[]{posX, this.height - 1 - posY};
                         return a;
                     }
                     break;
                 case E:
-                    posX = posX / 4;
+                    posX = posX / 3;
                     if (map_in_array[posY][posX] == 0) {
                         a = new int[]{posX, posY};
                         return a;
                     }
                     break;
                 case S:
-                    posY = posY / 4;
+                    posY = posY / 3;
                     if (map_in_array[posY][posX] == 0) {
                         a = new int[]{posX, posY};
                         return a;
                     }
                     break;
                 case W:
-                    posX = posX / 4;
+                    posX = posX / 3;
                     if (map_in_array[posY][this.width - 1 - posX] == 0) {
                         a = new int[]{this.width - 1 - posX, posY};
                         return a;
@@ -344,16 +386,30 @@ public class Map {
     }
 
 
-    public ArrayList<int[]> createSoldiersPosition(int[] capitainPosition, int numSoldiers, int viewRange) {
+    public ArrayList<int[]> createSoldiersPosition(ArrayList<int[]> capitains, int[] capitainPosition, int
+            numSoldiers, int viewRange, int distance) {
         ArrayList<int[]> soldiers = new ArrayList<>();
         int[] count = countSpaces(capitainPosition, this, numSoldiers);
         int sum = IntStream.of(count).sum();
+        boolean valid = true;
 
-        while (sum < numSoldiers) {
+        for (int i = 0; i < capitains.size(); i++) {
+            double dst = Math.sqrt((capitains.get(i)[0] - capitainPosition[0]) * (capitains.get(i)[0] -
+                    capitainPosition[0]) + (capitains.get(i)[1] - capitainPosition[1]) * (capitains.get(i)[1] -
+                    capitainPosition[1]));
+            if (!(dst >= distance && distance > 0 && dst < this.getWidth() && !capitains.contains(capitainPosition)
+                    && capitainPosition != capitains.get(i))) {
+                valid = false;
+            }
+        }
+
+        while (sum < numSoldiers && !valid) {
             capitainPosition = createPositions();
             count = countSpaces(capitainPosition, this, numSoldiers);
             sum = IntStream.of(count).sum();
         }
+
+
         soldiers.add(capitainPosition);
         int[] soldier;
         int i = 0, rand;
@@ -398,12 +454,19 @@ public class Map {
                 double dst = Math.sqrt((capitains.get(i - 1)[0] - capitain[0]) * (capitains.get(i - 1)[0] -
                         capitain[0]) + (capitains
                         .get(i - 1)[1] - capitain[1]) * (capitains.get(i - 1)[1] - capitain[1]));
-                if (dst < distance && distance > 0 && !capitains.contains(capitain) && capitain != capitains.get(i -
-                        1)) {
+                if (dst >= distance && distance > 0 && dst < this.getWidth() && !capitains.contains(capitain) &&
+                        capitain != capitains
+                                .get(i -
+                                        1)) {
                     capitains.add(capitain);
                 }
             }
         }
+
+        for (int i = 0; i < capitains.size(); i++)
+            System.out.println("Capitain: " + distance + "----------------" + capitains.get(i)[0] + " " + capitains.get(
+                    i)[1]);
+
         return capitains;
     }
 

@@ -28,11 +28,11 @@ public class AgentModel extends MapElement {
         globalMap = global;
     }
 
-    public Pair<Integer,Integer> getMyCoos(){
-        return new Pair<>(getX(),getY());
+    public Pair<Integer, Integer> getMyCoos() {
+        return new Pair<>(getX(), getY());
     }
 
-    public ArrayList<AID> getRobotsFromAgentList(){  //testing purposes
+    public ArrayList<AID> getRobotsFromAgentList() {  //testing purposes
         ArrayList<AID> robots = new ArrayList<>();
 
         for (ExplorerAgent agent : agents_list) {
@@ -50,7 +50,7 @@ public class AgentModel extends MapElement {
             Pair<Integer, Integer> pos = new Pair<>(agent.getModel_link().getX(), agent.getModel_link().getY());
             Pair<Integer, Integer> currentpos = new Pair<>(this.getX(), this.getY());
             int range = Utilities.distPos(pos, currentpos);
-            if (this.type != agent_type.ROBOT && radio_range >= range) {
+            if (this.type != agent_type.ROBOT && radio_range >= range) { //robots cant request info
                 agentsInRange.add(agent);
             }
         }
@@ -142,12 +142,15 @@ public class AgentModel extends MapElement {
         switch (type) {
             case CAPTAIN:
                 simGraphics.drawRect(Color.ORANGE);
+                simGraphics.drawString("C", Color.BLACK);
                 break;
             case SOLDIER:
                 simGraphics.drawRect(Color.cyan);
+                simGraphics.drawString("S", Color.BLACK);
                 break;
             case ROBOT:
                 simGraphics.drawRect(Color.red);
+                simGraphics.drawString("R", Color.BLACK);
                 break;
             default:
                 break;

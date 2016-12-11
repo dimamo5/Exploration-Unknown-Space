@@ -58,7 +58,7 @@ public class Soldier extends Human {
             public void action() {
                 tick++;
 
-                if (tick % 1 == 0) { //TODO destrolhar isto
+                if (tick % 10 == 0) { //TODO destrolhar isto
                     //System.out.println(getAID() + " state: " + state);
                     update();
                 }

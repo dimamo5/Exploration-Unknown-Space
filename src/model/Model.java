@@ -61,7 +61,7 @@ public class Model extends Repast3Launcher {
     private int cellPhoneRange = 10;
     private int visionRangeRobot = 10;
     private int visionRange = 5;
-    private int mapSize = 20;
+    private int mapSize = 10;
     private boolean displayStatistics = false;
 
     private ArrayList<ExplorerAgent> agents_list;
@@ -89,8 +89,8 @@ public class Model extends Repast3Launcher {
 
         display_list = new ArrayList<>();
 
-        //forest = new Map(mapSize, mapSize);
-        forest = Map.loadMap();
+        forest = new Map(mapSize, mapSize);
+        //forest = Map.loadMap();
         forest.print(); //prints globalMap on console
 
         //Map model

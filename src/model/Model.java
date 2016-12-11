@@ -69,14 +69,14 @@ public class Model extends Repast3Launcher {
     private int visionRangeRobot = VISION_RANGE_ROBOT;
     private int visionRange = VISION_RANGE;
     private int mapSize = MAP_SIZE;
-    private boolean displayStatistics = false;
+    private boolean loadMap = false;
     public int humanUpdTickPeriod = HUMAN_UPD_TICK_PERIOD;
 
-    public  int getHumanUpdTickPeriod() {
+    public int getHumanUpdTickPeriod() {
         return humanUpdTickPeriod;
     }
 
-    public  void setHumanUpdTickPeriod(int humanUpdTickPeriod) {
+    public void setHumanUpdTickPeriod(int humanUpdTickPeriod) {
         this.humanUpdTickPeriod = humanUpdTickPeriod;
     }
 
@@ -99,7 +99,8 @@ public class Model extends Repast3Launcher {
 
     @Override
     public String[] getInitParam() {
-        return new String[]{"numCap", "numRobot", "numSol","energyRobot", "radioRange", "visionRange", "visionRangeRobot", "mapSize", "displayStatistics", "humanUpdTickPeriod", "robotUpdTickPeriod"};
+        return new String[]{"numCap", "numRobot", "numSol", "energyRobot", "radioRange", "visionRange",
+                "visionRangeRobot", "mapSize", "loadMap", "humanUpdTickPeriod", "robotUpdTickPeriod"};
     }
 
     @Override
@@ -113,9 +114,11 @@ public class Model extends Repast3Launcher {
     private void createModel() {
 
         display_list = new ArrayList<>();
-
-        forest = new Map(mapSize, mapSize);
-        //forest = Map.loadMap();
+        if (this.loadMap)
+            forest = Map.loadMap();
+        else
+            forest = new Map(this.getMapSize(), this.getMapSize());
+        //Map.saveMap(forest);
         forest.print(); //prints globalMap on console
 
         //Map model
@@ -285,16 +288,16 @@ public class Model extends Repast3Launcher {
         return mapSize;
     }
 
-    public boolean isDisplayStatistics() {
-        return displayStatistics;
+    public boolean isLoadMap() {
+        return loadMap;
     }
 
     public void setMapSize(int mapSize) {
         this.mapSize = mapSize;
     }
 
-    public void setDisplayStatistics(boolean displayStatistics) {
-        this.displayStatistics = displayStatistics;
+    public void setLoadMap(boolean loadMap) {
+        this.loadMap = loadMap;
     }
 
     @Override

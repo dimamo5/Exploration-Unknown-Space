@@ -35,8 +35,8 @@ import java.util.ArrayList;
 public class Model extends Repast3Launcher {
 
     private static final boolean BATCH_MODE = true;
-    private static int NUM_CAP = 2;
-    private static int NUM_SOL = 4;
+    private static int NUM_CAP = 3;
+    private static int NUM_SOL = 1;
     private static int NUM_ROBOT = 5;
     private static int ROBOT_ENERGY = 20;
 
@@ -231,7 +231,7 @@ public class Model extends Repast3Launcher {
         agents_list = new ArrayList<>();
 
         //Gerar Capitães
-        ArrayList<int[]> capitains = forest.createCapitainsPosition(numCap, 25);
+        ArrayList<int[]> capitains = forest.createCapitainsPosition(numCap, (forest.getHeight() / numCap)- 1);
 
         for (int i = 0; i < capitains.size(); i++) {
             ArrayList<int[]> soldiers = forest.createSoldiersPosition(capitains.get(i), numSol, 5);
@@ -360,7 +360,7 @@ public class Model extends Repast3Launcher {
         boolean runMode = !BATCH_MODE;   // BATCH_MODE or !BATCH_MODE = GUI_MODE
 
         SimInit init = new SimInit();
-        //init.setNumRuns(1);   // works only in batch mode
+       // init.setNumRuns(2);   // works only in batch mode
 
         init.loadModel(new Model(), null, runMode);  //setting last param to true only displays surfaces
     }

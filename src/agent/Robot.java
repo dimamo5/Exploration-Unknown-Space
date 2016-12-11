@@ -91,7 +91,7 @@ public class Robot extends ExplorerAgent {
                             /*quando energy==0 -> guarda agentes com quem comunicou para evitar
                             responder com a mesma informação*/
                             if (!outOfEnergyCommAgents.contains(msg.getSender())) {
-                                System.out.println("O AGENTE\n"+msg.getSender()+"\nNAO ESTA NA LISTA, VOU ENVIAR INFO");
+                                //System.out.println("O AGENTE\n"+msg.getSender()+"\nNAO ESTA NA LISTA, VOU ENVIAR INFO");
                                 outOfEnergyCommAgents.add(msg.getSender());
                             }
                             else
@@ -99,7 +99,7 @@ public class Robot extends ExplorerAgent {
                         }
 
                         if(send) {
-                            System.out.println(getAID() + " sending info to " + msg.getSender());
+                            //System.out.println(getAID() + " sending info to " + msg.getSender());
                             sendMyInfoToAgent(msg);
                         }
                     }

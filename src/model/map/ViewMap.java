@@ -372,8 +372,8 @@ public class ViewMap implements Serializable {
     public ArrayList<Pair<Integer, Integer>> closestPoints(ArrayList<Pair<Integer, Integer>> agentsCoords,
                                                            ArrayList<Pair<Integer, Integer>> possibleCoords) {
         ArrayList<Pair<Integer, Integer>> pointsToAgent = new ArrayList<>();
-        for (int i = 0; i < agentsCoords.size() || possibleCoords.size() > 0; i++) {
-            Pair<Integer, Integer> agentCoord = possibleCoords.get(i);
+        for (int i = 0; i < agentsCoords.size() && possibleCoords.size() > 0; i++) {
+            Pair<Integer, Integer> agentCoord = agentsCoords.get(i);
             Collections.sort(possibleCoords, (o1, o2) -> {
                 int dist1 = Utilities.distPos(agentCoord, o1);
                 int dist2 = Utilities.distPos(agentCoord, o2);

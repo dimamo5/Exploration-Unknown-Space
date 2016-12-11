@@ -297,7 +297,7 @@ public class Model extends Repast3Launcher {
             ArrayList<int[]> soldiers = forest.createSoldiersPosition(capitains, capitains.get(i), numSol,
                     visionRange, mapSize / numCap);
 
-            Captain cap = new Captain(visionRange, radioRange, 10);
+            Captain cap = new Captain(visionRange, radioRange);
 
             AgentModel agModel = new AgentModel(soldiers.get(0)[0],
                     soldiers.get(0)[1],

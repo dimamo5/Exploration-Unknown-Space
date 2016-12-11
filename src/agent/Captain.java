@@ -38,9 +38,9 @@ public class Captain extends Human {
     private boolean captainMove = false;
     private Stack<Pair<Integer, Integer>> coosToExplore;
 
-    public Captain(int vision_range, int radio_range, int cellphone_range) {
+    public Captain(int vision_range, int radio_range) {
         super(vision_range, radio_range);
-        this.cellphone_range = cellphone_range;
+
         teamSoldiers = new ArrayList<>();
         teamSoldiersObject = new ArrayList<>();
     }

@@ -295,10 +295,10 @@ public class Model extends Repast3Launcher {
         agents_list = new ArrayList<>();
 
         //Gerar Capitães
-        ArrayList<int[]> capitains = forest.createCapitainsPosition(numCap, 10);
+        ArrayList<int[]> capitains = forest.createCapitainsPosition(numCap, mapSize/numCap);
 
         for (int i = 0; i < capitains.size(); i++) {
-            ArrayList<int[]> soldiers = forest.createSoldiersPosition(capitains.get(i), numSol, visionRange);
+            ArrayList<int[]> soldiers = forest.createSoldiersPosition(capitains, capitains.get(i), numSol, visionRange, mapSize/numCap);
 
             Captain cap = new Captain(visionRange, radioRange, cellPhoneRange);
 

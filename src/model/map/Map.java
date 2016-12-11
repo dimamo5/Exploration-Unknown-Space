@@ -36,9 +36,10 @@ public class Map implements Serializable {
 
     public static void saveMap(Map m) {
         try {
+
             // Write to disk with FileOutputStream
             FileOutputStream f_out = new
-                    FileOutputStream("/res/map.data");
+                    FileOutputStream("./res/map.data");
 
             ObjectOutputStream obj_out = new
                     ObjectOutputStream(f_out);
@@ -54,7 +55,7 @@ public class Map implements Serializable {
         FileInputStream f_in = null;
         try {
             f_in = new
-                    FileInputStream("/res/map.data");
+                    FileInputStream("./res/map.data");
             // Read object using ObjectInputStream
             ObjectInputStream obj_in =
                     new ObjectInputStream(f_in);

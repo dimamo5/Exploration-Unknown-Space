@@ -1,5 +1,6 @@
 package model.map;
 
+import com.bbn.openmap.omGraphics.grid.GridData;
 import javafx.util.Pair;
 import model.Model;
 import utilities.Utilities;
@@ -63,6 +64,35 @@ public class ViewMap implements Serializable {
             }
         }
         return rip;
+    }
+
+    public ArrayList<Integer> calculateProb() {
+        ArrayList<Integer> probs = new ArrayList<>();
+        int count1 = 0;
+        int count2 = 0;
+        int count3 = 0;
+        int count4 = 0;
+
+        for (int y = 0; y < map.length; y++) {
+            for (int x = 0; x < map.length; x++) {
+                if (map[y][x].heat == -1 && (y == 1 && x < (map.length / 2)) || (x == 1 && y < (map.length / 2))) {
+                    count1++;
+                } else if (map[y][x].heat == -1 && (y == 1 && y < (map.length / 2)) || (x == 1 && x >= (map.length / 2))) {
+                    count2++;
+                } else if (map[y][x].heat == -1 && (y == 1 &&  y >= (map.length / 2)) || (x == 1 && x < (map.length / 2))) {
+                    count3++;
+                } else if (map[y][x].heat == -1 && (x == map.length - 1 && y >= (map.length / 2)) || (y == map.length - 1 && x >= (map.length / 2))) {
+                    count4++;
+                }
+            }
+        }
+
+        probs.add(count1 / map.length);
+        probs.add(count2 / map.length);
+        probs.add(count3 / map.length);
+        probs.add(count4 / map.length);
+
+        return probs;
     }
 
     public Set<Pair<Integer, Integer>> unexploredArea(HeatElement h, Pair pos, int radioRange) {

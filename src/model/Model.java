@@ -244,14 +244,6 @@ public class Model extends Repast3Launcher {
         this.radioRange = radioRange;
     }
 
-    public int getCellPhoneRange() {
-        return cellPhoneRange;
-    }
-
-    public void setCellPhoneRange(int cellPhoneRange) {
-        this.cellPhoneRange = cellPhoneRange;
-    }
-
     public int getVisionRangeRobot() {
         return visionRangeRobot;
     }

@@ -1,10 +1,31 @@
 # Exploration-Unknown-Space
- Implementing a Multi-Agent System for distributed exploration and cooperative of an unknown space.
+## Problem
 
-Uma companhia do exército está a combater na floresta. O inimigo danificou as estradas existentes, e neste momento apenas existe um caminho possível para sair da floresta.
+An army company is fighting in the forest. The enemy has damaged existing roads, and at the moment there is only one possible way out of the forest.
 
-A companhia inclui vários capitães e soldados, e é decidido que cada um dos elementos irá explorar uma parte da floresta. Todos os elementos da companhia possuem um GPS (fornece a posição no terreno) e um rádio (para comunicação a curta distância). Os capitães possuem ainda um telefone sem fios, para comunicar entre si.
+The company includes several captains and soldiers, and it is decided that each of the elements will explore a part of the forest. All elements of the company have a GPS (provides position on the ground) and a radio (for short distance communication). The captains also have a cordless telephone to communicate with each other.
 
-Quando dois soldados, ou um soldado e um capitão se encontram, ou estão suficientemente próximos para comunicar via rádio, podem trocar informação. O capitão comunica então a nova informação aos restantes capitães. Também existem alguns robôs que são lançados na floresta. Os robôs movimentam-se de modo a explorar o terreno. Os capitães ou soldados podem questionar os robôs, quando se encontram com estes. Os robôs possuem energia limitada, parando a sua movimentação quando esta se esgota.
+When two soldiers, or a soldier and a captain meet, or are close enough to communicate via radio, they can exchange information. The captain then communicates the new information to the other captains. There are also some robots that are thrown into the forest. The robots move to explore the terrain. Captains or soldiers may question robots when they encounter them. Robots have limited energy, stopping their movement when it runs out.
 
-A simulação termina quando todos os elementos da companhia (capitães e soldados) conseguem sair da floresta. O utilizador deve poder definir a floresta (caminhos possíveis ou estradas danificadas), o número de capitães e o número de soldados da companhia. Deve ser ainda possível definir outros parâmetros como o alcance da comunicação via rádio, o raio de visão, etc. Devem ser realizadas experiências com diferentes configurações e estratégias, e retiradas conclusões.
+## Solution
+To solved this problem it was implemented a Multi-Agent System using [SAJaS](https://web.fe.up.pt/~hlc/doku.php?id=sajas), [JADE](http://jade.tilab.com/) and [RepastJ3](http://repast.sourceforge.net/repast_3/).
+
+The soldiers were disposed in teams acoording to the number of soldiers in a way that a team is composed by one captain and one or more soldiers. To find an exit each team does the following steps:
+- Captain orders oldiers to explore a part of the map but the soldiers can never pass the radio range with their captain
+- When the soldiers finish exploring all the map in the radio range they communicate what they saw to the captain
+- Captain decides the place they should regroup to explore
+- The cycle repeties until the exit is found
+- When the exit is found the captain talks with the another team captain's and they start moving to the exit
+
+## GUI
+![gui](http://i.imgur.com/GbtDsdn.png "GUI")
+
+1. Janela de seleção do agente cujo conhecimento surge na janela
+2. Representação gráfica da simulação. Os espaços verdes são árvores. Os ícones azúis são os soldados, os amarelos são capitães e os ícones vermelhos são robots
+3. Janela de controlo da simulação
+4. Heat map que representa o conhecimento de um agente quanto à floresta
+5. Controlo dos parâmetros da simulação
+6. Consola do Repast onde surgem algumas informações e mensagens de debug
+
+## Runnig the project
+`Compile the javacript project including the libraries and execute model/Model.java`
